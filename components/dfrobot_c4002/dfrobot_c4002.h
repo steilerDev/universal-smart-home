@@ -241,6 +241,7 @@ class C4002Component : public Component, public uart::UARTDevice {
   /** Lifecycle hooks */
   void setup() override;
   void loop() override;
+  void dump_config() override;
 
   /** UART helpers */
   void uart_clear_buffer();
@@ -347,6 +348,8 @@ class C4002Component : public Component, public uart::UARTDevice {
   void publish_text(const std::string &msg);
 
  protected:
+  int last_uart_probe_bytes_{-1};  // bytes seen on UART after last failed begin(); -1 = not attempted
+
   //**all data param **//
   DetectRet detect_result_;
 

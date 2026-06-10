@@ -20,6 +20,26 @@ void C4002Component::setup() {
 }
 
 /**
+ * dump_config — called when a client connects; always visible in esphome logs
+ */
+void C4002Component::dump_config() {
+  ESP_LOGCONFIG(TAG, "DFRobot C4002 mmWave Radar:");
+  if (this->is_failed()) {
+    if (this->last_uart_probe_bytes_ == 0) {
+      ESP_LOGE(TAG, "  FAILED: no bytes received from sensor");
+      ESP_LOGE(TAG, "  → check power (VCC/GND) and that sensor TX → ESP GPIO36");
+    } else if (this->last_uart_probe_bytes_ > 0) {
+      ESP_LOGE(TAG, "  FAILED: %d bytes received but frame invalid", this->last_uart_probe_bytes_);
+      ESP_LOGE(TAG, "  → possible baud rate mismatch or protocol error");
+    } else {
+      ESP_LOGE(TAG, "  FAILED: begin() not attempted (init error)");
+    }
+  } else {
+    ESP_LOGCONFIG(TAG, "  Setup successful");
+  }
+}
+
+/**
  * print_config
  * Print current configuration values to the log for debugging.
  */
@@ -95,11 +115,17 @@ void C4002Component::update_config_param() {
   //** driver init — limited retries so a missing sensor doesn't block forever **/
   bool init_ok = false;
   for (int attempt = 1; attempt <= 3; attempt++) {
+    // Flush stale UART data before each attempt
+    this->uart_clear_buffer();
     if (begin()) {
       init_ok = true;
       break;
     }
-    ESP_LOGW(TAG, "C4002 begin failed (attempt %d/3) — check UART wiring", attempt);
+    // Log how many raw bytes arrived so we can distinguish no-power vs wrong-baud
+    uint8_t probe[8] = {};
+    size_t got = this->uart_read_raw(probe, sizeof(probe), 50);
+    this->last_uart_probe_bytes_ = (int) got;
+    ESP_LOGW(TAG, "C4002 begin failed (attempt %d/3) — %d bytes on UART (0=no power/wiring, >0=baud/protocol mismatch)", attempt, (int) got);
     delay(300);
   }
   if (!init_ok) {

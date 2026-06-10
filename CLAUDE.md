@@ -104,6 +104,19 @@ esphome compile devices/<name>.yaml      # compile firmware
 esphome run devices/<name>.yaml          # compile + OTA flash
 ```
 
+### Post-deploy log check (required)
+
+After every OTA deploy, pull the device logs and verify no components are marked FAILED:
+
+```bash
+timeout 15 esphome logs devices/<name>.yaml --device <ip> 2>&1 | grep -E "FAILED|dfrobot|C4002|begin|error"
+```
+
+Key patterns to check:
+- `[E][component:224]: <component> is marked FAILED` — component crashed during setup
+- For C4002 specifically: `dump_config` will show `FAILED: no bytes received` (power/wiring) or `FAILED: N bytes received but frame invalid` (baud mismatch)
+- OTA rollback: `[W][safe_mode:094]: OTA rollback detected!` — new firmware crashed, old firmware restored
+
 ### Secrets resolution
 
 ESPHome resolves `!secret` relative to the config file's directory. The repo keeps `secrets.yaml` at root (gitignored). `devices/secrets.yaml` is a committed symlink → `../secrets.yaml` so ESPHome finds secrets when running against `devices/*.yaml`.
