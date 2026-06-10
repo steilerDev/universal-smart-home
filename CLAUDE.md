@@ -44,6 +44,48 @@ devices/secrets.yaml   — Symlink to ../secrets.yaml (committed, allows ESPHome
 - **Power monitor:** PZEM-004T (UART, pins TBD from schematic)
 - **Schematic:** https://app.cirkitdesigner.com/project/281a6c22-06b7-4593-8d16-d8be4f0f2b7c (requires login — can't be fetched programmatically)
 
+## ESP32-POE2 GPIO Constraints
+
+Source: [Olimex ESP32-POE2 user manual](https://github.com/OLIMEX/ESP32-POE2/blob/main/DOCUMENTS/ESP32-POE2-user-manual.pdf)
+Module: ESP32-WROVER-E (has PSRAM)
+
+**NEVER USE — hard-reserved by board hardware:**
+| GPIO | Reserved for |
+|------|-------------|
+| GPIO16, GPIO17 | PSRAM (WROVER internal) |
+| GPIO0  | Ethernet LAN8720 CLK_OUT |
+| GPIO12 | Ethernet PHY power enable |
+| GPIO18 | Ethernet MDIO |
+| GPIO23 | Ethernet MDC |
+
+**Strapping pins — constraints at boot:**
+- GPIO0: must be HIGH at boot (board handles this)
+- GPIO2: must be LOW/floating at boot — use as output only, no external pull-up
+- GPIO5: must be HIGH at boot
+- GPIO12: must be LOW at boot (board handles this for 3.3V flash)
+
+**Our PCB assignments and any known conflicts:**
+| GPIO | Use | Notes |
+|------|-----|-------|
+| GPIO0  | Ethernet CLK_OUT | ✓ |
+| GPIO2  | Motion UART TX | ⚠️ strapping pin. Safe: TX only, not driven at boot, board has pull-down |
+| GPIO3  | I2C SDA | ⚠️ nominally UART0 RX. Works: GPIO matrix lets I2C claim it; logger loses serial RX but TX (GPIO1) still works. Proven on device. |
+| GPIO4  | I2C SCL | ✓ |
+| GPIO12 | Ethernet PHY power | ✓ |
+| GPIO18 | Ethernet MDIO | ✓ |
+| GPIO23 | Ethernet MDC | ✓ |
+| GPIO33 | NeoPixel LED | ✓ |
+| GPIO36 | Motion UART RX | ✓ input-only |
+
+**Available for future sensors/actuators** (not used by board or our PCB):
+GPIO5, GPIO13, GPIO14, GPIO15, GPIO19, GPIO20, GPIO21, GPIO22, GPIO25, GPIO26, GPIO27, GPIO32, GPIO34¹, GPIO35¹, GPIO39¹
+
+¹ Input-only pins.
+
+**Power budget:** 3.3V 500mA · 5V 1.5A · 12/24V 0.75/1.5A · 25W total
+
+> Before assigning any GPIO to a new component, check it against this table first.
+
 ## ESPHome Build Environment
 
 ### Installation
