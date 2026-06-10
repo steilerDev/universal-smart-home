@@ -4,12 +4,10 @@
 
 external_components:
   - source:
-      type: git
-      url: https://github.com/cdjq/esphome.git
-      ref: dev  # TODO: pin to a specific commit SHA for reproducibility
+      type: local
+      path: ../components
     components:
       - dfrobot_c4002
-    refresh: 0s
 
 uart:
   - id: uart_motion
@@ -59,21 +57,21 @@ sensor:
 
 text_sensor:
   - platform: template
-    name: "${device_friendly_name} Movement Direction"
+    name: "${device_friendly_name} Movement Direction Text"
     id: movement_direction_text
     icon: "mdi:directions"
     lambda: |-
       if (id(movement_direction_sensor).has_state()) {
         int d = id(movement_direction_sensor).state;
-        if (d == 0) return {"Approaching"};
+        if (d == 0) return {"Away"};
         else if (d == 1) return {"No Direction"};
-        else if (d == 2) return {"Away"};
+        else if (d == 2) return {"Approaching"};
         else return {"Unknown"};
       }
       return {"No Data"};
     update_interval: 1s
   - platform: template
-    name: "${device_friendly_name} Target Status"
+    name: "${device_friendly_name} Target Status Text"
     id: target_status_text
     icon: "mdi:human-greeting"
     lambda: |-

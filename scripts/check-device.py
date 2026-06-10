@@ -74,9 +74,10 @@ PACKAGE_CHECKS: dict[str, dict[str, Any]] = {
         "label": "motion",
         "description": "DFRobot C4002 mmWave radar",
         "sensors": [
-            ("target_status",      0,  2,  ""),   # 0=none 1=static 2=motion
-            ("motion_distance",    0, 10,  "m"),
-            ("presence_distance",  0, 10,  "m"),
+            ("target_status",    0,  2,  ""),    # 0=none 1=static 2=motion
+            ("motion_distance",  0, 10,  "m"),
+            ("presence_distance", 0, 10, "m"),
+            ("motion_speed",     0, 10,  "m/s"),
         ],
     },
     "sensors/power-pzem004t": {
@@ -172,6 +173,8 @@ def check_sensor(
     if state is None:
         return False, f"  [{WARN}] {suffix}: entity present but no state received"
     v = state.state
+    if not isinstance(v, (int, float)):
+        return False, f"  [{FAIL}] {suffix}: unexpected state type {type(v).__name__} — possible entity name collision"
     if math.isnan(v):
         return False, f"  [{FAIL}] {suffix}: value is NaN (sensor not responding)"
     range_ok = (lo is None or v >= lo) and (hi is None or v <= hi)
