@@ -1,0 +1,10 @@
+# Package: BH1750 Ambient Light Sensor
+# Bus: I2C (bus_i2c defined in base/room-sensor.yaml)
+# Address: 0x23
+# Required substitutions: device_friendly_name
+
+sensor:
+  - platform: bh1750
+    name: "${device_friendly_name} Illuminance"
+    address: 0x23
+    update_interval: 10s

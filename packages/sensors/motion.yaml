@@ -1,0 +1,180 @@
+# Package: DFRobot C4002 mmWave Radar — Presence & Motion Detection
+# Pins (fixed PCB layout): TX→GPIO02, RX→GPIO36
+# Required substitutions: device_friendly_name
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/cdjq/esphome.git
+      ref: dev  # TODO: pin to a specific commit SHA for reproducibility
+    components:
+      - dfrobot_c4002
+    refresh: 0s
+
+uart:
+  - id: uart_motion
+    tx_pin: GPIO02
+    rx_pin: GPIO36
+    baud_rate: 115200
+
+dfrobot_c4002:
+  id: radar_c4002
+  uart_id: uart_motion
+
+sensor:
+  - platform: dfrobot_c4002
+    c4002_id: radar_c4002
+    movement_distance:
+      name: "${device_friendly_name} Motion Distance"
+      id: movement_distance_sensor
+      unit_of_measurement: "m"
+      accuracy_decimals: 2
+      icon: "mdi:ruler"
+      device_class: distance
+      state_class: measurement
+    existing_distance:
+      name: "${device_friendly_name} Presence Distance"
+      id: existing_distance_sensor
+      unit_of_measurement: "m"
+      accuracy_decimals: 2
+      icon: "mdi:account"
+      device_class: distance
+      state_class: measurement
+    movement_speed:
+      name: "${device_friendly_name} Motion Speed"
+      id: movement_speed_sensor
+      unit_of_measurement: "m/s"
+      accuracy_decimals: 2
+      icon: "mdi:speedometer"
+      device_class: speed
+      state_class: measurement
+    movement_direction:
+      name: "${device_friendly_name} Motion Direction"
+      id: movement_direction_sensor
+      icon: "mdi:compass"
+    target_status:
+      name: "${device_friendly_name} Target Status"
+      id: target_status_sensor
+      icon: "mdi:target"
+
+text_sensor:
+  - platform: template
+    name: "${device_friendly_name} Movement Direction"
+    id: movement_direction_text
+    icon: "mdi:directions"
+    lambda: |-
+      if (id(movement_direction_sensor).has_state()) {
+        int d = id(movement_direction_sensor).state;
+        if (d == 0) return {"Approaching"};
+        else if (d == 1) return {"No Direction"};
+        else if (d == 2) return {"Away"};
+        else return {"Unknown"};
+      }
+      return {"No Data"};
+    update_interval: 1s
+  - platform: template
+    name: "${device_friendly_name} Target Status"
+    id: target_status_text
+    icon: "mdi:human-greeting"
+    lambda: |-
+      if (id(target_status_sensor).has_state()) {
+        int d = id(target_status_sensor).state;
+        if (d == 0) return {"No Target"};
+        else if (d == 1) return {"Static Presence"};
+        else if (d == 2) return {"Motion"};
+        else return {"Unknown"};
+      }
+      return {"No Data"};
+    update_interval: 1s
+  - platform: dfrobot_c4002
+    c4002_id: radar_c4002
+    c4002_text_sensor:
+      name: "${device_friendly_name} Radar Log"
+      icon: "mdi:message-text-outline"
+      entity_category: diagnostic
+
+switch:
+  - platform: dfrobot_c4002
+    c4002_id: radar_c4002
+    switch_out_led:
+      name: "${device_friendly_name} Radar Out LED"
+      icon: "mdi:led-on"
+      entity_category: config
+    switch_run_led:
+      name: "${device_friendly_name} Radar Run LED"
+      icon: "mdi:led-on"
+      entity_category: config
+    switch_factory_reset:
+      name: "${device_friendly_name} Radar Factory Reset"
+      icon: "mdi:restart"
+      entity_category: config
+    switch_environmental_calibration:
+      name: "${device_friendly_name} Radar Calibration"
+      icon: "mdi:calibration"
+      entity_category: config
+
+select:
+  - platform: dfrobot_c4002
+    c4002_id: radar_c4002
+    operating_mode:
+      name: "${device_friendly_name} Radar Mode"
+      icon: "mdi:account"
+      entity_category: config
+      options:
+        - "Mode_1"
+        - "Mode_2"
+        - "Mode_3"
+
+number:
+  - platform: dfrobot_c4002
+    c4002_id: radar_c4002
+    max_range:
+      name: "${device_friendly_name} Max Detection Distance"
+      unit_of_measurement: "m"
+      icon: "mdi:ruler"
+      entity_category: config
+    min_range:
+      name: "${device_friendly_name} Min Detection Distance"
+      unit_of_measurement: "m"
+      icon: "mdi:ruler"
+      entity_category: config
+    light_threshold:
+      name: "${device_friendly_name} Light Threshold"
+      unit_of_measurement: "lx"
+      icon: "mdi:lightbulb"
+      entity_category: config
+    area1_min:
+      name: "${device_friendly_name} Area 1 Min"
+      unit_of_measurement: "m"
+      icon: "mdi:ruler"
+      entity_category: config
+    area1_max:
+      name: "${device_friendly_name} Area 1 Max"
+      unit_of_measurement: "m"
+      icon: "mdi:ruler"
+      entity_category: config
+    area2_min:
+      name: "${device_friendly_name} Area 2 Min"
+      unit_of_measurement: "m"
+      icon: "mdi:ruler"
+      entity_category: config
+    area2_max:
+      name: "${device_friendly_name} Area 2 Max"
+      unit_of_measurement: "m"
+      icon: "mdi:ruler"
+      entity_category: config
+    area3_min:
+      name: "${device_friendly_name} Area 3 Min"
+      unit_of_measurement: "m"
+      icon: "mdi:ruler"
+      entity_category: config
+    area3_max:
+      name: "${device_friendly_name} Area 3 Max"
+      unit_of_measurement: "m"
+      icon: "mdi:ruler"
+      entity_category: config
+    target_disappeard_delay_time:
+      name: "${device_friendly_name} Target Disappear Delay"
+      unit_of_measurement: "s"
+      icon: "mdi:timer"
+      entity_category: config

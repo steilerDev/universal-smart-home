@@ -1,0 +1,6 @@
+# Fusion 360 and CAD files — treat as binary to avoid diff noise
+*.f3d binary
+*.f3z binary
+*.stl binary
+*.step binary
+*.stp binary

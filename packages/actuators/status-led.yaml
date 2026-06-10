@@ -1,0 +1,14 @@
+# Package: WS2812 NeoPixel Status LED
+# Required substitutions:
+#   led_pin      — GPIO pin (all units: GPIO33)
+#   led_num_leds — number of LEDs (all units: "1")
+#   device_friendly_name
+
+light:
+  - platform: neopixelbus
+    type: GRB
+    variant: WS2811
+    pin: ${led_pin}
+    num_leds: ${led_num_leds}
+    name: "${device_friendly_name} Status LED"
+    id: status_led

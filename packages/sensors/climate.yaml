@@ -1,0 +1,28 @@
+# Package: ENS160 (eCO2/TVOC/AQI) + AHT20 (temperature/humidity)
+# Bus: I2C (bus_i2c defined in base/room-sensor.yaml)
+# Addresses: ENS160 @ 0x53, AHT20 @ default
+# Required substitutions: device_friendly_name
+
+sensor:
+  - platform: aht10
+    variant: AHT20
+    temperature:
+      id: id_temperature_sensor
+      name: "${device_friendly_name} Temperature"
+    humidity:
+      id: id_humidity_sensor
+      name: "${device_friendly_name} Humidity"
+    update_interval: 10s
+
+  - platform: ens160_i2c
+    address: 0x53
+    eco2:
+      name: "${device_friendly_name} eCO2"
+    tvoc:
+      name: "${device_friendly_name} TVOC"
+    aqi:
+      id: ens160_air_quality_index
+      name: "${device_friendly_name} Air Quality Index"
+    compensation:
+      temperature: id_temperature_sensor
+      humidity: id_humidity_sensor

@@ -1,0 +1,49 @@
+# Package: Olimex ESP32-POE2 base
+# Provides: board config, Ethernet (PoE), OTA, HA API, logger, I2C bus
+#
+# Required substitutions:
+#   device_name           — ESPHome entity name (lowercase-hyphenated)
+#   device_friendly_name  — human-readable label shown in HA
+#   device_ip             — static IP address (e.g. "10.10.14.21")
+#   i2c_sda_pin           — I2C SDA (all units: GPIO03)
+#   i2c_scl_pin           — I2C SCL (all units: GPIO04)
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${device_friendly_name}
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+logger:
+  level: DEBUG
+
+ota:
+  - platform: esphome
+    password: !secret esphome_ota_password
+
+api:
+  encryption:
+    key: !secret home_assistant_encryption
+
+ethernet:
+  type: LAN8720
+  mdc_pin: GPIO23
+  mdio_pin: GPIO18
+  clk:
+    pin: GPIO0
+    mode: CLK_OUT
+  power_pin: GPIO12
+  manual_ip:
+    static_ip: ${device_ip}
+    gateway: 10.10.14.1
+    subnet: 255.255.255.0
+
+i2c:
+  - id: bus_i2c
+    sda: ${i2c_sda_pin}
+    scl: ${i2c_scl_pin}
+    scan: false
+    frequency: 400kHz

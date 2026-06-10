@@ -1,0 +1,13 @@
+# ESPHome build artifacts
+.esphome/
+
+# Secrets — never commit (root only; devices/secrets.yaml is a tracked symlink)
+/secrets.yaml
+
+# Python virtualenv
+venv/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db

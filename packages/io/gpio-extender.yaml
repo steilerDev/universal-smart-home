@@ -1,0 +1,131 @@
+# Package: PCF8574 I2C GPIO Expander — buttons, power circuits, blinds
+# Bus: I2C (bus_i2c defined in base/room-sensor.yaml)
+# Address: 0x20  (PCF8575: false — 8-channel PCF8574)
+#
+# Fixed pin layout (PCB):
+#   0,1   → physical push buttons (input)
+#   2,3   → power circuit relays (switch, exposed to HA)
+#   4,5   → blind 1 open/close relays (internal, driven by cover entity)
+#   6,7   → blind 2 open/close relays (internal, driven by cover entity)
+#
+# Optional substitutions (override per device if travel times differ):
+#   blind_1_open_duration  (default: 30s)
+#   blind_1_close_duration (default: 30s)
+#   blind_2_open_duration  (default: 30s)
+#   blind_2_close_duration (default: 30s)
+#
+# Rooms without blinds: the cover entities will appear in HA but do nothing
+# if the relay channels are unpopulated on the board. Hide them in HA if needed.
+
+substitutions:
+  blind_1_open_duration: "30s"
+  blind_1_close_duration: "30s"
+  blind_2_open_duration: "30s"
+  blind_2_close_duration: "30s"
+
+pcf8574:
+  - id: gpio_extender
+    address: 0x20
+    pcf8575: false
+
+binary_sensor:
+  - platform: gpio
+    name: "${device_friendly_name} Button 1"
+    pin:
+      pcf8574: gpio_extender
+      number: 0
+      mode: INPUT
+      inverted: true
+  - platform: gpio
+    name: "${device_friendly_name} Button 2"
+    pin:
+      pcf8574: gpio_extender
+      number: 1
+      mode: INPUT
+      inverted: true
+
+switch:
+  - platform: gpio
+    name: "${device_friendly_name} Power Circuit 1"
+    id: power_circuit_1
+    restore_mode: ALWAYS_OFF
+    pin:
+      pcf8574: gpio_extender
+      number: 2
+      mode: OUTPUT
+      inverted: true
+  - platform: gpio
+    name: "${device_friendly_name} Power Circuit 2"
+    id: power_circuit_2
+    restore_mode: ALWAYS_OFF
+    pin:
+      pcf8574: gpio_extender
+      number: 3
+      mode: OUTPUT
+      inverted: true
+  - platform: gpio
+    id: blind_1_open_relay
+    internal: true
+    restore_mode: ALWAYS_OFF
+    pin:
+      pcf8574: gpio_extender
+      number: 4
+      mode: OUTPUT
+      inverted: true
+  - platform: gpio
+    id: blind_1_close_relay
+    internal: true
+    restore_mode: ALWAYS_OFF
+    pin:
+      pcf8574: gpio_extender
+      number: 5
+      mode: OUTPUT
+      inverted: true
+  - platform: gpio
+    id: blind_2_open_relay
+    internal: true
+    restore_mode: ALWAYS_OFF
+    pin:
+      pcf8574: gpio_extender
+      number: 6
+      mode: OUTPUT
+      inverted: true
+  - platform: gpio
+    id: blind_2_close_relay
+    internal: true
+    restore_mode: ALWAYS_OFF
+    pin:
+      pcf8574: gpio_extender
+      number: 7
+      mode: OUTPUT
+      inverted: true
+
+cover:
+  - platform: time_based
+    name: "${device_friendly_name} Blind 1"
+    id: blind_1_cover
+    open_duration: ${blind_1_open_duration}
+    close_duration: ${blind_1_close_duration}
+    open_action:
+      - switch.turn_off: blind_1_close_relay
+      - switch.turn_on: blind_1_open_relay
+    close_action:
+      - switch.turn_off: blind_1_open_relay
+      - switch.turn_on: blind_1_close_relay
+    stop_action:
+      - switch.turn_off: blind_1_open_relay
+      - switch.turn_off: blind_1_close_relay
+  - platform: time_based
+    name: "${device_friendly_name} Blind 2"
+    id: blind_2_cover
+    open_duration: ${blind_2_open_duration}
+    close_duration: ${blind_2_close_duration}
+    open_action:
+      - switch.turn_off: blind_2_close_relay
+      - switch.turn_on: blind_2_open_relay
+    close_action:
+      - switch.turn_off: blind_2_open_relay
+      - switch.turn_on: blind_2_close_relay
+    stop_action:
+      - switch.turn_off: blind_2_open_relay
+      - switch.turn_off: blind_2_close_relay
