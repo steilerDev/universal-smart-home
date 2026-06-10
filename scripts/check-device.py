@@ -100,7 +100,7 @@ PACKAGE_CHECKS: dict[str, dict[str, Any]] = {
     "actuators/dimmer": {
         "label": "dimmer",
         "description": "KRIDA I2C AC dimmer",
-        "lights": ["dimmer"],
+        "lights": ["main_light"],
     },
     "actuators/audio": {
         "label": "audio",

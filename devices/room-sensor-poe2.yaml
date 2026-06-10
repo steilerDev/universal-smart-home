@@ -14,3 +14,4 @@ packages:
   climate:     !include ../packages/sensors/climate.yaml
   illuminance: !include ../packages/sensors/illuminance.yaml
   gpio_ext:    !include ../packages/io/gpio-extender.yaml
+  dimmer:      !include ../packages/actuators/dimmer.yaml

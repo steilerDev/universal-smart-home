@@ -1,16 +1,19 @@
-# Package: KRIDA I2C MOSFET Trailing-Edge AC Dimmer
+# Package: KRIDA single-channel trailing-edge MOSFET I2C AC dimmer
+# Hardware: https://www.tindie.com/products/bugrovs2012/i2c-mosfet-trailing-edge-ac-led-dimmer-light/
+# Protocol: single byte 0–255 to I2C address 0x10 (0=off, 255=full power)
 # Bus: I2C (bus_i2c defined in base/room-sensor.yaml)
-# Address: 0x10
 # Required substitutions: device_friendly_name
 
 external_components:
-  - source: github://tomavc/KRIDA_i2c_Dimmer_EspHome@main
-    components: [i2c_dimmer]
+  - source:
+      type: local
+      path: ../components
+    components: [krida_dimmer]
 
 light:
-  - platform: i2c_dimmer
+  - platform: krida_dimmer
     name: "${device_friendly_name} Main Light"
+    i2c_id: bus_i2c
     address: 0x10
-    channel: 0x80
     default_transition_length: 3s
     restore_mode: ALWAYS_OFF
