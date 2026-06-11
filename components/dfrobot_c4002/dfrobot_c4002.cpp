@@ -184,12 +184,12 @@ void C4002Component::update_config_param() {
   }
 
   if (run_led_switch_ != nullptr) {
-    set_run_led(LED_ON);
-    run_led_switch_->publish_state((bool) LED_ON);
+    set_run_led(LED_OFF);
+    run_led_switch_->publish_state(false);
   }
   if (out_led_switch_ != nullptr) {
-    set_out_led(LED_ON);
-    out_led_switch_->publish_state((bool) LED_ON);
+    set_out_led(LED_OFF);
+    out_led_switch_->publish_state(false);
   }
 
   //** config report period **//

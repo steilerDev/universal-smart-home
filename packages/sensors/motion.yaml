@@ -98,10 +98,12 @@ switch:
       name: "${device_friendly_name} Radar Out LED"
       icon: "mdi:led-on"
       entity_category: config
+      disabled_by_default: true
     switch_run_led:
       name: "${device_friendly_name} Radar Run LED"
       icon: "mdi:led-on"
       entity_category: config
+      disabled_by_default: true
     switch_factory_reset:
       name: "${device_friendly_name} Radar Factory Reset"
       icon: "mdi:restart"
