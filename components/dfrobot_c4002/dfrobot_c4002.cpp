@@ -154,30 +154,30 @@ void C4002Component::update_config_param() {
     ESP_LOGD(TAG, "Publishing light_threshold_: %.2f", current_light_threshold);
   }
 
-  for (float &v : current_area_) {
-    v = 0.0f;
+  // Publish current operating mode (queried from radar)
+#ifdef USE_SELECT
+  if (operating_selector_ != nullptr && get_out_mode()) {
+    std::string mode_str;
+    switch (out_mode_) {
+      case OUT_MODE1: mode_str = "Mode_1"; break;
+      case OUT_MODE2: mode_str = "Mode_2"; break;
+      case OUT_MODE3: mode_str = "Mode_3"; break;
+      default:        mode_str = "Mode_1"; break;
+    }
+    operating_selector_->publish_state(mode_str);
   }
+#endif
 
+  // Area values are persisted in ESP flash (no radar read command exists for zone config).
+  // Restore saved values, re-apply them to the radar, and publish to HA.
+  load_area_prefs_();
   joint_enable_door();
-
-  if (area1_min_range_number_ != nullptr) {
-    area1_min_range_number_->publish_state(current_area_[AREA1_DOOR_MIN]);
-  }
-  if (area2_min_range_number_ != nullptr) {
-    area2_min_range_number_->publish_state(current_area_[AREA2_DOOR_MIN]);
-  }
-  if (area3_min_range_number_ != nullptr) {
-    area3_min_range_number_->publish_state(current_area_[AREA3_DOOR_MIN]);
-  }
-  if (area1_max_range_number_ != nullptr) {
-    area1_max_range_number_->publish_state(current_area_[AREA1_DOOR_MAX]);
-  }
-  if (area2_max_range_number_ != nullptr) {
-    area2_max_range_number_->publish_state(current_area_[AREA2_DOOR_MAX]);
-  }
-  if (area3_max_range_number_ != nullptr) {
-    area3_max_range_number_->publish_state(current_area_[AREA3_DOOR_MAX]);
-  }
+  if (area1_min_range_number_ != nullptr) area1_min_range_number_->publish_state(current_area_[AREA1_DOOR_MIN]);
+  if (area1_max_range_number_ != nullptr) area1_max_range_number_->publish_state(current_area_[AREA1_DOOR_MAX]);
+  if (area2_min_range_number_ != nullptr) area2_min_range_number_->publish_state(current_area_[AREA2_DOOR_MIN]);
+  if (area2_max_range_number_ != nullptr) area2_max_range_number_->publish_state(current_area_[AREA2_DOOR_MAX]);
+  if (area3_min_range_number_ != nullptr) area3_min_range_number_->publish_state(current_area_[AREA3_DOOR_MIN]);
+  if (area3_max_range_number_ != nullptr) area3_max_range_number_->publish_state(current_area_[AREA3_DOOR_MAX]);
 
   if (target_disappeard_delay_time_number_ != nullptr) {
     target_disappeard_delay_time_number_->publish_state(current_delay_time);
@@ -993,6 +993,27 @@ void C4002Component::set_area_range(RangValue range_value, float range) { curren
  * Get the area range of the device.
  */
 float C4002Component::get_area_range(RangValue range_value) { return current_area_[range_value]; }
+
+void C4002Component::load_area_prefs_() {
+  if (!area_prefs_initialized_) {
+    uint32_t base = fnv1_hash("c4002_area");
+    for (int i = 0; i < 6; i++)
+      area_prefs_[i] = global_preferences->make_preference<float>(base ^ (uint32_t) i);
+    area_prefs_initialized_ = true;
+  }
+  for (int i = 0; i < 6; i++) {
+    float val;
+    if (area_prefs_[i].load(&val))
+      current_area_[i] = val;
+  }
+}
+
+void C4002Component::save_area_prefs() {
+  if (!area_prefs_initialized_)
+    return;
+  for (int i = 0; i < 6; i++)
+    area_prefs_[i].save(&current_area_[i]);
+}
 
 /**
  * joint_enable_door

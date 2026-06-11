@@ -70,8 +70,8 @@ void Area1MinRangeNumber::control(float value) {
 
     if (this->parent_->joint_enable_door()) {
       this->parent_->set_area_range(AREA1_DOOR_MIN, value);
+      this->parent_->save_area_prefs();
       this->publish_state(value);
-
     } else {
       this->publish_state(area1_min);
       this->parent_->set_area_range(AREA1_DOOR_MIN, area1_min);
@@ -92,6 +92,7 @@ void Area1MaxRangeNumber::control(float value) {
     ESP_LOGD(TAG, "Set area 1 max range to %.1f", this->parent_->get_area_range(AREA1_DOOR_MAX));
 
     if (this->parent_->joint_enable_door()) {
+      this->parent_->save_area_prefs();
       this->publish_state(value);
     } else {
       ESP_LOGD(TAG, "Set area 1 max range failed");
@@ -114,6 +115,7 @@ void Area2MinRangeNumber::control(float value) {
     ESP_LOGD(TAG, "Set area 2 min range to %.1f", this->parent_->get_area_range(AREA2_DOOR_MIN));
 
     if (this->parent_->joint_enable_door()) {
+      this->parent_->save_area_prefs();
       this->publish_state(value);
     } else {
       ESP_LOGD(TAG, "Set area 2 min range failed");
@@ -135,6 +137,7 @@ void Area2MaxRangeNumber::control(float value) {
     this->parent_->set_area_range(AREA2_DOOR_MAX, value);
 
     if (this->parent_->joint_enable_door()) {
+      this->parent_->save_area_prefs();
       this->publish_state(value);
     } else {
       ESP_LOGD(TAG, "Set area 2 max range failed");
@@ -158,6 +161,7 @@ void Area3MinRangeNumber::control(float value) {
 
     if (this->parent_->joint_enable_door()) {
       ESP_LOGD(TAG, "Set area 3 min range to %.1f", value);
+      this->parent_->save_area_prefs();
       this->publish_state(value);
     } else {
       ESP_LOGD(TAG, "Set area 3 min range failed");
@@ -179,6 +183,7 @@ void Area3MaxRangeNumber::control(float value) {
     ESP_LOGD(TAG, "Set area 3 max range to %.1f", this->parent_->get_area_range(AREA3_DOOR_MAX));
 
     if (this->parent_->joint_enable_door()) {
+      this->parent_->save_area_prefs();
       this->publish_state(value);
     } else {
       ESP_LOGD(TAG, "Set area 3 max range failed");

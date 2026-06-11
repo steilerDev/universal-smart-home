@@ -3,6 +3,8 @@
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
 #include "esphome/core/log.h"
+#include "esphome/core/preferences.h"
+#include "esphome/core/helpers.h"
 #include <string>
 #include <stdint.h>
 
@@ -340,6 +342,7 @@ class C4002Component : public Component, public uart::UARTDevice {
   //** area range **//
   float get_area_range(RangValue range_value);
   void set_area_range(RangValue range_value, float range);
+  void save_area_prefs();
 #endif
 
 #ifdef USE_TEXT_SENSOR
@@ -368,6 +371,9 @@ class C4002Component : public Component, public uart::UARTDevice {
   //** area range **//
   float current_area_[6] = {0, 0, 0, 0, 0, 0};
   uint8_t enable_door_[15] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+  ESPPreferenceObject area_prefs_[6];
+  bool area_prefs_initialized_{false};
+  void load_area_prefs_();
 
   //** light threshold **//
   uint16_t light_threshold_;

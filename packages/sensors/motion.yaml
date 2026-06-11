@@ -30,6 +30,7 @@ sensor:
       icon: "mdi:ruler"
       device_class: distance
       state_class: measurement
+      internal: true
     existing_distance:
       name: "${device_friendly_name} Presence Distance"
       id: existing_distance_sensor
@@ -38,6 +39,7 @@ sensor:
       icon: "mdi:account"
       device_class: distance
       state_class: measurement
+      internal: true
     movement_speed:
       name: "${device_friendly_name} Motion Speed"
       id: movement_speed_sensor
@@ -46,20 +48,24 @@ sensor:
       icon: "mdi:speedometer"
       device_class: speed
       state_class: measurement
+      internal: true
     movement_direction:
       name: "${device_friendly_name} Motion Direction"
       id: movement_direction_sensor
       icon: "mdi:compass"
+      internal: true
     target_status:
       name: "${device_friendly_name} Target Status"
       id: target_status_sensor
       icon: "mdi:target"
+      internal: true
 
 text_sensor:
   - platform: template
     name: "${device_friendly_name} Movement Direction Text"
     id: movement_direction_text
     icon: "mdi:directions"
+    internal: true
     lambda: |-
       if (id(movement_direction_sensor).has_state()) {
         int d = id(movement_direction_sensor).state;
@@ -74,6 +80,7 @@ text_sensor:
     name: "${device_friendly_name} Target Status Text"
     id: target_status_text
     icon: "mdi:human-greeting"
+    internal: true
     lambda: |-
       if (id(target_status_sensor).has_state()) {
         int d = id(target_status_sensor).state;
@@ -90,7 +97,20 @@ text_sensor:
       name: "${device_friendly_name} Radar Log"
       icon: "mdi:message-text-outline"
       entity_category: diagnostic
-      disabled_by_default: true
+      internal: true
+
+binary_sensor:
+  - platform: template
+    name: "${device_friendly_name} Presence"
+    id: presence_sensor
+    device_class: occupancy
+    lambda: |-
+      if (id(target_status_sensor).has_state()) {
+        return id(target_status_sensor).state > 0;
+      }
+      return {};
+    filters:
+      - delayed_off: 5s
 
 switch:
   - platform: dfrobot_c4002
@@ -109,6 +129,7 @@ switch:
       name: "${device_friendly_name} Radar Factory Reset"
       icon: "mdi:restart"
       entity_category: config
+      internal: true
     switch_environmental_calibration:
       name: "${device_friendly_name} Radar Calibration"
       icon: "mdi:calibration"
@@ -121,7 +142,7 @@ select:
       name: "${device_friendly_name} Radar Mode"
       icon: "mdi:account"
       entity_category: config
-      disabled_by_default: true
+      internal: true
       options:
         - "Mode_1"
         - "Mode_2"

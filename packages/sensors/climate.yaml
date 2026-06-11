@@ -3,12 +3,30 @@
 # Addresses: ENS160 @ 0x53, AHT20 @ default
 # Required substitutions: device_friendly_name
 
+number:
+  - platform: template
+    name: "${device_friendly_name} Temperature Calibration"
+    id: id_temperature_calibration
+    min_value: -10
+    max_value: 10
+    step: 0.1
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-lines
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    initial_value: 0
+
 sensor:
   - platform: aht10
     variant: AHT20
     temperature:
       id: id_temperature_sensor
       name: "${device_friendly_name} Temperature"
+      filters:
+        - lambda: |-
+            float offset = id(id_temperature_calibration).state;
+            return isnan(offset) ? x : x + offset;
     humidity:
       id: id_humidity_sensor
       name: "${device_friendly_name} Humidity"
@@ -18,11 +36,30 @@ sensor:
     address: 0x53
     eco2:
       name: "${device_friendly_name} eCO2"
+      internal: true
     tvoc:
       name: "${device_friendly_name} TVOC"
+      internal: true
     aqi:
       id: ens160_air_quality_index
       name: "${device_friendly_name} Air Quality Index"
+      internal: true
     compensation:
       temperature: id_temperature_sensor
       humidity: id_humidity_sensor
+
+text_sensor:
+  - platform: template
+    name: "${device_friendly_name} Air Quality"
+    icon: mdi:air-filter
+    lambda: |-
+      if (!id(ens160_air_quality_index).has_state()) return {};
+      switch ((int) id(ens160_air_quality_index).state) {
+        case 1: return {"Excellent"};
+        case 2: return {"Good"};
+        case 3: return {"Moderate"};
+        case 4: return {"Poor"};
+        case 5: return {"Unhealthy"};
+        default: return {"Unknown"};
+      }
+    update_interval: 60s
