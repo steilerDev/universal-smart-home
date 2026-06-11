@@ -6,7 +6,7 @@ ESPHome firmware for ~25 room sensor units deployed across the house. Each unit 
 
 ## Hardware — Room Sensor
 
-> Full details: [Hardware — Room Sensor](https://notes.steiler.de/doc/hardware-room-sensor-f93N9HhTLD) · [Schematic](https://app.cirkitdesigner.com/project/281a6c22-06b7-4593-8d16-d8be4f0f2b7c) · [BOM spreadsheet](https://docs.google.com/spreadsheets/d/1IDwVHU_nB87WG1chJAw_y0TpFDG4_Gb6cJKhXvnkDOo/edit?usp=sharing)
+> [Schematic](https://app.cirkitdesigner.com/project/281a6c22-06b7-4593-8d16-d8be4f0f2b7c)
 
 | Component | Part |
 |-----------|------|
@@ -57,8 +57,6 @@ secrets.template.yaml
 
 ## Quick Start
 
-> Full guide: [Development Guide](https://notes.steiler.de/doc/development-guide-VQrIlahCvb)
-
 ```bash
 pip3 install esphome --break-system-packages
 cp secrets.template.yaml secrets.yaml  # fill in OTA password + HA encryption key
@@ -77,8 +75,6 @@ Add a new device:
 ---
 
 ## Packages
-
-> Full reference: [Packages Reference](https://notes.steiler.de/doc/packages-reference-xvuuEMVoV6)
 
 Each device YAML picks only the packages it needs. Every device requires `base`; the rest are optional.
 
