@@ -90,6 +90,7 @@ text_sensor:
       name: "${device_friendly_name} Radar Log"
       icon: "mdi:message-text-outline"
       entity_category: diagnostic
+      disabled_by_default: true
 
 switch:
   - platform: dfrobot_c4002
@@ -120,6 +121,7 @@ select:
       name: "${device_friendly_name} Radar Mode"
       icon: "mdi:account"
       entity_category: config
+      disabled_by_default: true
       options:
         - "Mode_1"
         - "Mode_2"
