@@ -10,15 +10,14 @@ ESPHome firmware for ~25 room sensor units deployed across the house. Each unit 
 
 | Component | Part |
 |-----------|------|
-| MCU | Olimex ESP32-POE2 (ESP32-WROVER-E, PoE Ethernet) |
-| Climate | ENS160 + AHT21 — eCO2, TVOC, AQI, temp, humidity |
-| Illuminance | BH1750 |
-| Presence | DFRobot C4002 mmWave radar |
-| Dimmer | KRIDA I2C AC trailing-edge MOSFET dimmer |
-| GPIO Expander | PCF8574 — 2 buttons, 2 power circuits, 2 roller blinds |
-| Status LED | WS2812 NeoPixel |
-| Audio | ES8311 + NS4150B (notifications / TTS) |
-| Power Monitor | PZEM-004T AC energy meter |
+| MCU | [Olimex ESP32-POE2](https://www.olimex.com/Products/IoT/ESP32/ESP32-POE2/open-source-hardware) (ESP32-WROVER-E, PoE Ethernet) |
+| Climate | [ENS160](https://esphome.io/components/sensor/ens160/) + [AHT21](https://esphome.io/components/sensor/aht10/) — eCO2, TVOC, AQI, temp, humidity |
+| Illuminance | [BH1750](https://esphome.io/components/sensor/bh1750/) |
+| Presence | [DFRobot C4002](https://www.dfrobot.com/product-3081.html) mmWave radar (custom component) |
+| Dimmer | [KRIDA I2C AC dimmer](https://www.tindie.com/products/bugrovs2012/i2c-mosfet-trailing-edge-ac-dimmer-light) trailing-edge MOSFET (custom component) |
+| GPIO Expander | [PCF8574](https://esphome.io/components/pcf8574/) — 2 buttons, 2 power circuits, 2 roller blinds |
+| Status LED | [WS2812 NeoPixel](https://esphome.io/components/light/neopixelbus/) |
+| Audio | [ES8311](https://esphome.io/components/audio_dac/es8311/) + NS4150B (notifications / TTS) |
 
 PCB case design files are in `hardware/room-sensor/`.
 
@@ -30,7 +29,7 @@ PCB case design files are in `hardware/room-sensor/`.
 devices/          — One YAML per physical device (substitutions + package includes)
 packages/
   base/           — Board, Ethernet, OTA, HA API, I2C bus
-  sensors/        — climate, illuminance, motion, power-pzem004t
+  sensors/        — climate, illuminance, motion
   actuators/      — status-led, dimmer, audio
   io/             — gpio-extender (PCF8574 — buttons, power circuits, blinds)
 components/       — Local custom ESPHome components (dfrobot_c4002, krida_dimmer)
@@ -81,14 +80,13 @@ Each device YAML picks only the packages it needs. Every device requires `base`;
 | Package | Provides |
 |---------|----------|
 | `base/room-sensor` | Board, Ethernet PoE, OTA, HA API, I2C bus |
-| `sensors/climate` | ENS160 + AHT20 — air quality, temp, humidity |
-| `sensors/illuminance` | BH1750 light level |
-| `sensors/motion` | DFRobot C4002 presence + target tracking |
-| `sensors/power-pzem004t` | PZEM-004T AC power monitoring |
-| `actuators/dimmer` | KRIDA I2C AC dimmer (light entity) |
-| `actuators/status-led` | WS2812 NeoPixel |
-| `actuators/audio` | ES8311 I2S media player |
-| `io/gpio-extender` | PCF8574 — buttons, switches, blind covers |
+| `sensors/climate` | [ENS160](https://esphome.io/components/sensor/ens160/) + [AHT20](https://esphome.io/components/sensor/aht10/) — air quality, temp, humidity |
+| `sensors/illuminance` | [BH1750](https://esphome.io/components/sensor/bh1750/) light level |
+| `sensors/motion` | [DFRobot C4002](https://www.dfrobot.com/product-3081.html) presence + target tracking |
+| `actuators/dimmer` | [KRIDA I2C AC dimmer](https://www.tindie.com/products/bugrovs2012/i2c-mosfet-trailing-edge-ac-dimmer-light) (light entity) |
+| `actuators/status-led` | [WS2812 NeoPixel](https://esphome.io/components/light/neopixelbus/) |
+| `actuators/audio` | [ES8311](https://esphome.io/components/audio_dac/es8311/) I2S media player |
+| `io/gpio-extender` | [PCF8574](https://esphome.io/components/pcf8574/) — buttons, switches, blind covers |
 
 ---
 
