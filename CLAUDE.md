@@ -101,8 +101,21 @@ Always run from the repo root:
 ```bash
 esphome config devices/<name>.yaml       # validate
 esphome compile devices/<name>.yaml      # compile firmware
-esphome run devices/<name>.yaml          # compile + OTA flash
+esphome run devices/<name>.yaml          # compile + OTA flash (tails logs forever — see deploy pattern below)
 ```
+
+### Deploy pattern (background + monitor)
+
+`esphome run` blocks indefinitely after flashing (it tails device logs). Always deploy in background and monitor for completion:
+
+1. Run deploy with `run_in_background: true` (Bash tool parameter).
+2. Set up a Monitor on the output file:
+   ```bash
+   tail -f <output-file> | grep --line-buffered -E "SUCCESS|successfully|OTA|upload|error|Error|FAILED|WARNING|hash"
+   ```
+3. Wait for all three confirmations: `SUCCESS` (build) → `OTA successful` → `Successfully uploaded`.
+4. After success, kill the deploy process with `pkill -f "esphome (run|logs).*<device-name>"`. **TaskStop only removes task tracking — it does NOT kill the OS process.** Each zombie `esphome run` holds a native API connection slot; ESPHome allows max 5 connections. Leaving them running fills all slots and blocks HA from reconnecting.
+
 
 ### Post-deploy log check (required)
 
