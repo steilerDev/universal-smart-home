@@ -1,34 +1,41 @@
 # Package: PZEM-004T AC Power Monitor
-# Pins: TBD — set substitutions once PCB schematic is finalised
+# Pins: GPIO1 (TX→PZEM RX), GPIO39 (RX←PZEM TX)
+# GPIO1 is UART0 TX (logger serial). Disable serial logger below to free it.
+# pzemac uses Modbus protocol — requires uart → modbus → sensor chain.
 # Required substitutions:
-#   pzem_uart_tx_pin  — e.g. "GPIO14"
-#   pzem_uart_rx_pin  — e.g. "GPIO15"
+#   pzem_uart_tx_pin  — GPIO1
+#   pzem_uart_rx_pin  — GPIO39
 #   device_friendly_name
+
+# Free GPIO1 from the serial logger; network/API logging still works.
+logger:
+  baud_rate: 0
 
 uart:
   - id: uart_pzem
     tx_pin: ${pzem_uart_tx_pin}
     rx_pin: ${pzem_uart_rx_pin}
     baud_rate: 9600
+    stop_bits: 1
+
+modbus:
+  - id: modbus_pzem
+    uart_id: uart_pzem
 
 sensor:
   - platform: pzemac
-    uart_id: uart_pzem
+    modbus_id: modbus_pzem
     current:
       name: "${device_friendly_name} Current"
-      unit_of_measurement: A
     voltage:
       name: "${device_friendly_name} Voltage"
-      unit_of_measurement: V
     power:
       name: "${device_friendly_name} Power"
-      unit_of_measurement: W
     energy:
       name: "${device_friendly_name} Energy"
-      unit_of_measurement: Wh
     frequency:
       name: "${device_friendly_name} Frequency"
-      unit_of_measurement: Hz
     power_factor:
       name: "${device_friendly_name} Power Factor"
+      internal: true
     update_interval: 10s

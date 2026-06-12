@@ -41,7 +41,7 @@ devices/secrets.yaml   — Symlink to ../secrets.yaml (committed, allows ESPHome
   - Channels 6,7 → Blind 2 open/close relays (internal switch → time_based cover)
 - **I2C sensors:** ENS160 @ 0x53, BH1750 @ 0x23, KRIDA dimmer @ 0x10
 - **Audio:** ES8311 @ 0x18 + NS4150B amplifier (I2S media player for notifications/TTS; voice assistant stub commented out in audio.yaml)
-- **Power monitor:** PZEM-004T (UART, pins TBD from schematic)
+- **Power monitor:** PZEM-004T (UART: ESP TX=GPIO1 → PZEM RX, ESP RX=GPIO39 ← PZEM TX; GPIO1 conflicts with UART0 logger — power package disables serial logger)
 - **Schematic:** https://app.cirkitdesigner.com/project/281a6c22-06b7-4593-8d16-d8be4f0f2b7c (requires login — can't be fetched programmatically)
 
 ## ESP32-POE2 GPIO Constraints
@@ -68,6 +68,7 @@ Module: ESP32-WROVER-E (has PSRAM)
 | GPIO | Use | Notes |
 |------|-----|-------|
 | GPIO0  | Ethernet CLK_OUT | ✓ |
+| GPIO1  | PZEM-004T UART TX | ⚠️ UART0 TX (logger serial). power-pzem004t.yaml sets baud_rate: 0 to release it |
 | GPIO2  | Motion UART TX | ⚠️ strapping pin. Safe: TX only, not driven at boot, board has pull-down |
 | GPIO3  | I2C SDA | ⚠️ nominally UART0 RX. Works: GPIO matrix lets I2C claim it; logger loses serial RX but TX (GPIO1) still works. Proven on device. |
 | GPIO4  | I2C SCL | ✓ |
@@ -76,9 +77,10 @@ Module: ESP32-WROVER-E (has PSRAM)
 | GPIO23 | Ethernet MDC | ✓ |
 | GPIO33 | NeoPixel LED | ✓ |
 | GPIO36 | Motion UART RX | ✓ input-only |
+| GPIO39 | PZEM-004T UART RX | ✓ input-only |
 
 **Available for future sensors/actuators** (not used by board or our PCB):
-GPIO5, GPIO13, GPIO14, GPIO15, GPIO19, GPIO20, GPIO21, GPIO22, GPIO25, GPIO26, GPIO27, GPIO32, GPIO34¹, GPIO35¹, GPIO39¹
+GPIO5, GPIO13, GPIO14, GPIO15, GPIO19, GPIO20, GPIO21, GPIO22, GPIO25, GPIO26, GPIO27, GPIO32, GPIO34¹, GPIO35¹
 
 ¹ Input-only pins.
 
