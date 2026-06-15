@@ -1,47 +1,58 @@
 # Package: ES8311 + NS4150B — I2S Audio (notification sounds / TTS)
 # Bus: I2C for DAC control (bus_i2c defined in base/room-sensor.yaml), I2S for audio data
 # ES8311 address: 0x18
-# Pins: TBD — set substitutions once PCB schematic is finalised
 # Required substitutions:
-#   audio_lrclk_pin   — I2S LR clock (e.g. "GPIO25")
-#   audio_bclk_pin    — I2S bit clock (e.g. "GPIO26")
-#   audio_dout_pin    — I2S data out to DAC (e.g. "GPIO22")
+#   audio_bclk_pin    — I2S bit clock       (e.g. "GPIO5")
+#   audio_lrclk_pin   — I2S LR clock        (e.g. "GPIO13")
+#   audio_dout_pin    — I2S data out to DAC  (e.g. "GPIO14")
+#   audio_din_pin     — I2S data in from mic (e.g. "GPIO15")
+#   audio_mclk_pin    — I2S MCLK output     (must be GPIO0/1/3 on ESP32 — hardware CLK_OUT pins only)
 #   device_friendly_name
+# Note: MCLK on GPIO1 requires UART0 logger disabled; add logger: baud_rate: 0 in the device file.
 
 i2s_audio:
   - id: bus_i2s
     i2s_lrclk_pin: ${audio_lrclk_pin}
     i2s_bclk_pin: ${audio_bclk_pin}
+    i2s_mclk_pin: ${audio_mclk_pin}
 
 audio_dac:
   - platform: es8311
     id: es8311_dac
     address: 0x18
+    use_mclk: true
+    use_microphone: false
 
-media_player:
+speaker:
   - platform: i2s_audio
-    name: "${device_friendly_name} Speaker"
-    id: media_player_speaker
+    id: i2s_speaker
+    i2s_audio_id: bus_i2s
     dac_type: external
     audio_dac: es8311_dac
-    i2s_audio_id: bus_i2s
     i2s_dout_pin: ${audio_dout_pin}
 
+media_player:
+  - platform: speaker
+    name: "${device_friendly_name} Speaker"
+    id: media_player_speaker
+    buffer_size: 32768
+    announcement_pipeline:
+      speaker: i2s_speaker
+      format: FLAC
+
+rtttl:
+  id: rtttl_beeper
+  speaker: i2s_speaker
+
+microphone:
+  - platform: i2s_audio
+    id: mic_i2s
+    i2s_audio_id: bus_i2s
+    i2s_din_pin: ${audio_din_pin}
+    adc_type: external
+    pdm: false
+
 # --- Voice assistant (future) ---
-# Uncomment and configure mic pin when ready to enable wake-word detection.
-# Requires Home Assistant Assist pipeline configuration.
-#
-# microphone:
-#   - platform: i2s_audio
-#     id: mic_i2s
-#     i2s_audio_id: bus_i2s
-#     i2s_din_pin: GPIO35  # TBD
-#     adc_type: external
-#     pdm: false
-#
 # voice_assistant:
 #   microphone: mic_i2s
 #   media_player: media_player_speaker
-#   noise_suppression_level: 2
-#   auto_gain: 31dBFS
-#   volume_multiplier: 2.0

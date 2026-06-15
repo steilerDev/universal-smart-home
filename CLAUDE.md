@@ -33,15 +33,18 @@ devices/secrets.yaml   — Symlink to ../secrets.yaml (committed, allows ESPHome
 - **Ethernet:** LAN8720, MDC=GPIO23, MDIO=GPIO18, CLK_OUT=GPIO0, power=GPIO12
 - **I2C bus:** SDA=GPIO03, SCL=GPIO04
 - **Motion UART:** TX=GPIO02, RX=GPIO36 (DFRobot C4002 mmWave)
-- **NeoPixel LED:** GPIO33 (WS2812, 1 LED per unit)
+- **NeoPixel LED:** GPIO33 (WS2812, 1 LED per unit) — shares GPIO33 with PZEM TX on prototype; move NeoPixel to GPIO32 when both are active
 - **GPIO expander:** PCF8574 @ 0x20 (8 channels: 2 inputs = buttons, 6 outputs via cover/switch)
   - Channels 0,1 → Button 1, Button 2 (binary_sensor, INPUT)
   - Channels 2,3 → Power Circuit 1, 2 (switch, OUTPUT)
   - Channels 4,5 → Blind 1 open/close relays (internal switch → time_based cover)
   - Channels 6,7 → Blind 2 open/close relays (internal switch → time_based cover)
 - **I2C sensors:** ENS160 @ 0x53, BH1750 @ 0x23, KRIDA dimmer @ 0x10
-- **Audio:** ES8311 @ 0x18 + NS4150B amplifier (I2S media player for notifications/TTS; voice assistant stub commented out in audio.yaml)
-- **Power monitor:** PZEM-004T (UART: ESP TX=GPIO1 → PZEM RX, ESP RX=GPIO39 ← PZEM TX; GPIO1 conflicts with UART0 logger — power package disables serial logger)
+- **Audio:** ES8311 @ 0x18 + NS4150B amplifier (I2S: BCK=GPIO5, LRCK=GPIO13, DOUT=GPIO14, DIN=GPIO15, MCLK=GPIO1)
+  - `use_mclk: true` with MCLK on GPIO1 (one of 3 valid CLK_OUT pins: GPIO0/1/3; GPIO0 taken by Ethernet)
+  - RTTTL for button sounds; media_player for HA TTS/announcements
+  - MCLK on GPIO1 requires `logger: baud_rate: 0` (disables UART0 serial logger)
+- **Power monitor:** PZEM-004T (UART: ESP TX=GPIO33 → PZEM RX, ESP RX=GPIO39 ← PZEM TX)
 - **Schematic:** https://app.cirkitdesigner.com/project/281a6c22-06b7-4593-8d16-d8be4f0f2b7c (requires login — can't be fetched programmatically)
 
 ## ESP32-POE2 GPIO Constraints
@@ -68,19 +71,25 @@ Module: ESP32-WROVER-E (has PSRAM)
 | GPIO | Use | Notes |
 |------|-----|-------|
 | GPIO0  | Ethernet CLK_OUT | ✓ |
-| GPIO1  | PZEM-004T UART TX | ⚠️ UART0 TX (logger serial). power-pzem004t.yaml sets baud_rate: 0 to release it |
+| GPIO1  | Audio MCLK (ES8311) | ⚠️ UART0 TX. Requires `logger: baud_rate: 0`. Valid CLK_OUT pin — confirmed working |
 | GPIO2  | Motion UART TX | ⚠️ strapping pin. Safe: TX only, not driven at boot, board has pull-down |
-| GPIO3  | I2C SDA | ⚠️ nominally UART0 RX. Works: GPIO matrix lets I2C claim it; logger loses serial RX but TX (GPIO1) still works. Proven on device. |
+| GPIO3  | I2C SDA | ⚠️ nominally UART0 RX. Works: GPIO matrix lets I2C claim it; proven on device |
 | GPIO4  | I2C SCL | ✓ |
+| GPIO5  | Audio I2S BCK | ✓ strapping pin, HIGH at boot — safe as I2S output |
 | GPIO12 | Ethernet PHY power | ✓ |
+| GPIO13 | Audio I2S LRCLK | ✓ |
+| GPIO14 | Audio I2S DOUT (→ ES8311) | ✓ |
+| GPIO15 | Audio I2S DIN (← mic) | ✓ |
 | GPIO18 | Ethernet MDIO | ✓ |
 | GPIO23 | Ethernet MDC | ✓ |
-| GPIO33 | NeoPixel LED | ✓ |
+| GPIO33 | PZEM-004T UART TX (prototype) / NeoPixel LED (PCB) | ⚠️ shared — prototype uses GPIO33 for PZEM TX; PCB design puts NeoPixel here. Move NeoPixel to GPIO32 if both needed |
 | GPIO36 | Motion UART RX | ✓ input-only |
 | GPIO39 | PZEM-004T UART RX | ✓ input-only |
 
+**ESP32 MCLK constraint:** Hardware CLK_OUT is limited to GPIO0/1/3 only. GPIO0 = Ethernet, GPIO3 = I2C SDA. Only GPIO1 is usable for audio MCLK.
+
 **Available for future sensors/actuators** (not used by board or our PCB):
-GPIO5, GPIO13, GPIO14, GPIO15, GPIO19, GPIO20, GPIO21, GPIO22, GPIO25, GPIO26, GPIO27, GPIO32, GPIO34¹, GPIO35¹
+GPIO19, GPIO20, GPIO21, GPIO22, GPIO25, GPIO26, GPIO27, GPIO32, GPIO34¹, GPIO35¹
 
 ¹ Input-only pins.
 

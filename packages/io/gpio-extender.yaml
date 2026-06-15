@@ -30,6 +30,7 @@ pcf8574:
 
 binary_sensor:
   - platform: gpio
+    id: button_1
     name: "${device_friendly_name} Button 1"
     pin:
       pcf8574: gpio_extender
@@ -37,6 +38,7 @@ binary_sensor:
       mode: INPUT
       inverted: true
   - platform: gpio
+    id: button_2
     name: "${device_friendly_name} Button 2"
     pin:
       pcf8574: gpio_extender

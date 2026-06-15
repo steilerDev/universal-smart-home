@@ -1,15 +1,9 @@
 # Package: PZEM-004T AC Power Monitor
-# Pins: GPIO1 (TX→PZEM RX), GPIO39 (RX←PZEM TX)
-# GPIO1 is UART0 TX (logger serial). Disable serial logger below to free it.
 # pzemac uses Modbus protocol — requires uart → modbus → sensor chain.
 # Required substitutions:
-#   pzem_uart_tx_pin  — GPIO1
-#   pzem_uart_rx_pin  — GPIO39
+#   pzem_uart_tx_pin  — UART TX to PZEM RX (e.g. "GPIO33")
+#   pzem_uart_rx_pin  — UART RX from PZEM TX (e.g. "GPIO39")
 #   device_friendly_name
-
-# Free GPIO1 from the serial logger; network/API logging still works.
-logger:
-  baud_rate: 0
 
 uart:
   - id: uart_pzem
