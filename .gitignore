@@ -16,3 +16,7 @@ Thumbs.db
 
 # Claude Code local settings (personal, not shared)
 .claude/settings.local.json
+
+# KiCad files
+.history
+.kicad-push
