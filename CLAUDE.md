@@ -283,3 +283,57 @@ esphome config devices/<room-name>.yaml   # validate before deploying
 **IP:** `10.10.14.20`  
 **ESPHome name:** `room-sensor-poe2` (must match for OTA continuity)  
 **Capabilities:** base + climate + illuminance + gpio_extender
+
+## PCB Manufacturing & Parts Sourcing
+
+### Workflow
+
+- **PCB manufacturing:** AISLER (aisler.net) — bare board, no assembly
+- **Parts:** Mouser Germany (mouser.de) — all components ordered separately and hand-soldered
+
+### KiCad Schematic Metadata
+
+The schematic uses two key custom fields per component:
+
+- **`MPN`** (Manufacturer Part Number) — required by AISLER for component matching in their BOM tool; also used for Mouser BOM upload (Mouser accepts MPN in their cart import CSV). This is the only field needed for the AISLER + Mouser workflow.
+- **`LCSC`** — only needed if ordering JLCPCB assembly. **Not present** in current schematic (removed; add back if switching to JLCPCB).
+
+**BOM export from KiCad:** Use the Symbol Fields Table — accessible via the spreadsheet icon in the schematic editor toolbar (KiCad 10). There is no menu path. Export as CSV; the MPN column maps directly to Mouser's BOM upload.
+
+### Mouser API
+
+Direct REST API for stock/price queries from the sandbox:
+
+```bash
+# Part number lookup (exact MPN or Mouser PN)
+curl -s -X POST "https://api.mouser.com/api/v1/search/partnumber?apiKey=$(grep mouser_api_key secrets.yaml | awk '{print $2}' | tr -d '\"')" \
+  -H "Content-Type: application/json" \
+  -d '{"SearchByPartRequest":{"mouserPartNumber":"<MPN>","partSearchOptions":""}}'
+
+# Keyword search (discovery, in-stock only)
+curl -s -X POST "https://api.mouser.com/api/v1/search/keyword?apiKey=..." \
+  -H "Content-Type: application/json" \
+  -d '{"SearchByKeywordRequest":{"keyword":"terminal block 2.54mm 4 position","records":20,"startingRecord":0,"searchOptions":"InStock","searchWithYourSignUpLanguage":"false"}}'
+```
+
+API key is stored in `secrets.yaml` as `mouser_api_key`. Returns EUR prices and German stock levels.
+
+### Chosen Components (RoomSensor-MainPlate)
+
+| Ref | Function | MPN | Mouser stock | Price (1pc) |
+|-----|----------|-----|-------------|-------------|
+| S1, S2 | 5-pin socket header | 61300511821 (Würth WR-PHD) | 6,255 | €0.36 |
+| S3 | 8-pin socket header | 61300811821 (Würth WR-PHD) | 4,813 | €0.41 |
+| A1 | 10-pin socket header | 61301011821 (Würth WR-PHD) | 2,578 | €0.69 |
+| E1 | 2×13 dual socket header | 61302621821 (Würth WR-PHD) | 2,262 | €1.04 |
+| C1, C2 | 4-pin 2.54mm screw terminal | 1725672 (Phoenix MPT) | 8,540 | €2.47 |
+| C3 | 7-pin 2.54mm screw terminal | 1725708 (Phoenix MPT) | 528 | €4.32 |
+| C4 | JST XH 6-pin header | B6B-XH-A(LF)(SN) | 147,925 | €0.26 |
+| C5 | JST XH 4-pin header | B4B-XH-A(LF)(SN) | 0 (62k arriving 2026-07-21) | €0.15 |
+
+**Terminal block notes:**
+- Phoenix MPT (C1/C2/C3) is the cheapest option available on Mouser DE at 2.54mm pitch. DEGSON (DG308) is cheaper but not listed on Mouser. Würth WR-TBL is the next best Mouser-native option (~€1.80 for 4-pin; 7-pin out of stock).
+- GCT TBC05-04-1-G-G (€1.28, 5100 in stock) is a potential cheaper swap for C1/C2 — footprint compatibility with the Phoenix MPT KiCad footprint needs to be verified before committing.
+- For 7-pin (C3), Phoenix 1725708 is currently the only option on Mouser DE.
+
+**Footprint family:** All 2.54mm screw/clamp terminals (Phoenix MPT, DG308, KF128, GCT TBC05) share the same `TerminalBlock_Phoenix:TerminalBlock_Phoenix_MPT-0,5-x-2.54_1x0xP2.54mm_Horizontal` KiCad footprint family.

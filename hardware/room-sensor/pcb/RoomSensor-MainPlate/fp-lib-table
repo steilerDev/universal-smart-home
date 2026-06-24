@@ -1,0 +1,4 @@
+(fp_lib_table
+	(version 7)
+	(lib (name "room-sensor") (type "KiCad") (uri "/Users/franksteiler/Documents/Sandboxes/universal-smart-home/hardware/room-sensor/room-sensor.pretty") (options "") (descr ""))
+)
