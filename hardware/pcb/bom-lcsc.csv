@@ -1,0 +1,10 @@
+MPN,LCSC#,Qty (1 board set),Description,Refs
+C50950,C50950,2,1x5 female socket 8.5mm,"MainPlate S1, S2"
+C27438,C27438,1,1x8 female socket 8.5mm,MainPlate S3
+PM254-1-10-Z-8.5,C2897373,1,1x10 female socket 8.5mm,MainPlate A1
+C64320,C64320,1,2x13 dual female socket 8.5mm,MainPlate E1
+KF128-2.54-4P,C474922,5,4-pin screw terminal 2.54mm,"MainPlate C1, C2 + BackPlate EX1, EX2, EX3"
+KF128-2.54-7P,C474925,1,7-pin screw terminal 2.54mm,MainPlate C3
+MTB10-10S,C358743,2,IDC 2x5 box header 2.54mm PCB side,"MainPlate J1, BackPlate C1"
+HX PM2.54-1x4P ZC H11,C41427519,5,4-pin tall female socket 11mm,"BackPlate R1, R2, R3, L1, E1"
+PCF8574P,C398073,1,DIP-16 I2C GPIO expander,BackPlate U1

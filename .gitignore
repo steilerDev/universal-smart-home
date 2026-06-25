@@ -20,3 +20,4 @@ Thumbs.db
 # KiCad files
 .history
 .kicad-push
+*-unsaved-export-*.kicad_prl

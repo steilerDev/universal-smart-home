@@ -14,10 +14,13 @@ packages/
   actuators/      — status-led, dimmer, relay (via gpio extender), audio
   io/             — gpio-extender (PCF8574 — buttons + power circuits + blinds)
 hardware/
-  room-sensor/
-    pcb/board-a/  — First PCB distribution board (design files go here)
-    pcb/board-b/  — Second PCB distribution board
-    case/         — Fusion 360 case files (.f3d stored as plain binary)
+  pcb/
+    RoomSensor-BackPlate/  — Back plate PCB (PCF8574 expander, connectors)
+    RoomSensor-MainPlate/  — Main plate PCB (Olimex socket, screw terminals)
+    bom-lcsc.csv           — Combined BOM for LCSC ordering
+  case/         — Fusion 360 case files (.f3d stored as plain binary)
+  room-sensor.kicad_sym   — Custom KiCad symbol library
+  room-sensor.pretty/     — Custom KiCad footprint library
 scripts/
   validate-all.sh — Validate all device configs
   deploy.sh       — OTA deploy a single device
@@ -289,51 +292,42 @@ esphome config devices/<room-name>.yaml   # validate before deploying
 ### Workflow
 
 - **PCB manufacturing:** AISLER (aisler.net) — bare board, no assembly
-- **Parts:** Mouser Germany (mouser.de) — all components ordered separately and hand-soldered
+- **Parts:** LCSC (lcsc.com) — all components ordered separately and hand-soldered
 
 ### KiCad Schematic Metadata
 
-The schematic uses two key custom fields per component:
+- **`MPN`** (Manufacturer Part Number) — the only custom field used. Required by AISLER; cross-reference against LCSC table below for ordering.
+- **`LCSC`** — not present in schematic. Use LCSC# column below to build cart on lcsc.com.
 
-- **`MPN`** (Manufacturer Part Number) — required by AISLER for component matching in their BOM tool; also used for Mouser BOM upload (Mouser accepts MPN in their cart import CSV). This is the only field needed for the AISLER + Mouser workflow.
-- **`LCSC`** — only needed if ordering JLCPCB assembly. **Not present** in current schematic (removed; add back if switching to JLCPCB).
+**BOM export from KiCad:** Use the Symbol Fields Table — accessible via the spreadsheet icon in the schematic editor toolbar (KiCad 10). There is no menu path. Export as CSV.
 
-**BOM export from KiCad:** Use the Symbol Fields Table — accessible via the spreadsheet icon in the schematic editor toolbar (KiCad 10). There is no menu path. Export as CSV; the MPN column maps directly to Mouser's BOM upload.
+### Chosen Components — RoomSensor-MainPlate
 
-### Mouser API
+| Ref | Function | MPN (in schematic) | LCSC# | Stock | Price |
+|-----|----------|--------------------|-------|-------|-------|
+| S1, S2 | 1×5 female socket 8.5mm | C50950 | C50950 | 147k | $0.08 |
+| S3 | 1×8 female socket 8.5mm | C27438 | C27438 | 214k | $0.11 |
+| A1 | 1×10 female socket 8.5mm | PM254-1-10-Z-8.5 | C2897373 | 29k | $0.19 |
+| E1 | 2×13 dual female socket 8.5mm | C64320 | C64320 | 3.5k | $0.22 |
+| C1, C2 | 4-pin screw terminal 2.54mm | KF128-2.54-4P | C474922 | 3.9k | $0.47 |
+| C3 | 7-pin screw terminal 2.54mm | KF128-2.54-7P | C474925 | 340 ⚠️ | $0.78 |
+| C4 | XH 6-pin PCB header 2.5mm | ZX-XH2.54-6PZZ | C7429636 | 95k | $0.03 |
+| C5 | XH 4-pin PCB header 2.5mm | ZX-XH2.54-4PZZ | C7429634 | 650k | $0.01 |
+| J1 | IDC 2×5 box header 2.54mm (PCB side) | MTB10-10S | C358743 | 47k | $0.08 |
 
-Direct REST API for stock/price queries from the sandbox:
+Note: C4/C5 are not yet placed in the schematic — MPNs listed for when they are added.
 
-```bash
-# Part number lookup (exact MPN or Mouser PN)
-curl -s -X POST "https://api.mouser.com/api/v1/search/partnumber?apiKey=$(grep mouser_api_key secrets.yaml | awk '{print $2}' | tr -d '\"')" \
-  -H "Content-Type: application/json" \
-  -d '{"SearchByPartRequest":{"mouserPartNumber":"<MPN>","partSearchOptions":""}}'
+### Chosen Components — RoomSensor-BackPlate
 
-# Keyword search (discovery, in-stock only)
-curl -s -X POST "https://api.mouser.com/api/v1/search/keyword?apiKey=..." \
-  -H "Content-Type: application/json" \
-  -d '{"SearchByKeywordRequest":{"keyword":"terminal block 2.54mm 4 position","records":20,"startingRecord":0,"searchOptions":"InStock","searchWithYourSignUpLanguage":"false"}}'
-```
+| Ref | Function | MPN (in schematic) | LCSC# | Stock | Price |
+|-----|----------|--------------------|-------|-------|-------|
+| R1–R3, L1, E1 | 1×4 tall female socket 11mm | HX PM2.54-1x4P ZC H11 | C41427519 | 3.8k | $0.21 |
+| EX1–EX3 | 4-pin screw terminal 2.54mm | KF128-2.54-4P | C474922 | 3.9k | $0.47 |
+| C1 | IDC 2×5 box header 2.54mm (PCB side) | MTB10-10S | C358743 | 47k | $0.08 |
+| U1 | PCF8574 DIP-16 GPIO expander | PCF8574P | C398073 | 351 | $0.77 |
+| SW1, SW2 | Voltage selector | *(solder pads — no part)* | — | — | — |
 
-API key is stored in `secrets.yaml` as `mouser_api_key`. Returns EUR prices and German stock levels.
-
-### Chosen Components (RoomSensor-MainPlate)
-
-| Ref | Function | MPN | Mouser stock | Price (1pc) |
-|-----|----------|-----|-------------|-------------|
-| S1, S2 | 5-pin socket header | 61300511821 (Würth WR-PHD) | 6,255 | €0.36 |
-| S3 | 8-pin socket header | 61300811821 (Würth WR-PHD) | 4,813 | €0.41 |
-| A1 | 10-pin socket header | 61301011821 (Würth WR-PHD) | 2,578 | €0.69 |
-| E1 | 2×13 dual socket header | 61302621821 (Würth WR-PHD) | 2,262 | €1.04 |
-| C1, C2 | 4-pin 2.54mm screw terminal | 1725672 (Phoenix MPT) | 8,540 | €2.47 |
-| C3 | 7-pin 2.54mm screw terminal | 1725708 (Phoenix MPT) | 528 | €4.32 |
-| C4 | JST XH 6-pin header | B6B-XH-A(LF)(SN) | 147,925 | €0.26 |
-| C5 | JST XH 4-pin header | B4B-XH-A(LF)(SN) | 0 (62k arriving 2026-07-21) | €0.15 |
-
-**Terminal block notes:**
-- Phoenix MPT (C1/C2/C3) is the cheapest option available on Mouser DE at 2.54mm pitch. DEGSON (DG308) is cheaper but not listed on Mouser. Würth WR-TBL is the next best Mouser-native option (~€1.80 for 4-pin; 7-pin out of stock).
-- GCT TBC05-04-1-G-G (€1.28, 5100 in stock) is a potential cheaper swap for C1/C2 — footprint compatibility with the Phoenix MPT KiCad footprint needs to be verified before committing.
-- For 7-pin (C3), Phoenix 1725708 is currently the only option on Mouser DE.
-
-**Footprint family:** All 2.54mm screw/clamp terminals (Phoenix MPT, DG308, KF128, GCT TBC05) share the same `TerminalBlock_Phoenix:TerminalBlock_Phoenix_MPT-0,5-x-2.54_1x0xP2.54mm_Horizontal` KiCad footprint family.
+**Notes:**
+- KF128 (C474922/C474925) uses the same `TerminalBlock_Phoenix:TerminalBlock_Phoenix_MPT-0,5-x-2.54` KiCad footprint family as Phoenix MPT — direct drop-in.
+- PCF8574**P** = DIP-16, I2C address 0x20. Do NOT use PCF8574**AP** (C398072) — that's address 0x38, firmware-incompatible.
+- XH connectors (C4/C5) are 2.5mm pitch, not 2.54mm — use JST_XH KiCad footprints.
