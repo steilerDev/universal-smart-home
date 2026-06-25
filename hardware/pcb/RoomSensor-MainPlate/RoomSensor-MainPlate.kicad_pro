@@ -555,7 +555,7 @@
           "group_by": false,
           "label": "Reference",
           "name": "Reference",
-          "show": true
+          "show": false
         },
         {
           "group_by": false,
@@ -564,34 +564,34 @@
           "show": true
         },
         {
-          "group_by": true,
+          "group_by": false,
           "label": "Value",
           "name": "Value",
-          "show": true
+          "show": false
         },
         {
-          "group_by": true,
+          "group_by": false,
           "label": "DNP",
           "name": "${DNP}",
-          "show": true
+          "show": false
         },
         {
-          "group_by": true,
+          "group_by": false,
           "label": "Exclude from BOM",
           "name": "${EXCLUDE_FROM_BOM}",
-          "show": true
+          "show": false
         },
         {
-          "group_by": true,
+          "group_by": false,
           "label": "Exclude from Board",
           "name": "${EXCLUDE_FROM_BOARD}",
-          "show": true
+          "show": false
         },
         {
-          "group_by": true,
+          "group_by": false,
           "label": "Footprint",
           "name": "Footprint",
-          "show": true
+          "show": false
         },
         {
           "group_by": false,
@@ -672,7 +672,7 @@
         "uuid": "e05eedec-4a5b-4cb3-a744-52cc56b6a366"
       }
     ],
-    "used_designators": "Power1,Light1,LED1,Presence1,GPIO1,ESP1,Audio1,Climate1,B_Data1,B_Power1,J1-4",
+    "used_designators": "J1-4,B_Power1,B_Data1,Climate1,Audio1,ESP1,GPIO1,Presence1,LED1,Light1,Power1",
     "variants": []
   },
   "sheets": [

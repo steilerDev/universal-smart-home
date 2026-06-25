@@ -1654,7 +1654,7 @@
 					)
 				)
 			)
-			(property "MPN" "1725672"
+			(property "MPN" "KF128-2.54-4P"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -5369,6 +5369,28 @@
 				)
 			)
 		)
+		(property "MPN" "MTB10-10S"
+			(at 111.76 147.32 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" ""
+			(at 111.76 147.32 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "10"
 			(uuid "77037006-1135-49ab-9c6f-10ddf2767b23")
 		)
@@ -5475,7 +5497,18 @@
 				)
 			)
 		)
-		(property "MPN" "61300811821"
+		(property "MPN" "C27438"
+			(at 111.76 78.74 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" ""
 			(at 111.76 78.74 0)
 			(hide yes)
 			(show_name no)
@@ -5586,7 +5619,18 @@
 				)
 			)
 		)
-		(property "MPN" "1725708"
+		(property "MPN" "KF128-2.54-7P"
+			(at 113.03 128.27 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" ""
 			(at 113.03 128.27 0)
 			(hide yes)
 			(show_name no)
@@ -5694,7 +5738,18 @@
 				)
 			)
 		)
-		(property "MPN" "61301011821"
+		(property "MPN" "PM254-1-10-Z-8.5"
+			(at 111.76 102.87 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" ""
 			(at 111.76 102.87 0)
 			(hide yes)
 			(show_name no)
@@ -5812,7 +5867,18 @@
 				)
 			)
 		)
-		(property "MPN" "61300511821"
+		(property "MPN" "C50950"
+			(at 111.76 46.99 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" ""
 			(at 111.76 46.99 0)
 			(hide yes)
 			(show_name no)
@@ -5912,7 +5978,18 @@
 				)
 			)
 		)
-		(property "MPN" "61302621821"
+		(property "MPN" "C64320"
+			(at 46.99 101.6 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" ""
 			(at 46.99 101.6 0)
 			(hide yes)
 			(show_name no)
@@ -6077,7 +6154,18 @@
 				)
 			)
 		)
-		(property "MPN" "61300511821"
+		(property "MPN" "C50950"
+			(at 111.76 62.23 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" ""
 			(at 111.76 62.23 0)
 			(hide yes)
 			(show_name no)
@@ -6180,7 +6268,18 @@
 				)
 			)
 		)
-		(property "MPN" "1725672"
+		(property "MPN" "KF128-2.54-4P"
+			(at 113.03 175.26 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" ""
 			(at 113.03 175.26 0)
 			(hide yes)
 			(show_name no)
@@ -6279,7 +6378,18 @@
 				)
 			)
 		)
-		(property "MPN" "1725672"
+		(property "MPN" "KF128-2.54-4P"
+			(at 113.03 161.29 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" ""
 			(at 113.03 161.29 0)
 			(hide yes)
 			(show_name no)
