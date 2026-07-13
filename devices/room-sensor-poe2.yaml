@@ -15,6 +15,9 @@ substitutions:
   audio_dout_pin: "GPIO14"
   audio_din_pin: "GPIO15"
   audio_mclk_pin: "GPIO1"
+  # NeoPixel on GPIO32 — GPIO33 is taken by PZEM UART TX on this device
+  led_pin: "GPIO32"
+  led_num_leds: "1"
 
 # MCLK on GPIO1 requires UART0 logger disabled (GPIO1 = UART0 TX)
 logger:
@@ -29,6 +32,7 @@ packages:
   motion:      !include ../packages/sensors/motion.yaml
   power:       !include ../packages/sensors/power-pzem004t.yaml
   audio:       !include ../packages/actuators/audio.yaml
+  status_led:  !include ../packages/actuators/status-led.yaml
 
 binary_sensor:
   - id: !extend button_1
