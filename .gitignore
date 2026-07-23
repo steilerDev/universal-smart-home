@@ -17,6 +17,15 @@ Thumbs.db
 # Claude Code local settings (personal, not shared)
 .claude/settings.local.json
 
+# ESPHome Device Builder state (written into devices/ on the build host — disposable,
+# device identity lives in YAML substitutions, so keep it out of git)
+devices/.device-builder*.json
+devices/.device-builder-peer-link-key.bin
+devices/dashboard-jobs/
+
+# Local deploy env (builder/Authentik credentials)
+deploy/.env
+
 # KiCad files
 .history
 .kicad-push

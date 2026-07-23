@@ -100,7 +100,32 @@ GPIO19, GPIO20, GPIO21, GPIO22, GPIO25, GPIO26, GPIO27, GPIO32, GPIO34¹, GPIO35
 
 > Before assigning any GPIO to a new component, check it against this table first.
 
-## ESPHome Build Environment
+## Deploy via Device Builder (default path)
+
+Firmware is built and OTA-flashed by a **self-hosted ESPHome Device Builder** on the
+primary Docker host (fronted by Authentik), **not** by compiling in this sandbox. The
+agent edits YAML, pushes to `main`, and triggers the build over the builder's WebSocket
+API. Use the `deploy-device` skill, or run the steps directly:
+
+```bash
+esphome config devices/<name>.yaml     # 1. validate locally (cheap, no compile)
+git add -A && git commit -m "…" && git push origin main   # 2. push (builder git-syncs main)
+./scripts/builder-deploy.py <name>     # 3. compile + OTA on the builder, streamed
+./scripts/check-device.py <name>       # 4. health-check
+```
+
+- One-time server + Authentik setup: `deploy/README.md` (+ `deploy/docker-compose.yml`).
+- Agent env (`ESPHOME_BUILDER_URL`, `AUTHENTIK_*`): see `deploy/README.md` §4.
+- `scripts/builder-deploy.py` speaks the builder's single `/ws` endpoint
+  (`firmware/install` → `firmware/follow_job`), authenticating with an Authentik
+  Bearer JWT. `--all` deploys every device; `--compile-only` skips the OTA.
+- Auth/sync model: single hostname behind Authentik, config dir = `devices/`,
+  git-sync sidecar pulls `origin/main` every ~15s. Details in `deploy/README.md`.
+
+The local-compile path below is the **fallback** for when the builder is unavailable;
+it requires the PlatformIO/SSL workarounds in "Known Build Issues & Fixes".
+
+## ESPHome Build Environment (local fallback)
 
 ### Installation
 

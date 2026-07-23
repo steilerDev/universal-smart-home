@@ -1,0 +1,59 @@
+# ESPHome Device Builder + git-sync, fronted by an EXISTING Authentik proxy provider.
+#
+# The builder is never published to the host. Both humans and the deploy agent
+# arrive at https://esphome.<domain>:
+#   - browsers  → Authentik SSO (unchanged)
+#   - the agent → Authentik Bearer JWT (OAuth2 client-credentials)
+# The Authentik outpost reaches this container over the shared internal network.
+#
+# Setup (see deploy/README.md): clone this repo on the host, drop a real
+# secrets.yaml at the checkout root, then `cp .env.example .env` and edit.
+services:
+  esphome-builder:
+    image: ghcr.io/esphome/esphome:latest
+    container_name: esphome-builder
+    # The builder's config scanner is top-level only, so point it straight at
+    # devices/. The rest of the repo stays on disk for ../packages, ../components
+    # and the devices/secrets.yaml -> ../secrets.yaml symlink.
+    command: ["esphome-device-builder", "/repo/devices"]
+    environment:
+      # Build artifacts / venvs / job logs live off the repo (and off git reset's path).
+      ESPHOME_DATA_DIR: /data
+      # NOTE: ESPHOME_USERNAME / ESPHOME_PASSWORD are intentionally UNSET.
+      # Authentik is the sole auth layer; setting native auth here would collide
+      # with the Authorization header the outpost already consumes.
+    volumes:
+      - ${ESPHOME_REPO_DIR:?set ESPHOME_REPO_DIR in .env to the host repo checkout}:/repo
+      - esphome-data:/data
+    expose:
+      - "6052"          # internal network only — no host port binding
+    networks:
+      - authentik       # reachable by the Authentik outpost
+      - egress          # outbound to GitHub / PlatformIO / device LAN
+    restart: unless-stopped
+
+  esphome-git-sync:
+    image: alpine/git:latest
+    container_name: esphome-git-sync
+    entrypoint: ["/bin/sh", "/git-sync.sh"]
+    environment:
+      GIT_SYNC_REPO: /repo
+      GIT_SYNC_REF: ${ESPHOME_GIT_REF:-main}
+      GIT_SYNC_INTERVAL: ${ESPHOME_GIT_INTERVAL:-15}
+    volumes:
+      - ${ESPHOME_REPO_DIR:?set ESPHOME_REPO_DIR in .env to the host repo checkout}:/repo
+      - ./git-sync.sh:/git-sync.sh:ro
+    networks:
+      - egress          # outbound to GitHub only
+    restart: unless-stopped
+
+volumes:
+  esphome-data:
+
+networks:
+  # The existing Authentik outpost network. Rename via AUTHENTIK_NETWORK in .env.
+  authentik:
+    external: true
+    name: ${AUTHENTIK_NETWORK:-authentik}
+  egress:
+    driver: bridge
