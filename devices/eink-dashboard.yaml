@@ -1,0 +1,38 @@
+# E-Ink Dashboard — TRMNL BYOS client (LaraPaper)
+# Olimex ESP32-POE2 + Waveshare 7.5" 800x480 mono e-paper panel.
+#
+# The panel pulls its screen from LaraPaper; edit trmnl_server to point at it.
+#
+# SPI pin choice note: the LAN8720 uses the ESP32 RMII interface, which HARD-
+# RESERVES GPIO19/21/22/25/26/27 (TXD0/TXEN/TXD1/RXD0/RXD1/CRS_DV) — these are
+# NOT usable despite being "available" in the CLAUDE.md table. This display-only
+# device omits the audio/PZEM/NeoPixel packages, so we reuse those now-free pins:
+#   14=CLK 13=MOSI 15=CS 32=DC 33=RST 35=BUSY (input-only, fine for BUSY)
+
+substitutions:
+  device_name: eink-dashboard
+  device_friendly_name: "E-Ink Dashboard"
+  device_ip: "10.10.14.25"
+  # base package always instantiates the I2C bus; keep the house-standard pins
+  # even though this device has no I2C peripherals.
+  i2c_sda_pin: "GPIO04"
+  i2c_scl_pin: "GPIO03"
+
+  # --- TRMNL / LaraPaper ---
+  trmnl_server: "http://10.10.14.5:4567"
+  trmnl_refresh: "15min"
+
+  # --- e-paper panel ---
+  eink_model: "7.50inv2"
+  eink_width: "800"
+  eink_height: "480"
+  eink_clk_pin: "GPIO14"
+  eink_mosi_pin: "GPIO13"
+  eink_cs_pin: "GPIO15"
+  eink_dc_pin: "GPIO32"
+  eink_reset_pin: "GPIO33"
+  eink_busy_pin: "GPIO35"
+
+packages:
+  base:  !include ../packages/base/room-sensor.yaml
+  trmnl: !include ../packages/displays/trmnl.yaml

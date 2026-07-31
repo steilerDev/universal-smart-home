@@ -1,0 +1,71 @@
+# Package: TRMNL e-ink dashboard (BYOS client for LaraPaper)
+#
+# Turns an Olimex ESP32-POE2 into a native-behaving TRMNL device that pulls its
+# screen from a self-hosted LaraPaper (BYOS) server. The custom `trmnl`
+# component (components/trmnl/) speaks the /api/setup + /api/display + /api/log
+# protocol; `online_image` fetches/decodes the rendered screen; `waveshare_epaper`
+# drives the panel.
+#
+# Required substitutions (set in the device YAML):
+#   trmnl_server      — base URL of the LaraPaper server, e.g. "http://10.10.14.5:4567"
+#   eink_model        — waveshare_epaper model, e.g. "7.50inv2"
+#   eink_width        — panel width in px  (e.g. 800)
+#   eink_height       — panel height in px (e.g. 480)
+#   eink_clk_pin      — SPI SCLK
+#   eink_mosi_pin     — SPI MOSI
+#   eink_cs_pin       — panel CS
+#   eink_dc_pin       — panel DC
+#   eink_reset_pin    — panel RST
+#   eink_busy_pin     — panel BUSY (input; input-only GPIOs are fine here)
+#
+# Optional substitutions (sensible defaults below via device YAML):
+#   trmnl_refresh     — fallback refresh cadence if the server omits one (default 15min)
+
+external_components:
+  - source:
+      type: local
+      path: ../components
+    components: [trmnl]
+
+# LaraPaper is served over plain HTTP on the LAN; image URLs likewise.
+http_request:
+  verify_ssl: false
+  timeout: 15s
+
+spi:
+  clk_pin: ${eink_clk_pin}
+  mosi_pin: ${eink_mosi_pin}
+
+online_image:
+  - id: trmnl_screen
+    # Placeholder — the trmnl component overwrites this at runtime with the
+    # server-provided image_url before every download.
+    url: "http://0.0.0.0/placeholder.png"
+    format: PNG
+    type: BINARY
+    update_interval: never
+    buffer_size: 4096
+
+display:
+  - platform: waveshare_epaper
+    id: eink
+    model: ${eink_model}
+    cs_pin: ${eink_cs_pin}
+    dc_pin: ${eink_dc_pin}
+    reset_pin: ${eink_reset_pin}
+    busy_pin: ${eink_busy_pin}
+    reset_duration: 2ms
+    update_interval: never   # driven by the trmnl component, not a timer
+    lambda: |-
+      it.image(0, 0, id(trmnl_screen));
+
+trmnl:
+  id: trmnl_client
+  online_image_id: trmnl_screen
+  display_id: eink
+  server: ${trmnl_server}
+  width: ${eink_width}
+  height: ${eink_height}
+  model: "universal-smart-home"
+  fw_version: "1.0.0"
+  default_refresh_rate: ${trmnl_refresh}
