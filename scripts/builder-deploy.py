@@ -2,15 +2,17 @@
 """Trigger a compile + OTA on the self-hosted ESPHome Device Builder over its WebSocket API.
 
 The heavy build (PlatformIO toolchain, ~1 GB) and the OTA upload happen on the
-builder host, not in this sandbox. This client only:
+builder host, not in this container. This client only:
 
-  1. mints an Authentik machine-to-machine JWT (OAuth2 client-credentials),
-  2. opens the builder's single ``/ws`` endpoint through Authentik with that JWT,
-  3. calls ``firmware/install`` for each device and streams the job to completion,
-  4. exits non-zero if any job failed.
+  1. opens the builder's single ``/ws`` endpoint,
+  2. calls ``firmware/install`` for each device and streams the job to completion,
+  3. exits non-zero if any job failed.
 
-Assumes the device YAMLs already live on the builder (git-synced) — push to
-``main`` first, then run this. See deploy/README.md and .claude/skills/deploy-device.
+Default path: the agent runs in the ``claude`` container beside the builder, on
+the internal Docker network. The repo is bind-mounted into both, so edits to
+``devices/*.yaml`` are already visible to the builder — just run this, no push
+needed to flash. ``ESPHOME_BUILDER_URL=ws://esphome-builder:6052/ws``, no auth.
+See deploy/README.md and .claude/skills/deploy-device.
 
 Usage:
     ./scripts/builder-deploy.py room-sensor-poe2
@@ -19,7 +21,13 @@ Usage:
     ./scripts/builder-deploy.py room-sensor-poe2 --compile-only
 
 Environment:
-    ESPHOME_BUILDER_URL    wss://esphome.<domain>/ws           (required)
+    ESPHOME_BUILDER_URL    ws://esphome-builder:6052/ws        (required)
+
+Fallback — running the client from OUTSIDE the Docker network, through Authentik
+(wss://esphome.<domain>/ws). Set these and the client mints an OAuth2
+client-credentials JWT and presents it as a Bearer token (``--basic`` for the
+goauthentik.io/token variant); pair with ``--sync-timeout`` if a git-synced
+builder needs time to pick up a pushed commit first:
     AUTHENTIK_TOKEN_URL    https://auth.<domain>/application/o/token/
     AUTHENTIK_CLIENT_ID    <proxy provider client_id>
     AUTHENTIK_SVC_USER     <service-account username>
@@ -27,8 +35,7 @@ Environment:
     AUTHENTIK_CLIENT_SECRET  (optional; for confidential providers)
     AUTHENTIK_SCOPE        (optional; default "openid profile")
 
-If none of the AUTHENTIK_* vars are set, the client connects without auth
-(useful only when the builder is reached directly with native auth disabled).
+If none of the AUTHENTIK_* vars are set, the client connects without auth.
 """
 from __future__ import annotations
 
@@ -301,8 +308,9 @@ def main() -> None:
     p.add_argument("--server", help="builder /ws URL (default $ESPHOME_BUILDER_URL)")
     p.add_argument("--compile-only", action="store_true", help="compile without OTA upload")
     p.add_argument("--timeout", type=float, default=900, help="per-job timeout seconds (default 900)")
-    p.add_argument("--sync-timeout", type=float, default=20,
-                   help="seconds to wait for the builder git-sync poll before deploying (default 20)")
+    p.add_argument("--sync-timeout", type=float, default=0,
+                   help="seconds to wait before deploying, for a git-synced (out-of-network) "
+                        "builder to pick up a pushed commit; 0 with the shared mount (default 0)")
     p.add_argument("--basic", action="store_true",
                    help="use Authentik Basic (goauthentik.io/token) instead of Bearer")
     p.add_argument("--insecure", action="store_true", help="skip TLS certificate verification")

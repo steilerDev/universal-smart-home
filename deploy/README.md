@@ -1,17 +1,32 @@
-# ESPHome Device Builder — self-hosted build/deploy server
+# ESPHome Device Builder + Claude agent — colocated stack
 
-This directory deploys the **ESPHome Device Builder** on the primary Docker host as
-the build + OTA server for this repo, fronted by the existing **Authentik** proxy
-provider. The Claude Code agent edits YAML, pushes to `main`, and triggers builds
-over the builder's WebSocket API — no local PlatformIO toolchain in the sandbox.
+This directory deploys **two** containers on the primary Docker host:
+
+- **`esphome-builder`** — the ESPHome Device Builder (compile + OTA server),
+  fronted by the existing **Authentik** proxy provider for browser access.
+- **`claude`** — the Claude Code agent, running *inside* the Docker network,
+  **behind** the Authentik gate.
+
+The repo is bind-mounted into **both** at `/repo`, and the two share an internal
+network, which removes the two frictions of the git-driven design:
 
 ```
-agent → git push main → GitHub
-agent → wss://esphome.<domain>/ws  (Authentik Bearer JWT) → outpost → builder
-builder host: git-sync sidecar pulls origin/main every 15s → builder compiles + OTA
+host checkout /opt/docker/home_esp ──bind-mount /repo──► esphome-builder  (runs /repo/devices)
+                                    └─bind-mount /repo──► claude           (edits /repo/devices)
+                                                            │  edits are instantly visible ↑ (same files)
+  claude ── ws://esphome-builder:6052/ws (no auth) ─────────┘  compile + OTA
+  browsers ── https://esphome.<domain> ── Authentik SSO ──► esphome-builder  (unchanged)
 ```
 
-## Why the config dir points at `devices/`
+- **No auth for the agent** — it reaches the builder directly on the internal
+  `esphome-net`. The builder's native auth stays unset; Authentik only gates the
+  browser UI.
+- **No git-sync** — the shared mount means the agent's YAML edits are visible to
+  the builder immediately, with no commit required to flash.
+- **Git stays the source of truth** — `commit + push` is a durability step *after*
+  a successful deploy, not part of the deploy path.
+
+## Why the config dir points at `/repo/devices`
 
 The builder's config scanner (`list_yaml_files`) is **top-level only** and skips
 `secrets.yaml` and dotfiles. Our device YAMLs live in `devices/` and `!include
@@ -23,93 +38,82 @@ parent tree is present on disk.
 ## 1. Provision the checkout on the host
 
 ```bash
-sudo mkdir -p /srv/esphome && cd /srv/esphome
-git clone https://github.com/steilerDev/universal-smart-home
-cd universal-smart-home
-# secrets.yaml is gitignored and survives `git reset --hard`; place it once:
+sudo mkdir -p /opt/docker && cd /opt/docker
+git clone https://github.com/steilerDev/universal-smart-home home_esp
+cd home_esp
+# secrets.yaml is gitignored and lives at the checkout root; place it once:
 cp secrets.template.yaml secrets.yaml && $EDITOR secrets.yaml
 ```
 
 `secrets.yaml` sits at the checkout **root**; the committed `devices/secrets.yaml`
 symlink points at it, so the builder finds secrets when compiling `devices/*.yaml`.
 
-## 2. Configure Authentik (single hostname, single auth layer)
+## 2. Authentik (browser SSO only — no change needed)
 
-The existing Proxy Provider + Application for `esphome.<domain>` stays unchanged and
-keeps SSO-gating the browser UI. Add **machine-to-machine** access for the agent:
+The existing Proxy Provider + Application for `esphome.<domain>` stays exactly as
+it is and keeps SSO-gating the browser UI. **No machine-to-machine service account
+is needed** — the agent lives inside the network and never traverses the outpost.
 
-1. **Service account** — Directory → Users → Create service account, e.g.
-   `svc-esphome-deploy`. Generate an **App password** token (save it).
-2. **Authorize it** — bind the service account (or a group it's in) to the ESPHome
-   Application so its token is allowed through the proxy.
-3. **Client ID** — Providers → your ESPHome proxy provider → copy the **Client ID**.
-
-The agent then fetches a JWT *issued for the proxy provider* and presents it as a
-Bearer token on the WebSocket. Authentik's proxy accepts
-`Authorization: Bearer <JWT>` (and the `goauthentik.io/token` Basic variant) and
-forwards the WS upgrade to the builder. No path exemptions, no extra ports.
-
-Verify the token endpoint by hand:
-
-```bash
-curl -s -X POST https://auth.<domain>/application/o/token/ \
-  -d grant_type=client_credentials \
-  -d client_id='<proxy-provider-client-id>' \
-  -d username='svc-esphome-deploy' \
-  -d password='<app-password>' \
-  -d scope='openid profile' | jq .access_token
-```
-
-Leave the builder's own `ESPHOME_USERNAME` / `ESPHOME_PASSWORD` **unset** — Authentik
-is the only auth layer (setting native auth would collide with the `Authorization`
-header the outpost consumes). The builder is only reachable via the outpost's
-internal network, never published to the host.
-
-## 3. Start it
+## 3. Start the stack
 
 ```bash
 cd deploy
-cp .env.example .env && $EDITOR .env    # set ESPHOME_REPO_DIR + AUTHENTIK_NETWORK
+cp .env.example .env && $EDITOR .env
+#   ESPHOME_REPO_DIR   → /opt/docker/home_esp  (the checkout above)
+#   CLAUDE_CONFIG_DIR  → absolute path to the host ~/.claude to reuse
+#   AUTHENTIK_NETWORK  → your Authentik outpost network (docker network ls)
 docker compose up -d
-docker compose logs -f esphome-git-sync # confirm it reaches origin/main
+docker compose ps                 # esphome-builder + claude, no published builder port
 ```
 
-Find your Authentik network name with `docker network ls` (the outpost's network).
+`CLAUDE_CONFIG_DIR` is bind-mounted to `/root/.claude` in the agent container so it
+reuses your existing Claude login and settings — no API key in the repo. Give an
+**absolute** path (Docker does not expand `~`).
 
-## 4. Point the agent at it
+## 4. Run the agent
 
-Set these in the sandbox environment (`/etc/sandbox-persistent.sh`) so
-`scripts/builder-deploy.py` and the `deploy-device` skill can reach the builder:
+```bash
+docker exec -it claude claude
+```
+
+`ESPHOME_BUILDER_URL` is preset in the compose environment to
+`ws://esphome-builder:6052/ws`, so deploys work with no further configuration:
+
+```bash
+esphome config devices/room-sensor-poe2.yaml   # validate
+./scripts/builder-deploy.py room-sensor-poe2   # compile + OTA on the builder
+./scripts/check-device.py room-sensor-poe2     # health check
+git add -A && git commit -m "…" && git push origin main   # persist (durability)
+```
+
+The `deploy-device` skill codifies this loop.
+
+## Fallback: running the client from outside the network
+
+If you ever run `scripts/builder-deploy.py` from *outside* the Docker network
+(e.g. a dev sandbox), it reaches the builder through Authentik instead. Set:
 
 ```bash
 export ESPHOME_BUILDER_URL='wss://esphome.<domain>/ws'
 export AUTHENTIK_TOKEN_URL='https://auth.<domain>/application/o/token/'
 export AUTHENTIK_CLIENT_ID='<proxy-provider-client-id>'
-export AUTHENTIK_SVC_USER='svc-esphome-deploy'
+export AUTHENTIK_SVC_USER='<service-account>'
 export AUTHENTIK_SVC_TOKEN='<app-password>'
 ```
 
-The Authentik hostnames must be reachable from the sandbox — allow them in the
-network policy the same way the device IPs are (`sbx policy allow network esphome.<domain>`).
-
-Then, from the repo root:
-
-```bash
-pip3 install -r requirements-tooling.txt
-git push origin main
-./scripts/builder-deploy.py room-sensor-poe2
-./scripts/check-device.py room-sensor-poe2
-```
+The client mints an OAuth2 client-credentials JWT and presents it as
+`Authorization: Bearer <JWT>` on the WS upgrade (`--basic` switches to the
+`goauthentik.io/token` variant if the outpost strips Bearer). This path needs an
+Authentik service account bound to the ESPHome application, and the Authentik
+hostnames allowed in that environment's network policy. It is **not** required for
+the in-network `claude` container above.
 
 ## Notes
 
-- **git-sync** only runs `git reset --hard origin/<ref>` (tracked files). Untracked
-  builder state (`.device-builder*.json` job history/labels) and `secrets.yaml`
-  persist. It has no listening port.
 - **Source of truth is the YAML in git.** Treat the builder UI as deploy/observe
-  only; set friendly names via device-YAML `substitutions`, not the UI, so the
-  gitignored builder state stays disposable.
-- **`--basic`** on the deploy client switches to the `goauthentik.io/token` Basic
-  header if your outpost strips `Authorization: Bearer` on the WS upgrade.
+  only; set friendly names via device-YAML `substitutions`, so the gitignored
+  builder state (`.device-builder*.json`) stays disposable.
+- The builder is **never published to the host** — it is reachable only via the
+  Authentik outpost (browser) and the internal `esphome-net` (agent).
 - The Device Builder is the default command of `ghcr.io/esphome/esphome` as of
   ESPHome 2026.6.0. Pin a tag instead of `:latest` for reproducibility.
