@@ -63,6 +63,11 @@ Module: ESP32-WROVER-E (has PSRAM)
 | GPIO12 | Ethernet PHY power enable |
 | GPIO18 | Ethernet MDIO |
 | GPIO23 | Ethernet MDC |
+| GPIO19, GPIO21, GPIO22 | Ethernet RMII TXD0 / TX_EN / TXD1 |
+| GPIO25, GPIO26, GPIO27 | Ethernet RMII RXD0 / RXD1 / CRS_DV |
+
+The six RMII pins are fixed in ESP-IDF's EMAC driver and cannot be remapped.
+`esphome config` rejects any other use of them whenever `ethernet:` is present.
 
 **Strapping pins — constraints at boot:**
 - GPIO0: must be HIGH at boot (board handles this)
@@ -93,9 +98,15 @@ Module: ESP32-WROVER-E (has PSRAM)
 **ESP32 MCLK constraint:** Hardware CLK_OUT is limited to GPIO0/1/3 only. GPIO0 = Ethernet, GPIO3 = I2C SCL. Only GPIO1 is usable for audio MCLK.
 
 **Available for future sensors/actuators** (not used by board or our PCB):
-GPIO19, GPIO20, GPIO21, GPIO22, GPIO25, GPIO26, GPIO27, GPIO34¹, GPIO35¹
+GPIO34¹, GPIO35¹ — plus GPIO13, GPIO14, GPIO15, GPIO32, GPIO33 on any device that
+omits the audio, status-led and power-monitor packages (the e-ink dashboard reuses
+exactly those for its e-paper SPI bus).
 
 ¹ Input-only pins.
+
+> GPIO19/21/22/25/26/27 were previously listed here as free. They are **not** — see
+> the RMII rows in the hard-reserved table above. GPIO20 does not exist on the
+> ESP32-WROVER.
 
 **Power budget:** 3.3V 500mA · 5V 1.5A · 12/24V 0.75/1.5A · 25W total
 

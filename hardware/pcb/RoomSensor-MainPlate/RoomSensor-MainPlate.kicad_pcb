@@ -117,8 +117,8 @@
 		(capping no)
 		(filling no)
 		(pcbplotparams
-			(layerselection 0x00000000_00000000_55555555_5755f5ff)
-			(plot_on_all_layers_selection 0x00000000_00000000_00000000_00000000)
+			(layerselection 0x00000000_00000000_55555555_555555a0)
+			(plot_on_all_layers_selection 0x00000000_00000000_00000000_02020000)
 			(disableapertmacros no)
 			(usegerberextensions no)
 			(usegerberattributes yes)
@@ -146,11 +146,11 @@
 			(sketchdnponfab yes)
 			(crossoutdnponfab yes)
 			(subtractmaskfromsilk no)
-			(outputformat 1)
+			(outputformat 5)
 			(mirror no)
 			(drillshape 0)
 			(scaleselection 1)
-			(outputdirectory "/Users/franksteiler/Desktop/")
+			(outputdirectory "./")
 		)
 	)
 	(footprint "room-sensor:ENS160 + AHT20 Connector"
@@ -2902,14 +2902,6 @@
 		(path "/abd2abd8-fa74-4186-8bd2-ed660cc97b85")
 		(sheetname "/")
 		(sheetfile "RoomSensor-MainPlate.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "3" "5" "7" "9" "11" "13" "15" "17" "19" "21" "23" "25" "2"
-					"4" "6" "8" "10" "12" "14" "16" "18" "20" "22" "24" "26"
-				)
-			)
-		)
 		(attr through_hole)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -3002,6 +2994,61 @@
 			(fill no)
 			(layer "B.SilkS")
 			(uuid "d325e67e-815a-4ced-8d92-3ed8ccfb5a98")
+		)
+		(fp_rect
+			(start -33 -51.5)
+			(end -17 -75)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "Dwgs.User")
+			(uuid "153c2859-41dc-438e-a0a2-86d077ed44eb")
+		)
+		(fp_circle
+			(center 1 9.76)
+			(end 2.5 9.76)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "Dwgs.User")
+			(uuid "c0accc30-fde2-44e9-8d4c-58b4b2b12687")
+		)
+		(fp_circle
+			(center 1 -40.24)
+			(end 2.5 -40.24)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "Dwgs.User")
+			(uuid "3766e06c-eb2e-477a-b954-6e78a8f73ef7")
+		)
+		(fp_circle
+			(center -51 9.76)
+			(end -49.5 9.76)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "Dwgs.User")
+			(uuid "efcb5807-ccdb-4dac-9642-02c72b616f19")
+		)
+		(fp_circle
+			(center -51 -40.24)
+			(end -49.5 -40.24)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "Dwgs.User")
+			(uuid "878f2464-dc57-4c28-8c4b-4285a47a453e")
 		)
 		(fp_line
 			(start 1.77 1.77)
@@ -4466,6 +4513,17 @@
 			)
 		)
 	)
+	(gr_rect
+		(start 60 32)
+		(end 70 42)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill no)
+		(layer "Dwgs.User")
+		(uuid "6944ff86-5492-47c2-8f81-9acc499270c7")
+	)
 	(gr_line
 		(start 115 124)
 		(end 115 121)
@@ -4495,6 +4553,18 @@
 			(font
 				(size 1 1)
 				(thickness 0.125)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "10x10mm"
+		(at 61.5 37 0)
+		(layer "Dwgs.User")
+		(uuid "01b57775-4706-4757-bd9f-009344e4c003")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
 			)
 			(justify left bottom)
 		)

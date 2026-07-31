@@ -524,7 +524,7 @@
     "last_paths": {
       "idf": "",
       "netlist": "",
-      "plot": "/Users/franksteiler/Desktop/",
+      "plot": "./",
       "specctra_dsn": "",
       "vrml": ""
     },
