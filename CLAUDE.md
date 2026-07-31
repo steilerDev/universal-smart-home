@@ -34,9 +34,9 @@ devices/secrets.yaml   — Symlink to ../secrets.yaml (committed, allows ESPHome
 
 - **Board:** Olimex ESP32-POE2 (`board: esp32dev`, framework: arduino)
 - **Ethernet:** LAN8720, MDC=GPIO23, MDIO=GPIO18, CLK_OUT=GPIO0, power=GPIO12
-- **I2C bus:** SDA=GPIO03, SCL=GPIO04
+- **I2C bus:** SDA=GPIO04, SCL=GPIO03
 - **Motion UART:** TX=GPIO02, RX=GPIO36 (DFRobot C4002 mmWave)
-- **NeoPixel LED:** GPIO33 (WS2812, 1 LED per unit) — shares GPIO33 with PZEM TX on prototype; move NeoPixel to GPIO32 when both are active
+- **NeoPixel LED:** GPIO32 (WS2812, 1 LED per unit) — moved off GPIO33, which the PZEM-004T UART TX owns
 - **GPIO expander:** PCF8574 @ 0x20 (8 channels: 2 inputs = buttons, 6 outputs via cover/switch)
   - Channels 0,1 → Button 1, Button 2 (binary_sensor, INPUT)
   - Channels 2,3 → Power Circuit 1, 2 (switch, OUTPUT)
@@ -63,6 +63,11 @@ Module: ESP32-WROVER-E (has PSRAM)
 | GPIO12 | Ethernet PHY power enable |
 | GPIO18 | Ethernet MDIO |
 | GPIO23 | Ethernet MDC |
+| GPIO19, GPIO21, GPIO22 | Ethernet RMII TXD0 / TX_EN / TXD1 |
+| GPIO25, GPIO26, GPIO27 | Ethernet RMII RXD0 / RXD1 / CRS_DV |
+
+The six RMII pins are fixed in ESP-IDF's EMAC driver and cannot be remapped.
+`esphome config` rejects any other use of them whenever `ethernet:` is present.
 
 **Strapping pins — constraints at boot:**
 - GPIO0: must be HIGH at boot (board handles this)
@@ -76,8 +81,8 @@ Module: ESP32-WROVER-E (has PSRAM)
 | GPIO0  | Ethernet CLK_OUT | ✓ |
 | GPIO1  | Audio MCLK (ES8311) | ⚠️ UART0 TX. Requires `logger: baud_rate: 0`. Valid CLK_OUT pin — confirmed working |
 | GPIO2  | Motion UART TX | ⚠️ strapping pin. Safe: TX only, not driven at boot, board has pull-down |
-| GPIO3  | I2C SDA | ⚠️ nominally UART0 RX. Works: GPIO matrix lets I2C claim it; proven on device |
-| GPIO4  | I2C SCL | ✓ |
+| GPIO3  | I2C SCL | ⚠️ nominally UART0 RX. Works: GPIO matrix lets I2C claim it; proven on device |
+| GPIO4  | I2C SDA | ✓ |
 | GPIO5  | Audio I2S BCK | ✓ strapping pin, HIGH at boot — safe as I2S output |
 | GPIO12 | Ethernet PHY power | ✓ |
 | GPIO13 | Audio I2S LRCLK | ✓ |
@@ -85,16 +90,23 @@ Module: ESP32-WROVER-E (has PSRAM)
 | GPIO15 | Audio I2S DIN (← mic) | ✓ |
 | GPIO18 | Ethernet MDIO | ✓ |
 | GPIO23 | Ethernet MDC | ✓ |
-| GPIO33 | PZEM-004T UART TX (prototype) / NeoPixel LED (PCB) | ⚠️ shared — prototype uses GPIO33 for PZEM TX; PCB design puts NeoPixel here. Move NeoPixel to GPIO32 if both needed |
+| GPIO32 | NeoPixel status LED | ✓ |
+| GPIO33 | PZEM-004T UART TX | ✓ sole owner — the NeoPixel moved to GPIO32 |
 | GPIO36 | Motion UART RX | ✓ input-only |
 | GPIO39 | PZEM-004T UART RX | ✓ input-only |
 
-**ESP32 MCLK constraint:** Hardware CLK_OUT is limited to GPIO0/1/3 only. GPIO0 = Ethernet, GPIO3 = I2C SDA. Only GPIO1 is usable for audio MCLK.
+**ESP32 MCLK constraint:** Hardware CLK_OUT is limited to GPIO0/1/3 only. GPIO0 = Ethernet, GPIO3 = I2C SCL. Only GPIO1 is usable for audio MCLK.
 
 **Available for future sensors/actuators** (not used by board or our PCB):
-GPIO19, GPIO20, GPIO21, GPIO22, GPIO25, GPIO26, GPIO27, GPIO32, GPIO34¹, GPIO35¹
+GPIO34¹, GPIO35¹ — plus GPIO13, GPIO14, GPIO15, GPIO32, GPIO33 on any device that
+omits the audio, status-led and power-monitor packages (the e-ink dashboard reuses
+exactly those for its e-paper SPI bus).
 
 ¹ Input-only pins.
+
+> GPIO19/21/22/25/26/27 were previously listed here as free. They are **not** — see
+> the RMII rows in the hard-reserved table above. GPIO20 does not exist on the
+> ESP32-WROVER.
 
 **Power budget:** 3.3V 500mA · 5V 1.5A · 12/24V 0.75/1.5A · 25W total
 
