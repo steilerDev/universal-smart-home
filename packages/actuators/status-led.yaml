@@ -1,6 +1,6 @@
 # Package: WS2812 NeoPixel Status LED
 # Required substitutions:
-#   led_pin      — GPIO pin (all units: GPIO33)
+#   led_pin      — GPIO pin (all units: GPIO32)
 #   led_num_leds — number of LEDs (all units: "1")
 #   device_friendly_name
 
