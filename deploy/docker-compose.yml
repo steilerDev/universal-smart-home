@@ -39,8 +39,10 @@ services:
 
   claude:
     build:
-      context: ..
-      dockerfile: deploy/claude.Dockerfile
+      # Self-contained: the image copies no repo files (the repo is provided at
+      # RUNTIME via the /repo bind mount below), so the context is just this dir.
+      context: .
+      dockerfile: claude.Dockerfile
     container_name: claude
     working_dir: /repo
     # Long-running; attach an interactive agent with:
