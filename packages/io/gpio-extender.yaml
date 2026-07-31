@@ -3,10 +3,10 @@
 # Address: 0x20  (PCF8575: false — 8-channel PCF8574)
 #
 # Fixed pin layout (PCB):
-#   0,1   → physical push buttons (input)
-#   2,3   → power circuit relays (switch, exposed to HA)
-#   4,5   → blind 1 open/close relays (internal, driven by cover entity)
-#   6,7   → blind 2 open/close relays (internal, driven by cover entity)
+#   0,1   → power circuit relays (switch, exposed to HA)
+#   2,3   → blind 1 open/close relays (internal, driven by cover entity)
+#   4,5   → blind 2 open/close relays (internal, driven by cover entity)
+#   6,7   → physical push buttons (input)
 #
 # Optional substitutions (override per device if travel times differ):
 #   blind_1_open_duration  (default: 30s)
@@ -34,7 +34,7 @@ binary_sensor:
     name: "${device_friendly_name} Button 1"
     pin:
       pcf8574: gpio_extender
-      number: 0
+      number: 6
       mode: INPUT
       inverted: true
   - platform: gpio
@@ -42,7 +42,7 @@ binary_sensor:
     name: "${device_friendly_name} Button 2"
     pin:
       pcf8574: gpio_extender
-      number: 1
+      number: 7
       mode: INPUT
       inverted: true
 
@@ -53,7 +53,7 @@ switch:
     restore_mode: ALWAYS_OFF
     pin:
       pcf8574: gpio_extender
-      number: 2
+      number: 0
       mode: OUTPUT
       inverted: true
   - platform: gpio
@@ -62,7 +62,7 @@ switch:
     restore_mode: ALWAYS_OFF
     pin:
       pcf8574: gpio_extender
-      number: 3
+      number: 1
       mode: OUTPUT
       inverted: true
   - platform: gpio
@@ -71,7 +71,7 @@ switch:
     restore_mode: ALWAYS_OFF
     pin:
       pcf8574: gpio_extender
-      number: 4
+      number: 2
       mode: OUTPUT
       inverted: true
   - platform: gpio
@@ -80,7 +80,7 @@ switch:
     restore_mode: ALWAYS_OFF
     pin:
       pcf8574: gpio_extender
-      number: 5
+      number: 3
       mode: OUTPUT
       inverted: true
   - platform: gpio
@@ -89,7 +89,7 @@ switch:
     restore_mode: ALWAYS_OFF
     pin:
       pcf8574: gpio_extender
-      number: 6
+      number: 4
       mode: OUTPUT
       inverted: true
   - platform: gpio
@@ -98,7 +98,7 @@ switch:
     restore_mode: ALWAYS_OFF
     pin:
       pcf8574: gpio_extender
-      number: 7
+      number: 5
       mode: OUTPUT
       inverted: true
 

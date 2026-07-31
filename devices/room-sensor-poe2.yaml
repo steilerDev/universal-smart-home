@@ -6,8 +6,8 @@ substitutions:
   device_name: room-sensor-poe2
   device_friendly_name: "Room Sensor POE2"
   device_ip: "10.10.14.20"
-  i2c_sda_pin: "GPIO03"
-  i2c_scl_pin: "GPIO04"
+  i2c_sda_pin: "GPIO04"
+  i2c_scl_pin: "GPIO03"
   pzem_uart_tx_pin: "GPIO33"
   pzem_uart_rx_pin: "GPIO39"
   audio_bclk_pin: "GPIO5"
@@ -15,6 +15,8 @@ substitutions:
   audio_dout_pin: "GPIO14"
   audio_din_pin: "GPIO15"
   audio_mclk_pin: "GPIO1"
+  led_pin: "GPIO32"
+  led_num_leds: "1"
 
 # MCLK on GPIO1 requires UART0 logger disabled (GPIO1 = UART0 TX)
 logger:
@@ -29,6 +31,7 @@ packages:
   motion:      !include ../packages/sensors/motion.yaml
   power:       !include ../packages/sensors/power-pzem004t.yaml
   audio:       !include ../packages/actuators/audio.yaml
+  status_led:  !include ../packages/actuators/status-led.yaml
 
 binary_sensor:
   - id: !extend button_1
