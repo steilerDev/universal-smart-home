@@ -58,7 +58,10 @@ void C4002Component::loop() {
 
   ret = get_note_info_loop();
   if (ret.noteType == NOTE_INFO_RESULT) {
-    ESP_LOGD(TAG, "******run print NOTE_INFO_RESULT*********");
+    // Banner fires ~1/s for every result note and carries no data — VERBOSE so
+    // it stays out of normal DEBUG logs. Calibration notes below stay at DEBUG:
+    // they are infrequent and actually actionable.
+    ESP_LOGV(TAG, "******run print NOTE_INFO_RESULT*********");
   } else if (ret.noteType == NOTE_INFO_CALIBRATION) {
     ESP_LOGD(TAG, "********Calibration countdown: %2d s**********", ret.calibCountdown);
     if (ret.calibCountdown == 0) {
@@ -850,7 +853,9 @@ RecvPack C4002Component::recv_pack() {
         recv_dat.resPonCode = (ResponseCode) recv_dat.dataHeader.respCode;
 
         if (recv_dat.packType == FRAME_TYPE_NOTIFICATION) {
-          ESP_LOGD(TAG, "get note result");
+          // Fires on every radar notification frame (~2/s) and carries no payload
+          // detail — VERBOSE so it stays out of normal DEBUG logs.
+          ESP_LOGV(TAG, "get note result");
         } else if (recv_dat.packType == FRAME_TYPE_WRITE_RESPOND) {
           ESP_LOGD(TAG, "get write respond");
         } else if (recv_dat.packType == FRAME_TYPE_READ_RESPOND) {

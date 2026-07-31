@@ -56,14 +56,21 @@ PACKAGE_CHECKS: dict[str, dict[str, Any]] = {
     },
     "sensors/climate": {
         "label": "climate",
-        "description": "ENS160 (eCO2/TVOC/AQI) + AHT20 (temp/humidity)",
+        "description": "ENS160 (air quality) + AHT20 (temp/humidity)",
         "sensors": [
             ("temperature",      -20,   60,    "°C"),
             ("humidity",           0,  100,    "%"),
-            ("eco2",             400, 8000,    "ppm"),
-            ("tvoc",               0, 65000,   "ppb"),
-            ("air_quality_index",  0,    6,    "AQI"),
         ],
+        # The ENS160 eco2/tvoc/aqi sensors are `internal: true` in the package,
+        # so they are never published over the native API. The derived
+        # "Air Quality" text sensor is the observable proof the ENS160 is alive:
+        # its lambda returns empty unless the AQI sensor has a valid state.
+        #
+        # Empty is tolerated: the ENS160 reports invalid during its warm-up after
+        # every reset, so a check run right after an OTA legitimately sees "".
+        # It reads e.g. 'Excellent' once the sensor settles.
+        "text_sensors": ["air_quality"],
+        "tolerate_empty_text": True,
     },
     "sensors/illuminance": {
         "label": "illuminance",
@@ -77,12 +84,17 @@ PACKAGE_CHECKS: dict[str, dict[str, Any]] = {
             ("target_status",    0,  2,  ""),    # 0=none 1=static 2=motion
             ("motion_distance",  0, 10,  "m"),
             ("presence_distance", 0, 10, "m"),
-            ("motion_speed",     0, 10,  "m/s"),
+            # Signed velocity: negative = target approaching, positive = receding.
+            ("motion_speed",   -10, 10,  "m/s"),
         ],
     },
     "sensors/power-pzem004t": {
         "label": "power_monitor",
         "description": "PZEM-004T power monitor",
+        # The PZEM is mains-powered: with no high voltage connected it cannot
+        # answer at all, so NaN is the expected reading rather than a fault.
+        # Flip to False once mains is wired to assert on real measurements.
+        "tolerate_nan": True,
         "sensors": [
             ("voltage", 0, 300,   "V"),
             ("current", 0, 100,   "A"),
@@ -165,6 +177,7 @@ def check_sensor(
     unit: str,
     entities_by_suffix: dict[str, SensorInfo],
     states_by_key: dict[int, SensorState],
+    tolerate_nan: bool = False,
 ) -> tuple[bool, str]:
     info = entities_by_suffix.get(suffix)
     if info is None:
@@ -176,6 +189,8 @@ def check_sensor(
     if not isinstance(v, (int, float)):
         return False, f"  [{FAIL}] {suffix}: unexpected state type {type(v).__name__} — possible entity name collision"
     if math.isnan(v):
+        if tolerate_nan:
+            return True, f"  [{WARN}] {suffix}: NaN — expected, hardware not connected"
         return False, f"  [{FAIL}] {suffix}: value is NaN (sensor not responding)"
     range_ok = (lo is None or v >= lo) and (hi is None or v <= hi)
     tag = PASS if range_ok else FAIL
@@ -214,6 +229,33 @@ def check_cover(
     state = states_by_key.get(info.key)
     pos = f"{state.position * 100:.0f}%" if state else "?"
     return True, f"  [{PASS}] {suffix}: position {pos}"
+
+
+def check_text_sensor(
+    suffix: str,
+    entities_by_suffix: dict[str, Any],
+    states_by_key: dict[int, Any],
+    tolerate_empty: bool = False,
+) -> tuple[bool, str]:
+    """Assert a text sensor exists, and (unless tolerated) carries a value.
+
+    The templated text sensors in this repo return {} when their backing sensor
+    has no state, so "" means the source has not produced a reading yet. For
+    sensors with a warm-up period that is expected rather than a fault — see
+    tolerate_empty.
+    """
+    info = entities_by_suffix.get(suffix)
+    if info is None:
+        return False, f"  [{FAIL}] {suffix}: entity not found on device"
+    state = states_by_key.get(info.key)
+    if state is None:
+        return False, f"  [{WARN}] {suffix}: entity present but no state received"
+    val = state.state
+    if not val:
+        if tolerate_empty:
+            return True, f"  [{WARN}] {suffix}: empty — sensor still warming up"
+        return False, f"  [{FAIL}] {suffix}: empty — backing sensor has no state"
+    return True, f"  [{PASS}] {suffix}: {val!r}"
 
 
 def check_light(suffix, entities_by_suffix, states_by_key):
@@ -282,11 +324,14 @@ async def run(device_name: str) -> int:
     covers:         dict[str, CoverInfo]        = {}
     lights:         dict[str, LightInfo]        = {}
     media_players:  dict[str, MediaPlayerInfo]  = {}
+    text_sensors:   dict[str, TextSensorInfo]   = {}
 
     for e in entities:
         sfx = object_id_suffix(e.object_id, prefix)
         if isinstance(e, SensorInfo):
             sensors[sfx] = e
+        elif isinstance(e, TextSensorInfo):
+            text_sensors[sfx] = e
         elif isinstance(e, BinarySensorInfo):
             binary_sensors[sfx] = e
         elif isinstance(e, SwitchInfo):
@@ -335,8 +380,16 @@ async def run(device_name: str) -> int:
         pkg_pass = pkg_fail = 0
         lines = []
 
+        tolerate_nan = spec.get("tolerate_nan", False)
         for suffix, lo, hi, unit in spec.get("sensors", []):
-            ok, msg = check_sensor(suffix, lo, hi, unit, sensors, states_by_key)
+            ok, msg = check_sensor(suffix, lo, hi, unit, sensors, states_by_key, tolerate_nan)
+            lines.append(msg)
+            if ok: pkg_pass += 1
+            else:   pkg_fail += 1
+
+        tolerate_empty = spec.get("tolerate_empty_text", False)
+        for suffix in spec.get("text_sensors", []):
+            ok, msg = check_text_sensor(suffix, text_sensors, states_by_key, tolerate_empty)
             lines.append(msg)
             if ok: pkg_pass += 1
             else:   pkg_fail += 1
@@ -387,10 +440,12 @@ async def run(device_name: str) -> int:
             matched_suffixes.add(sfx)
         for sfx in spec.get("lights", []):
             matched_suffixes.add(sfx)
+        for sfx in spec.get("text_sensors", []):
+            matched_suffixes.add(sfx)
 
     all_suffixes = (
         list(sensors) + list(binary_sensors) + list(switches) +
-        list(covers) + list(lights) + list(media_players)
+        list(covers) + list(lights) + list(media_players) + list(text_sensors)
     )
     extra = [s for s in all_suffixes if s not in matched_suffixes]
     if extra:
