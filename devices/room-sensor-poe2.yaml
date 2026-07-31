@@ -15,6 +15,7 @@ substitutions:
   audio_dout_pin: "GPIO14"
   audio_din_pin: "GPIO15"
   audio_mclk_pin: "GPIO1"
+  # NeoPixel on GPIO32 — GPIO33 is taken by PZEM UART TX on this device
   led_pin: "GPIO32"
   led_num_leds: "1"
 
