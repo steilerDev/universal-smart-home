@@ -15,12 +15,16 @@ services:
   esphome-builder:
     image: ghcr.io/esphome/esphome:latest
     container_name: esphome-builder
-    # The builder's config scanner is top-level only, so point it straight at
-    # devices/. The rest of the repo stays on disk for ../packages, ../components
-    # and the devices/secrets.yaml -> ../secrets.yaml symlink.
-    command: ["esphome-device-builder", "/repo/devices"]
+    # The image entrypoint routes `dashboard <args>` to the Device Builder
+    # backend (`esphome-device-builder <args>`); any other first arg is passed
+    # to the plain esphome CLI (which has no such subcommand). So the command
+    # MUST start with `dashboard`. The config scanner is top-level only, so point
+    # it straight at devices/ — the rest of the repo stays on disk for
+    # ../packages, ../components and the devices/secrets.yaml -> ../secrets.yaml symlink.
+    command: ["dashboard", "/repo/devices"]
     environment:
-      # Build artifacts / venvs / job logs live off the repo on a named volume.
+      # Build trees / storage / idedata / remote-build venvs live off the repo
+      # on a named volume (esphome core honors ESPHOME_DATA_DIR).
       ESPHOME_DATA_DIR: /data
       # NOTE: ESPHOME_USERNAME / ESPHOME_PASSWORD are intentionally UNSET.
       # Authentik gates the browser UI; the agent reaches the builder on the
@@ -29,6 +33,9 @@ services:
     volumes:
       - ${ESPHOME_REPO_DIR:?set ESPHOME_REPO_DIR in .env to the host repo checkout}:/repo
       - esphome-data:/data
+      # The image forces the ~1 GB PlatformIO toolchain into /cache when mounted
+      # (else it re-downloads on every container recreate). Persist it.
+      - esphome-cache:/cache
     expose:
       - "6052"          # internal networks only — never published to the host
     networks:
@@ -65,6 +72,7 @@ services:
 
 volumes:
   esphome-data:
+  esphome-cache:
 
 networks:
   # The existing Authentik outpost network. Rename via AUTHENTIK_NETWORK in .env.
