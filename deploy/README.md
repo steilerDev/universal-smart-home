@@ -31,7 +31,8 @@ host checkout /opt/docker/home_esp ──bind-mount /repo──► esphome-build
 The builder's config scanner (`list_yaml_files`) is **top-level only** and skips
 `secrets.yaml` and dotfiles. Our device YAMLs live in `devices/` and `!include
 ../packages/...`, so the container mounts the **whole repo** at `/repo` but runs
-`esphome-device-builder /repo/devices`. Includes, `external_components: ../components`,
+`dashboard /repo/devices` — the image entrypoint routes that to the Device Builder
+backend, `esphome-device-builder /repo/devices`. Includes, `external_components: ../components`,
 and the `devices/secrets.yaml → ../secrets.yaml` symlink all resolve because the
 parent tree is present on disk.
 
@@ -115,5 +116,8 @@ the in-network `claude` container above.
   builder state (`.device-builder*.json`) stays disposable.
 - The builder is **never published to the host** — it is reachable only via the
   Authentik outpost (browser) and the internal `esphome-net` (agent).
-- The Device Builder is the default command of `ghcr.io/esphome/esphome` as of
-  ESPHome 2026.6.0. Pin a tag instead of `:latest` for reproducibility.
+- The image's default `CMD` is `dashboard /config`; its entrypoint rewrites the
+  `dashboard` subcommand to the Device Builder backend (`esphome-device-builder`).
+  Any other first arg is passed to the plain `esphome` CLI, so the builder
+  `command` **must** begin with `dashboard`. Verified on 2026.6.2 and 2026.6.5.
+  Pin a tag instead of `:latest` for reproducibility.
