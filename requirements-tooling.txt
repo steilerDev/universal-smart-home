@@ -1,0 +1,5 @@
+# Tooling deps for the scripts/ helpers (not firmware deps).
+#   pip3 install -r requirements-tooling.txt
+websockets>=13        # scripts/builder-deploy.py  (Device Builder /ws client)
+aioesphomeapi         # scripts/check-device.py    (native-API health check)
+PyYAML                # device/secret YAML parsing in scripts/

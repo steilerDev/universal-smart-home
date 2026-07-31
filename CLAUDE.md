@@ -100,7 +100,37 @@ GPIO19, GPIO20, GPIO21, GPIO22, GPIO25, GPIO26, GPIO27, GPIO32, GPIO34¹, GPIO35
 
 > Before assigning any GPIO to a new component, check it against this table first.
 
-## ESPHome Build Environment
+## Deploy via Device Builder (default path)
+
+Firmware is built and OTA-flashed by a **self-hosted ESPHome Device Builder** on the
+primary Docker host, **not** by compiling in this sandbox. The agent runs in a `claude`
+container **beside** the builder (see `deploy/docker-compose.yml`): the repo is
+bind-mounted into both at `/repo`, so edits to `devices/*.yaml` are visible to the
+builder **instantly** — no git-sync, no push required to flash. The agent reaches the
+builder on the internal Docker network (`ws://esphome-builder:6052/ws`, no auth);
+Authentik only gates the browser UI. Use the `deploy-device` skill, or run directly:
+
+```bash
+esphome config devices/<name>.yaml     # 1. validate locally (cheap, no compile)
+./scripts/builder-deploy.py <name>     # 2. compile + OTA on the builder, streamed
+./scripts/check-device.py <name>       # 3. health-check
+git add -A && git commit -m "…" && git push origin main   # 4. persist (durability, not needed to flash)
+```
+
+- One-time stack setup (both containers, host checkout at `/opt/docker/home_esp`):
+  `deploy/README.md` (+ `deploy/docker-compose.yml`, `deploy/claude.Dockerfile`).
+- `ESPHOME_BUILDER_URL` is preset in the compose env; no `AUTHENTIK_*` needed in-network.
+- `scripts/builder-deploy.py` speaks the builder's single `/ws` endpoint
+  (`firmware/install` → `firmware/follow_job`). `--all` deploys every device;
+  `--compile-only` skips the OTA.
+- **Fallback (out-of-network):** running the client from outside the Docker network
+  reaches the builder through Authentik with a Bearer JWT (`AUTHENTIK_*` env + `--basic`);
+  see `deploy/README.md`.
+
+The local-compile path below is the deeper **fallback** for when the builder is
+unavailable; it requires the PlatformIO/SSL workarounds in "Known Build Issues & Fixes".
+
+## ESPHome Build Environment (local fallback)
 
 ### Installation
 
