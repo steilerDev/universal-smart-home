@@ -10,16 +10,22 @@ substitutions:
   i2c_scl_pin: "GPIO03"
   pzem_uart_tx_pin: "GPIO33"
   pzem_uart_rx_pin: "GPIO39"
-  audio_bclk_pin: "GPIO5"
-  audio_lrclk_pin: "GPIO13"
-  audio_dout_pin: "GPIO14"
-  audio_din_pin: "GPIO15"
-  audio_mclk_pin: "GPIO1"
   # NeoPixel on GPIO32 — GPIO33 is taken by PZEM UART TX on this device
   led_pin: "GPIO32"
   led_num_leds: "1"
+  # Audio (ES8311 + NS4150B) is NOT part of the initial build. The PCB routes the
+  # pinout (BCK=GPIO5, LRCLK=GPIO13, DOUT=GPIO14, DIN=GPIO15, MCLK=GPIO1) but the
+  # components are not populated. To enable: restore these substitutions and the
+  # audio package include below — see packages/actuators/audio.yaml.
+  # audio_bclk_pin: "GPIO5"
+  # audio_lrclk_pin: "GPIO13"
+  # audio_dout_pin: "GPIO14"
+  # audio_din_pin: "GPIO15"
+  # audio_mclk_pin: "GPIO1"
 
-# MCLK on GPIO1 requires UART0 logger disabled (GPIO1 = UART0 TX)
+# Serial logging stays off even without audio: UART0 RX is GPIO3, which this
+# device uses as I2C SCL. Enabling UART0 would claim that pin and break the
+# whole I2C bus (climate, illuminance, PCF8574, dimmer). Logs go over the API.
 logger:
   baud_rate: 0
 
