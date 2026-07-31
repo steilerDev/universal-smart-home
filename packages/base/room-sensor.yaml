@@ -5,8 +5,8 @@
 #   device_name           — ESPHome entity name (lowercase-hyphenated)
 #   device_friendly_name  — human-readable label shown in HA
 #   device_ip             — static IP address (e.g. "10.10.14.21")
-#   i2c_sda_pin           — I2C SDA (all units: GPIO03)
-#   i2c_scl_pin           — I2C SCL (all units: GPIO04)
+#   i2c_sda_pin           — I2C SDA (all units: GPIO04)
+#   i2c_scl_pin           — I2C SCL (all units: GPIO03)
 
 esphome:
   name: ${device_name}

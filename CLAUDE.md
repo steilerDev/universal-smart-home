@@ -34,9 +34,9 @@ devices/secrets.yaml   — Symlink to ../secrets.yaml (committed, allows ESPHome
 
 - **Board:** Olimex ESP32-POE2 (`board: esp32dev`, framework: arduino)
 - **Ethernet:** LAN8720, MDC=GPIO23, MDIO=GPIO18, CLK_OUT=GPIO0, power=GPIO12
-- **I2C bus:** SDA=GPIO03, SCL=GPIO04
+- **I2C bus:** SDA=GPIO04, SCL=GPIO03
 - **Motion UART:** TX=GPIO02, RX=GPIO36 (DFRobot C4002 mmWave)
-- **NeoPixel LED:** GPIO33 (WS2812, 1 LED per unit) — shares GPIO33 with PZEM TX on prototype; move NeoPixel to GPIO32 when both are active
+- **Status LED:** GPIO32 (WS2811/WS2812, 1 LED per unit) via `esp32_rmt_led_strip` — GPIO33 carries PZEM TX on the prototype, so the LED lives on GPIO32 (the deprecated `neopixelbus` platform was replaced)
 - **GPIO expander:** PCF8574 @ 0x20 (8 channels: 2 inputs = buttons, 6 outputs via cover/switch)
   - Channels 0,1 → Button 1, Button 2 (binary_sensor, INPUT)
   - Channels 2,3 → Power Circuit 1, 2 (switch, OUTPUT)
@@ -76,8 +76,8 @@ Module: ESP32-WROVER-E (has PSRAM)
 | GPIO0  | Ethernet CLK_OUT | ✓ |
 | GPIO1  | Audio MCLK (ES8311) | ⚠️ UART0 TX. Requires `logger: baud_rate: 0`. Valid CLK_OUT pin — confirmed working |
 | GPIO2  | Motion UART TX | ⚠️ strapping pin. Safe: TX only, not driven at boot, board has pull-down |
-| GPIO3  | I2C SDA | ⚠️ nominally UART0 RX. Works: GPIO matrix lets I2C claim it; proven on device |
-| GPIO4  | I2C SCL | ✓ |
+| GPIO3  | I2C SCL | ⚠️ nominally UART0 RX. Works: GPIO matrix lets I2C claim it; proven on device |
+| GPIO4  | I2C SDA | ✓ |
 | GPIO5  | Audio I2S BCK | ✓ strapping pin, HIGH at boot — safe as I2S output |
 | GPIO12 | Ethernet PHY power | ✓ |
 | GPIO13 | Audio I2S LRCLK | ✓ |
@@ -85,14 +85,15 @@ Module: ESP32-WROVER-E (has PSRAM)
 | GPIO15 | Audio I2S DIN (← mic) | ✓ |
 | GPIO18 | Ethernet MDIO | ✓ |
 | GPIO23 | Ethernet MDC | ✓ |
-| GPIO33 | PZEM-004T UART TX (prototype) / NeoPixel LED (PCB) | ⚠️ shared — prototype uses GPIO33 for PZEM TX; PCB design puts NeoPixel here. Move NeoPixel to GPIO32 if both needed |
+| GPIO32 | Status LED (WS2811/WS2812, esp32_rmt_led_strip) | ✓ prototype LED pin (PZEM occupies GPIO33) |
+| GPIO33 | PZEM-004T UART TX (prototype) / NeoPixel LED (PCB) | ⚠️ shared — prototype uses GPIO33 for PZEM TX, so the LED moves to GPIO32; PCB design puts NeoPixel here when no PZEM |
 | GPIO36 | Motion UART RX | ✓ input-only |
 | GPIO39 | PZEM-004T UART RX | ✓ input-only |
 
-**ESP32 MCLK constraint:** Hardware CLK_OUT is limited to GPIO0/1/3 only. GPIO0 = Ethernet, GPIO3 = I2C SDA. Only GPIO1 is usable for audio MCLK.
+**ESP32 MCLK constraint:** Hardware CLK_OUT is limited to GPIO0/1/3 only. GPIO0 = Ethernet, GPIO3 = I2C SCL. Only GPIO1 is usable for audio MCLK.
 
 **Available for future sensors/actuators** (not used by board or our PCB):
-GPIO19, GPIO20, GPIO21, GPIO22, GPIO25, GPIO26, GPIO27, GPIO32, GPIO34¹, GPIO35¹
+GPIO19, GPIO20, GPIO21, GPIO22, GPIO25, GPIO26, GPIO27, GPIO34¹, GPIO35¹
 
 ¹ Input-only pins.
 
@@ -100,7 +101,37 @@ GPIO19, GPIO20, GPIO21, GPIO22, GPIO25, GPIO26, GPIO27, GPIO32, GPIO34¹, GPIO35
 
 > Before assigning any GPIO to a new component, check it against this table first.
 
-## ESPHome Build Environment
+## Deploy via Device Builder (default path)
+
+Firmware is built and OTA-flashed by a **self-hosted ESPHome Device Builder** on the
+primary Docker host, **not** by compiling in this sandbox. The agent runs in a `claude`
+container **beside** the builder (see `deploy/docker-compose.yml`): the repo is
+bind-mounted into both at `/repo`, so edits to `devices/*.yaml` are visible to the
+builder **instantly** — no git-sync, no push required to flash. The agent reaches the
+builder on the internal Docker network (`ws://esphome-builder:6052/ws`, no auth);
+Authentik only gates the browser UI. Use the `deploy-device` skill, or run directly:
+
+```bash
+esphome config devices/<name>.yaml     # 1. validate locally (cheap, no compile)
+./scripts/builder-deploy.py <name>     # 2. compile + OTA on the builder, streamed
+./scripts/check-device.py <name>       # 3. health-check
+git add -A && git commit -m "…" && git push origin main   # 4. persist (durability, not needed to flash)
+```
+
+- One-time stack setup (both containers, host checkout at `/opt/docker/home_esp`):
+  `deploy/README.md` (+ `deploy/docker-compose.yml`, `deploy/claude.Dockerfile`).
+- `ESPHOME_BUILDER_URL` is preset in the compose env; no `AUTHENTIK_*` needed in-network.
+- `scripts/builder-deploy.py` speaks the builder's single `/ws` endpoint
+  (`firmware/install` → `firmware/follow_job`). `--all` deploys every device;
+  `--compile-only` skips the OTA.
+- **Fallback (out-of-network):** running the client from outside the Docker network
+  reaches the builder through Authentik with a Bearer JWT (`AUTHENTIK_*` env + `--basic`);
+  see `deploy/README.md`.
+
+The local-compile path below is the deeper **fallback** for when the builder is
+unavailable; it requires the PlatformIO/SSL workarounds in "Known Build Issues & Fixes".
+
+## ESPHome Build Environment (local fallback)
 
 ### Installation
 
