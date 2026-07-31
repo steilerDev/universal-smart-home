@@ -37,10 +37,8 @@ packages:
   dimmer:      !include ../packages/actuators/dimmer.yaml
   motion:      !include ../packages/sensors/motion.yaml
   power:       !include ../packages/sensors/power-pzem004t.yaml
-  audio:       !include ../packages/actuators/audio.yaml
   status_led:  !include ../packages/actuators/status-led.yaml
+  # audio:     !include ../packages/actuators/audio.yaml   # not populated on this build
 
-binary_sensor:
-  - id: !extend button_1
-    on_press:
-      - rtttl.play: 'beep:d=8,o=5,b=180:a'
+# NOTE: button_1 previously played an RTTTL beep on press. That action lives with
+# the audio package, so it is removed here along with it. Re-add when audio lands.
