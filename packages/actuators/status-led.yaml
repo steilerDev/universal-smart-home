@@ -1,13 +1,15 @@
-# Package: WS2812 NeoPixel Status LED
+# Package: WS2811/WS2812 Status LED (RMT-driven)
+# Uses esp32_rmt_led_strip (the supported replacement for the deprecated
+# neopixelbus platform, which upstream targets for removal ~2027.1).
 # Required substitutions:
-#   led_pin      — GPIO pin (all units: GPIO33)
+#   led_pin      — GPIO pin (GPIO32 when PZEM present on GPIO33; GPIO33 otherwise)
 #   led_num_leds — number of LEDs (all units: "1")
 #   device_friendly_name
 
 light:
-  - platform: neopixelbus
-    type: GRB
-    variant: WS2811
+  - platform: esp32_rmt_led_strip
+    chipset: WS2811
+    rgb_order: GRB
     pin: ${led_pin}
     num_leds: ${led_num_leds}
     name: "${device_friendly_name} Status LED"
