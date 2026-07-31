@@ -15,11 +15,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # The Claude Code CLI.
 RUN npm install -g @anthropic-ai/claude-code
 
-# ESPHome (validation) + the repo's tooling deps (websockets, aioesphomeapi, PyYAML).
-COPY requirements-tooling.txt /tmp/requirements-tooling.txt
+# ESPHome (validation) + the tooling scripts' deps. Kept in sync with
+# ../requirements-tooling.txt but inlined here so the image builds without any
+# repo file in the build context (the repo is only needed at RUNTIME, via the
+# /repo bind mount). This keeps the build context tiny and location-independent.
 RUN pip3 install --break-system-packages --no-cache-dir \
-        esphome -r /tmp/requirements-tooling.txt \
-    && rm -f /tmp/requirements-tooling.txt
+        esphome websockets aioesphomeapi PyYAML
 
 # The repo is bind-mounted here at runtime (see docker-compose.yml).
 WORKDIR /repo

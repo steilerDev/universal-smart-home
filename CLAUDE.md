@@ -36,7 +36,7 @@ devices/secrets.yaml   — Symlink to ../secrets.yaml (committed, allows ESPHome
 - **Ethernet:** LAN8720, MDC=GPIO23, MDIO=GPIO18, CLK_OUT=GPIO0, power=GPIO12
 - **I2C bus:** SDA=GPIO04, SCL=GPIO03
 - **Motion UART:** TX=GPIO02, RX=GPIO36 (DFRobot C4002 mmWave)
-- **NeoPixel LED:** GPIO32 (WS2812, 1 LED per unit) — moved off GPIO33, which the PZEM-004T UART TX owns
+- **Status LED:** GPIO32 (WS2811/WS2812, 1 LED per unit) via `esp32_rmt_led_strip` — GPIO33 carries PZEM TX on the prototype, so the LED lives on GPIO32 (the deprecated `neopixelbus` platform was replaced)
 - **GPIO expander:** PCF8574 @ 0x20 (8 channels: 2 inputs = buttons, 6 outputs via cover/switch)
   - Channels 0,1 → Button 1, Button 2 (binary_sensor, INPUT)
   - Channels 2,3 → Power Circuit 1, 2 (switch, OUTPUT)
@@ -90,8 +90,8 @@ The six RMII pins are fixed in ESP-IDF's EMAC driver and cannot be remapped.
 | GPIO15 | Audio I2S DIN (← mic) | ✓ |
 | GPIO18 | Ethernet MDIO | ✓ |
 | GPIO23 | Ethernet MDC | ✓ |
-| GPIO32 | NeoPixel status LED | ✓ |
-| GPIO33 | PZEM-004T UART TX | ✓ sole owner — the NeoPixel moved to GPIO32 |
+| GPIO32 | Status LED (WS2811/WS2812, esp32_rmt_led_strip) | ✓ prototype LED pin (PZEM occupies GPIO33) |
+| GPIO33 | PZEM-004T UART TX (prototype) / NeoPixel LED (PCB) | ⚠️ shared — prototype uses GPIO33 for PZEM TX, so the LED moves to GPIO32; PCB design puts NeoPixel here when no PZEM |
 | GPIO36 | Motion UART RX | ✓ input-only |
 | GPIO39 | PZEM-004T UART RX | ✓ input-only |
 
