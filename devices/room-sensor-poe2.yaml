@@ -32,13 +32,13 @@ logger:
 
 packages:
   base:        !include ../packages/base/room-sensor.yaml
-  climate:     !include ../packages/sensors/climate.yaml
-  illuminance: !include ../packages/sensors/illuminance.yaml
-  gpio_ext:    !include ../packages/io/gpio-extender.yaml
-  dimmer:      !include ../packages/actuators/dimmer.yaml
-  motion:      !include ../packages/sensors/motion.yaml
-  status_led:  !include ../packages/actuators/status-led.yaml
   power:       !include ../packages/sensors/power-pzem004t.yaml
-  # audio: not populated on this build (ES8311/NS4150B components absent)
+  # stripped for PZEM debugging (I2C bus also stuck — separate issue):
+  # climate:     !include ../packages/sensors/climate.yaml
+  # illuminance: !include ../packages/sensors/illuminance.yaml
+  # gpio_ext:    !include ../packages/io/gpio-extender.yaml
+  # dimmer:      !include ../packages/actuators/dimmer.yaml
+  # motion:      !include ../packages/sensors/motion.yaml
+  # status_led:  !include ../packages/actuators/status-led.yaml
   # audio: !include ../packages/actuators/audio.yaml
 
