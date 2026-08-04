@@ -9,7 +9,7 @@ substitutions:
   i2c_sda_pin: "GPIO04"
   i2c_scl_pin: "GPIO03"
   pzem_uart_tx_pin: "GPIO15"
-  pzem_uart_rx_pin: "GPIO33"
+  pzem_uart_rx_pin: "GPIO34"   # LOOPBACK TEST: GPIO34 is floating/unconnected
   pzem_address: "0x01"
   # NeoPixel on GPIO32 — GPIO15/GPIO33 are used for PZEM UART on this device
   led_pin: "GPIO32"
