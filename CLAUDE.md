@@ -36,7 +36,7 @@ devices/secrets.yaml   — Symlink to ../secrets.yaml (committed, allows ESPHome
 - **Ethernet:** LAN8720, MDC=GPIO23, MDIO=GPIO18, CLK_OUT=GPIO0, power=GPIO12
 - **I2C bus:** SDA=GPIO04, SCL=GPIO03
 - **Motion UART:** TX=GPIO02, RX=GPIO36 (DFRobot C4002 mmWave)
-- **Status LED:** GPIO32 (WS2811/WS2812, 1 LED per unit) via `esp32_rmt_led_strip` — GPIO33 carries PZEM TX on the prototype, so the LED lives on GPIO32 (the deprecated `neopixelbus` platform was replaced)
+- **Status LED:** GPIO32 (WS2811/WS2812, 1 LED per unit) via `esp32_rmt_led_strip` — GPIO15 carries PZEM TX on the prototype, so the LED lives on GPIO32 (the deprecated `neopixelbus` platform was replaced)
 - **GPIO expander:** PCF8574 @ 0x20 (8 channels: 2 inputs = buttons, 6 outputs via cover/switch)
   - Channels 0,1 → Button 1, Button 2 (binary_sensor, INPUT)
   - Channels 2,3 → Power Circuit 1, 2 (switch, OUTPUT)
@@ -47,7 +47,7 @@ devices/secrets.yaml   — Symlink to ../secrets.yaml (committed, allows ESPHome
   - `use_mclk: true` with MCLK on GPIO1 (one of 3 valid CLK_OUT pins: GPIO0/1/3; GPIO0 taken by Ethernet)
   - RTTTL for button sounds; media_player for HA TTS/announcements
   - MCLK on GPIO1 requires `logger: baud_rate: 0` (disables UART0 serial logger)
-- **Power monitor:** PZEM-004T (UART: ESP TX=GPIO33 → PZEM RX, ESP RX=GPIO39 ← PZEM TX)
+- **Power monitor:** PZEM-004T (UART: ESP TX=GPIO15 → PZEM RX, ESP RX=GPIO33 ← PZEM TX)
 - **Schematic:** https://app.cirkitdesigner.com/project/281a6c22-06b7-4593-8d16-d8be4f0f2b7c (requires login — can't be fetched programmatically)
 
 ## ESP32-POE2 GPIO Constraints
@@ -87,13 +87,13 @@ The six RMII pins are fixed in ESP-IDF's EMAC driver and cannot be remapped.
 | GPIO12 | Ethernet PHY power | ✓ |
 | GPIO13 | Audio I2S LRCLK | ✓ |
 | GPIO14 | Audio I2S DOUT (→ ES8311) | ✓ |
-| GPIO15 | Audio I2S DIN (← mic) | ✓ |
+| GPIO15 | Audio I2S DIN (← mic) / PZEM-004T UART TX (prototype) | ⚠️ shared — prototype uses GPIO15 for PZEM TX because audio is not populated; PCB with audio uses GPIO15 for I2S DIN instead |
 | GPIO18 | Ethernet MDIO | ✓ |
 | GPIO23 | Ethernet MDC | ✓ |
-| GPIO32 | Status LED (WS2811/WS2812, esp32_rmt_led_strip) | ✓ prototype LED pin (PZEM occupies GPIO33) |
-| GPIO33 | PZEM-004T UART TX (prototype) / NeoPixel LED (PCB) | ⚠️ shared — prototype uses GPIO33 for PZEM TX, so the LED moves to GPIO32; PCB design puts NeoPixel here when no PZEM |
+| GPIO32 | Status LED (WS2811/WS2812, esp32_rmt_led_strip) | ✓ prototype LED pin |
+| GPIO33 | PZEM-004T UART RX (prototype) / NeoPixel LED (PCB) | ⚠️ shared — prototype uses GPIO33 for PZEM RX (← PZEM TX); PCB design puts NeoPixel here when no PZEM |
 | GPIO36 | Motion UART RX | ✓ input-only |
-| GPIO39 | PZEM-004T UART RX | ✓ input-only |
+| GPIO39 | (available) | ✓ input-only — was PZEM RX in early prototype, reassigned to GPIO33 |
 
 **ESP32 MCLK constraint:** Hardware CLK_OUT is limited to GPIO0/1/3 only. GPIO0 = Ethernet, GPIO3 = I2C SCL. Only GPIO1 is usable for audio MCLK.
 

@@ -1,8 +1,9 @@
 # Package: PZEM-004T AC Power Monitor
 # pzemac uses Modbus protocol — requires uart → modbus → sensor chain.
 # Required substitutions:
-#   pzem_uart_tx_pin  — UART TX to PZEM RX (e.g. "GPIO33")
-#   pzem_uart_rx_pin  — UART RX from PZEM TX (e.g. "GPIO39")
+#   pzem_uart_tx_pin  — UART TX to PZEM RX (e.g. "GPIO15")
+#   pzem_uart_rx_pin  — UART RX from PZEM TX (e.g. "GPIO33")
+#   pzem_address      — Modbus slave address (default "0x01")
 #   device_friendly_name
 
 uart:
@@ -19,6 +20,7 @@ modbus:
 sensor:
   - platform: pzemac
     modbus_id: modbus_pzem
+    address: ${pzem_address}
     current:
       name: "${device_friendly_name} Current"
     voltage:
