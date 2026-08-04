@@ -8,8 +8,8 @@ substitutions:
   device_ip: "10.10.14.20"
   i2c_sda_pin: "GPIO04"
   i2c_scl_pin: "GPIO03"
-  pzem_uart_tx_pin: "GPIO15"   # testing alternate pins
-  pzem_uart_rx_pin: "GPIO33"   # testing: GPIO39 physical connection suspected bad
+  pzem_uart_tx_pin: "GPIO33"   # testing alternate pins
+  pzem_uart_rx_pin: "GPIO15"   # testing: GPIO39 physical connection suspected bad
   # NeoPixel on GPIO32 — GPIO33 is taken by PZEM UART TX on this device
   led_pin: "GPIO32"
   led_num_leds: "1"
