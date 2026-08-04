@@ -42,5 +42,3 @@ packages:
   # audio: not populated on this build (ES8311/NS4150B components absent)
   # audio: !include ../packages/actuators/audio.yaml
 
-# NOTE: button_1 previously played an RTTTL beep on press. That action lives with
-# the audio package, so it is removed here along with it. Re-add when audio lands.
