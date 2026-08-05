@@ -4,9 +4,8 @@
 
 external_components:
   - source:
-      type: git
-      url: https://github.com/cdjq/esphome.git
-      ref: dev
+      type: local
+      path: ../components
     components:
       - dfrobot_c4002
 
@@ -200,4 +199,8 @@ number:
       name: "${device_friendly_name} Target Disappear Delay"
       unit_of_measurement: "s"
       icon: "mdi:timer"
+      entity_category: config
+    sensitivity_threshold:
+      name: "${device_friendly_name} Radar Sensitivity Threshold"
+      icon: "mdi:signal-cellular-3"
       entity_category: config
