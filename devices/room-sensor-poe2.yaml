@@ -6,6 +6,9 @@ substitutions:
   device_name: room-sensor-poe2
   device_friendly_name: "Room Sensor POE2"
   device_ip: "10.10.14.20"
+  room_width_m: "4.0"
+  room_depth_m: "5.0"
+  ceiling_height_m: "2.4"
   i2c_sda_pin: "GPIO04"
   i2c_scl_pin: "GPIO03"
   pzem_uart_tx_pin: "GPIO15"
