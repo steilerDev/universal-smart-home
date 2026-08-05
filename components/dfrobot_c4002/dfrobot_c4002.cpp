@@ -185,6 +185,11 @@ void C4002Component::update_config_param() {
   if (target_disappeard_delay_time_number_ != nullptr) {
     target_disappeard_delay_time_number_->publish_state(current_delay_time);
   }
+  if (sensitivity_threshold_number_ != nullptr) {
+    uint8_t current_sensitivity = get_current_sensitivity_threshold();
+    sensitivity_threshold_number_->publish_state(current_sensitivity);
+    ESP_LOGD(TAG, "Publishing sensitivity threshold: %d", current_sensitivity);
+  }
 
   if (run_led_switch_ != nullptr) {
     set_run_led(LED_OFF);
@@ -483,6 +488,60 @@ bool C4002Component::set_target_disappear_delay(uint16_t delay_time) {
 }
 
 /**
+ * set_distance_door_threshold
+ * Write per-gate energy thresholds for motion or presence detection.
+ * Higher threshold = less sensitive at that distance gate.
+ */
+bool C4002Component::set_distance_door_threshold(DistanceDoorType door_type, const uint8_t *threshold_data) {
+  uint8_t send_date[40];
+  uint16_t data_len = 0;
+  uint16_t temp = 5 + 15;  // 4-byte header + door_type + 15 threshold bytes
+
+  send_date[data_len++] = CMD_SET_DISTANCE_DOOR_THRESHOLD;
+  send_date[data_len++] = READ_AND_WRITE_REQ;
+  send_date[data_len++] = temp >> 0 & 0xFF;
+  send_date[data_len++] = temp >> 8 & 0xFF;
+  send_date[data_len++] = (uint8_t) door_type;
+  for (int i = 0; i < 15; i++) {
+    send_date[data_len++] = threshold_data[i];
+  }
+  send_pack(send_date, data_len, FRAME_TYPE_WRITE_REQUSET);
+
+  RecvPack rec_pack = recv_pack();
+  return (SUCCEED == rec_pack.resPonCode);
+}
+
+/**
+ * set_sensitivity_threshold
+ * Apply a uniform energy threshold across all 15 gates for both MOVE and EXIST
+ * door types. Higher value = more noise rejection (less sensitive).
+ */
+bool C4002Component::set_sensitivity_threshold(uint8_t value) {
+  uint8_t thresholds[15];
+  for (int i = 0; i < 15; i++) thresholds[i] = value;
+  bool ok = set_distance_door_threshold(MOVE_DIST_DOOR, thresholds);
+  ok &= set_distance_door_threshold(EXIST_DIST_DOOR, thresholds);
+  return ok;
+}
+
+/**
+ * get_current_sensitivity_threshold
+ * Read back per-gate thresholds and return the maximum across both door types
+ * as a single representative value.
+ */
+uint8_t C4002Component::get_current_sensitivity_threshold() {
+  uint8_t move_data[15] = {}, exist_data[15] = {};
+  get_distance_presence_threshold(MOVE_DIST_DOOR, move_data);
+  get_distance_presence_threshold(EXIST_DIST_DOOR, exist_data);
+  uint8_t max_val = 0;
+  for (int i = 0; i < 15; i++) {
+    if (move_data[i] > max_val) max_val = move_data[i];
+    if (exist_data[i] > max_val) max_val = exist_data[i];
+  }
+  return max_val;
+}
+
+/**
  * get_target_disappear_delay
  * Get the delay time of the target disappear.
  * Returns the delay time in ms.
@@ -574,53 +633,23 @@ void C4002Component::get_distance_presence_threshold(DistanceDoorType door_type,
 
 /**
  * analysis gate data
- * Analysis the gate data,send the result.
+ * Publish the calibration-generated thresholds for both door types.
  */
 void C4002Component::analysis_text_report() {
-  uint8_t move_data[15], exist_data[15];
-  uint8_t thld = 80;
-  std::vector<uint8_t> over_indices;
-  uint8_t flag = 0;
-
+  uint8_t move_data[15] = {}, exist_data[15] = {};
   get_distance_presence_threshold(MOVE_DIST_DOOR, move_data);
   get_distance_presence_threshold(EXIST_DIST_DOOR, exist_data);
 
-  for (int8_t i = 0; i < 15; i++) {
-    if (move_data[i] < exist_data[i]) {
-      move_data[i] = exist_data[i];
-    }
+  char buf[180];
+  int n = snprintf(buf, sizeof(buf), "Cal M:[");
+  for (int i = 0; i < 15 && n < (int) sizeof(buf) - 1; i++)
+    n += snprintf(buf + n, sizeof(buf) - n, i < 14 ? "%d," : "%d", move_data[i]);
+  n += snprintf(buf + n, sizeof(buf) - n, "] E:[");
+  for (int i = 0; i < 15 && n < (int) sizeof(buf) - 1; i++)
+    n += snprintf(buf + n, sizeof(buf) - n, i < 14 ? "%d," : "%d", exist_data[i]);
+  snprintf(buf + n, sizeof(buf) - n, "]");
 
-    if (move_data[i] > thld) {
-      over_indices.push_back(i);
-    }
-
-    if (move_data[i] > thld && flag != 1) {
-      flag = 1;
-    }
-  }
-
-  if (flag == 0) {
-    this->publish_text("The calibration threshold is effective!");
-    return;
-  }
-
-  char data_str[180];
-  int offset = 0;
-
-  offset += snprintf(data_str + offset, sizeof(data_str) - offset,
-                     "Calibration failed:Interference is detected at a distance of ");
-
-  for (size_t i = 0; i < over_indices.size(); i++) {
-    uint8_t idx = over_indices[i];
-
-    offset += snprintf(data_str + offset, sizeof(data_str) - offset, "%.1f%s", interval_point_[idx],
-                       (i < over_indices.size() - 1) ? ", " : "");
-  }
-
-  snprintf(data_str + offset, sizeof(data_str) - offset,
-           " m, Please clear all interference sources within this range and recalibrate.");
-
-  this->publish_text(data_str);
+  this->publish_text(buf);
 }
 
 /**
