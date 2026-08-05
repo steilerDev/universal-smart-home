@@ -4,8 +4,9 @@
 
 external_components:
   - source:
-      type: local
-      path: ../components
+      type: git
+      url: https://github.com/cdjq/esphome.git
+      ref: dev
     components:
       - dfrobot_c4002
 
@@ -109,7 +110,8 @@ binary_sensor:
       }
       return {};
     filters:
-      - delayed_off: 5s
+      - delayed_on: 2s
+      - delayed_off: 10s
 
 switch:
   - platform: dfrobot_c4002
