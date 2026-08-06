@@ -96,6 +96,10 @@ void C4002Component::get_data() {
   for (auto &listener : this->listeners_) {
     if (listener != nullptr) {
       listener->on_target_status((uint8_t) target_state);
+      listener->on_detection_detail((uint8_t) target_state, detect_result_.existDistIndex,
+                                     detect_result_.existTargetDist, detect_result_.existTargetEnery,
+                                     detect_result_.moveTargetDist, detect_result_.moveTargetEnery,
+                                     detect_result_.moveTargetSpeed);
     }
   }
 }

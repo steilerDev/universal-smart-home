@@ -58,3 +58,6 @@ text_sensor:
     c4002_text_sensor:
       name: "${device_friendly_name} Radar Log"
       entity_category: diagnostic
+    gate_status:
+      name: "${device_friendly_name} Radar Gates"
+      entity_category: diagnostic

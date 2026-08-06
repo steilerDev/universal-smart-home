@@ -23,6 +23,9 @@ namespace dfrobot_c4002 {
 class C4002Listener {
  public:
   virtual void on_target_status(uint8_t state){};
+  virtual void on_detection_detail(uint8_t state, uint32_t exist_index, uint16_t exist_dist,
+                                    uint8_t exist_energy, uint16_t move_dist, uint8_t move_energy,
+                                    int16_t move_speed){};
 };
 
 static const uint8_t TIME_OUT = 0x64;
