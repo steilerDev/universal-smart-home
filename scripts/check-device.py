@@ -80,13 +80,9 @@ PACKAGE_CHECKS: dict[str, dict[str, Any]] = {
     "sensors/motion": {
         "label": "motion",
         "description": "DFRobot C4002 mmWave radar",
-        "sensors": [
-            ("target_status",    0,  2,  ""),    # 0=none 1=static 2=motion
-            ("motion_distance",  0, 10,  "m"),
-            ("presence_distance", 0, 10, "m"),
-            # Signed velocity: negative = target approaching, positive = receding.
-            ("motion_speed",   -10, 10,  "m/s"),
-        ],
+        "binary_sensors": ["presence"],
+        "text_sensors": ["radar_gates", "radar_log"],
+        "switches": ["radar_calibrate"],
     },
     "sensors/power-pzem004t": {
         "label": "power_monitor",
