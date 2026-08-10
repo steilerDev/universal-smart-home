@@ -114,6 +114,18 @@ packages:
       flow_pin: "GPIO05"
       flow_pulses_per_liter: "595"
 
+  # --- Aggregate "total" line ---
+  # Stand-in for a real whole-house meter: sums the four domestic supply lines
+  # (not the heating circuits, not the well). Swap it for a real water-flow
+  # include once the main meter is wired.
+  water_total: !include
+    file: ../packages/sensors/water-total.yaml
+    vars:
+      total_line_1: eg_kalt
+      total_line_2: eg_warm
+      total_line_3: og_kalt
+      total_line_4: og_warm
+
   # --- Grid power (Eastron SDM, RS485) — not populated yet ---
   # Enabling this also requires `logger: baud_rate: 0` in the base package:
   # GPIO1 is the console TX. Add the substitutions below alongside it.
