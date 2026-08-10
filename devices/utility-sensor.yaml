@@ -121,3 +121,55 @@ packages:
   #   sdm_uart_rx_pin: "GPIO39"
   #   sdm_address: "1"
   # energy: !include ../packages/sensors/energy-sdm.yaml
+
+# --- Aggregate "total" water line ---
+# Stand-in for a real whole-house meter until one is wired: sums the four
+# DOMESTIC supply lines only — not the heating circuits, not the well. It
+# measures nothing itself, so it is only as good as those four calibrations and
+# misses anything they do not see (garden taps, leaks upstream of them).
+#
+# Defined here rather than as a package: it is one device's aggregate of that
+# same device's lines, and inlining keeps the sources visible where they are
+# summed. When the real meter arrives, give it a normal water-flow include and
+# delete this block, keeping the entity names so HA history carries over.
+#
+# No reset button: this is a live sum of the four per-line totals, so resetting
+# any of those moves this with it.
+#
+# ⚠ Do NOT add both this and the individual lines to Home Assistant's water
+# dashboard — the same litres would be counted twice. Pick one level.
+#
+# Both read NaN for a few seconds after boot, until every source has published
+# once; they settle within one 5s pulse_counter interval.
+sensor:
+  - platform: combination
+    type: sum
+    name: "Water Flow - Total"
+    id: water_flow_total
+    unit_of_measurement: "L/min"
+    device_class: volume_flow_rate
+    state_class: measurement
+    accuracy_decimals: 2
+    icon: mdi:water-plus
+    sources:
+      - source: water_flow_eg_kalt
+      - source: water_flow_eg_warm
+      - source: water_flow_og_kalt
+      - source: water_flow_og_warm
+
+  # Sum of the per-line totals rather than a separate integration of the flow
+  # above: this way the total can never drift away from the parts it is made of.
+  - platform: combination
+    type: sum
+    name: "Water Volume - Total"
+    id: water_volume_total
+    unit_of_measurement: "L"
+    device_class: water
+    state_class: total_increasing
+    accuracy_decimals: 2
+    icon: mdi:water-plus
+    sources:
+      - source: water_volume_eg_kalt
+      - source: water_volume_eg_warm
+      - source: water_volume_og_kalt
+      - source: water_volume_og_warm
