@@ -1,0 +1,65 @@
+# Package: Eastron SDM three-phase grid meter over Modbus RTU
+#
+# NOT currently enabled on any device — the meter is wired but the RS485 leg is
+# not yet populated. Kept here so the config is ready to switch on; include it
+# from devices/utility-sensor.yaml when the hardware lands.
+#
+# Required substitutions:
+#   sdm_uart_tx_pin  — UART TX → RS485 DI   (e.g. "GPIO01")
+#   sdm_uart_rx_pin  — UART RX ← RS485 RO   (e.g. "GPIO39")
+#   sdm_address      — Modbus slave address (default "1")
+#
+# ⚠ GPIO1 is the serial console TX. Enabling this package means the logger must
+# be silenced — set `baud_rate: 0` in packages/base/utility-sensor.yaml, or the
+# logger and this UART fight over the pin.
+
+uart:
+  - id: uart_sdm
+    tx_pin: ${sdm_uart_tx_pin}
+    rx_pin: ${sdm_uart_rx_pin}
+    baud_rate: 9600
+    stop_bits: 1
+
+modbus:
+  - id: modbus_sdm
+    uart_id: uart_sdm
+
+sensor:
+  - platform: sdm_meter
+    modbus_id: modbus_sdm
+    address: ${sdm_address}
+    update_interval: 30s
+    phase_a:
+      current:
+        name: "Grid Current - Phase 1"
+      voltage:
+        name: "Grid Voltage - Phase 1"
+      active_power:
+        name: "Grid Power - Phase 1"
+    phase_b:
+      current:
+        name: "Grid Current - Phase 2"
+      voltage:
+        name: "Grid Voltage - Phase 2"
+      active_power:
+        name: "Grid Power - Phase 2"
+    phase_c:
+      current:
+        name: "Grid Current - Phase 3"
+      voltage:
+        name: "Grid Voltage - Phase 3"
+      active_power:
+        name: "Grid Power - Phase 3"
+    total_power:
+      name: "Grid Power - Total"
+    # sdm_meter already tags these device_class: energy / state_class:
+    # total_increasing, so HA's energy dashboard picks them up as grid
+    # consumption + return without further annotation.
+    import_active_energy:
+      name: "Grid Import Active Energy"
+    export_active_energy:
+      name: "Grid Export Active Energy"
+    import_reactive_energy:
+      name: "Grid Import Reactive Energy"
+    export_reactive_energy:
+      name: "Grid Export Reactive Energy"

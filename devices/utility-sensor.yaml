@@ -1,0 +1,120 @@
+# Utility Sensor — whole-house metering unit (basement)
+# Olimex ESP32-POE2 @ 10.10.14.11 · ESPHome name: utility-sensor
+#
+# Capabilities: 8 × water meter (pulse) + well level (Modbus). Grid power over
+# RS485 (Eastron SDM) is wired for but not yet populated — see the commented
+# include at the bottom.
+#
+# This device predates the repo: it was configured directly in the ESPHome
+# dashboard and lost its config when the builder was rebuilt. The YAML below is
+# that live config, restructured into packages. Two things are load-bearing and
+# must not be "cleaned up":
+#   • no `friendly_name` — entities are unprefixed (sensor.water_flow_eg_kalt).
+#   • the "Waserstand Brunnen" typo — it is the existing HA entity_id.
+# Changing either re-slugs entities in HA and orphans history + automations.
+#
+# GPIO map (Ethernet takes GPIO0/12/18/23 + RMII GPIO19/21/22/25/26/27):
+#   GPIO03  well Modbus TX      GPIO35  well Modbus RX (input-only)
+#   GPIO04  flow EG Kalt        GPIO36  flow EG Warm   (input-only)
+#   GPIO33  flow OG Kalt        GPIO13  flow OG Warm
+#   GPIO15  flow EG Heizung     GPIO02  flow OG Heizung
+#   GPIO14  flow Anbau Heizung  GPIO05  flow Brunnen
+# GPIO02/05/15 are strapping pins. They are inputs here and the meters are
+# passive at boot, which is why this works — do not add pull-ups to them.
+
+substitutions:
+  device_name: utility-sensor
+  device_comment: "Utility Sensor"
+  device_ip: "10.10.14.11"
+
+  # --- Well (QDY30A submersible level transmitter) ---
+  well_uart_tx_pin: "GPIO03"
+  well_uart_rx_pin: "GPIO35"
+  well_modbus_address: "0x01"
+  # Install geometry, measured downward from the well head. The published level
+  # is the water column above the PUMP INTAKE: raw + (pump depth - sensor depth).
+  # ⚠ Placeholders — measure the real install and correct these two numbers.
+  #    Equal values reproduce the pre-repo behaviour (raw column above probe).
+  well_sensor_depth_cm: "0"
+  well_pump_depth_cm: "0"
+
+packages:
+  base: !include ../packages/base/utility-sensor.yaml
+  well: !include ../packages/sensors/well-level.yaml
+
+  # --- Water meters, one include per supply line ---
+  # flow_pulses_per_liter is only the FIRST-BOOT default for the per-line
+  # "Water Pulses per Liter" number in HA; once set there it persists across
+  # re-flashes and this value is ignored. 396 = the YF-B K-factor (6.6 * 60).
+  flow_eg_kalt: !include
+    file: ../packages/sensors/water-flow.yaml
+    vars:
+      flow_key: eg_kalt
+      flow_name: "EG Kalt"
+      flow_pin: "GPIO04"
+      flow_pulses_per_liter: "396"
+
+  flow_eg_warm: !include
+    file: ../packages/sensors/water-flow.yaml
+    vars:
+      flow_key: eg_warm
+      flow_name: "EG Warm"
+      flow_pin: "GPIO36"
+      flow_pulses_per_liter: "396"
+
+  flow_og_kalt: !include
+    file: ../packages/sensors/water-flow.yaml
+    vars:
+      flow_key: og_kalt
+      flow_name: "OG Kalt"
+      # Terminal is silkscreened "16"; it is wired to GPIO33 (GPIO16 is PSRAM).
+      flow_pin: "GPIO33"
+      flow_pulses_per_liter: "396"
+
+  flow_og_warm: !include
+    file: ../packages/sensors/water-flow.yaml
+    vars:
+      flow_key: og_warm
+      flow_name: "OG Warm"
+      flow_pin: "GPIO13"
+      flow_pulses_per_liter: "396"
+
+  flow_eg_heizung: !include
+    file: ../packages/sensors/water-flow.yaml
+    vars:
+      flow_key: eg_heizung
+      flow_name: "EG Heizung"
+      flow_pin: "GPIO15"
+      flow_pulses_per_liter: "396"
+
+  flow_og_heizung: !include
+    file: ../packages/sensors/water-flow.yaml
+    vars:
+      flow_key: og_heizung
+      flow_name: "OG Heizung"
+      flow_pin: "GPIO02"
+      flow_pulses_per_liter: "396"
+
+  flow_anbau_heizung: !include
+    file: ../packages/sensors/water-flow.yaml
+    vars:
+      flow_key: anbau_heizung
+      flow_name: "Anbau Heizung"
+      flow_pin: "GPIO14"
+      flow_pulses_per_liter: "396"
+
+  flow_brunnen: !include
+    file: ../packages/sensors/water-flow.yaml
+    vars:
+      flow_key: brunnen
+      flow_name: "Brunnen"
+      flow_pin: "GPIO05"
+      flow_pulses_per_liter: "396"
+
+  # --- Grid power (Eastron SDM, RS485) — not populated yet ---
+  # Enabling this also requires `logger: baud_rate: 0` in the base package:
+  # GPIO1 is the console TX. Add the substitutions below alongside it.
+  #   sdm_uart_tx_pin: "GPIO01"
+  #   sdm_uart_rx_pin: "GPIO39"
+  #   sdm_address: "1"
+  # energy: !include ../packages/sensors/energy-sdm.yaml

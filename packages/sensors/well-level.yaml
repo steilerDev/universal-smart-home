@@ -1,0 +1,78 @@
+# Package: Well water level — QDY30A submersible level transmitter over Modbus RTU
+#
+# Required substitutions:
+#   well_uart_tx_pin      — UART TX → RS485 DI   (e.g. "GPIO03")
+#   well_uart_rx_pin      — UART RX ← RS485 RO   (e.g. "GPIO35")
+#   well_modbus_address   — Modbus slave address (default "0x01")
+#   well_sensor_depth_cm  — how deep the probe hangs below the reference point
+#   well_pump_depth_cm    — how deep the pump intake hangs below the same point
+#
+# ── What the sensor reports vs. what we publish ──────────────────────────────
+# A submersible transmitter measures the water column ABOVE ITSELF — it knows
+# nothing about the well or the pump. What matters operationally is how much
+# water is still above the pump intake, i.e. how much can be drawn before the
+# pump runs dry. Both depths are fixed by how the hardware was installed, so
+# they are build-time substitutions, not runtime entities.
+#
+#         ─── reference (well head) ─── 0
+#                  │      ▲
+#                  │      │ well_pump_depth_cm
+#          ~~~~~~~~│~~~~~~▼~~~~ water surface
+#                  ▓ pump intake        ▲
+#                  │                    │ published value = water above pump
+#                  ● probe        ──────▼──── (raw = column above probe)
+#                  ▲
+#                  └ well_sensor_depth_cm (from reference)
+#
+#   water_surface_depth = well_sensor_depth_cm - raw
+#   above_pump          = well_pump_depth_cm - water_surface_depth
+#                       = raw + (well_pump_depth_cm - well_sensor_depth_cm)
+#
+# So the correction is a plain offset of (pump depth - sensor depth). It is
+# NEGATIVE in the normal install where the probe hangs below the pump: a probe
+# 100 cm below the intake reading a 150 cm column means 50 cm above the pump.
+#
+# The value is deliberately NOT clamped at zero — a negative reading is the
+# meaningful "water surface has dropped below the pump intake" signal.
+
+uart:
+  - id: uart_well
+    tx_pin: ${well_uart_tx_pin}
+    rx_pin: ${well_uart_rx_pin}
+    baud_rate: 9600
+    data_bits: 8
+    stop_bits: 1
+    parity: NONE
+
+modbus:
+  - id: modbus_well
+    uart_id: uart_well
+
+modbus_controller:
+  - id: modbus_well_master
+    address: ${well_modbus_address}
+    modbus_id: modbus_well
+    setup_priority: -10
+    update_interval: 2s
+
+sensor:
+  - platform: modbus_controller
+    modbus_controller_id: modbus_well_master
+    id: well_level
+    # Name kept verbatim (including the "Waserstand" typo) from the pre-repo
+    # config — it is what sensor.waserstand_brunnen in HA is keyed on, and
+    # renaming it would orphan the existing history and automations.
+    name: "Waserstand Brunnen"
+    register_type: holding
+    value_type: S_WORD
+    address: 0x0004
+    force_new_range: true
+    device_class: distance
+    state_class: measurement
+    icon: mdi:car-coolant-level
+    unit_of_measurement: cm
+    accuracy_decimals: 1
+    filters:
+      # Install geometry → water level above the pump intake. See the diagram above.
+      - lambda: "return x + (${well_pump_depth_cm} - ${well_sensor_depth_cm});"
+      - throttle_average: 20s

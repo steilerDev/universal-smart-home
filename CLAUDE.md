@@ -2,23 +2,26 @@
 
 ## Project Overview
 
-ESPHome-based smart home system. ~25 room sensor units (Olimex ESP32-POE2, PoE Ethernet) deployed across the house. Repository is the single source of truth for all device configurations.
+ESPHome-based smart home system. ~25 room sensor units (Olimex ESP32-POE2, PoE Ethernet) deployed across the house, plus a few special-purpose nodes on the same board (e-ink dashboard, utility/metering sensor). Repository is the single source of truth for all device configurations.
 
 ## Repository Structure
 
 ```
 devices/          — One YAML per physical device (substitutions + package includes)
 packages/
-  base/           — Board config, Ethernet, OTA, API, I2C bus
-  sensors/        — motion, climate, illuminance, power-pzem004t
+  base/           — room-sensor (arduino + I2C) / utility-sensor (esp-idf, no I2C)
+  sensors/        — motion, climate, illuminance, power-pzem004t,
+                    water-flow, well-level, energy-sdm
   actuators/      — status-led, dimmer, relay (via gpio extender), audio
   io/             — gpio-extender (PCF8574 — buttons + power circuits + blinds)
+  displays/       — trmnl (e-ink dashboard BYOS client)
 hardware/
   pcb/
     RoomSensor-BackPlate/  — Back plate PCB (PCF8574 expander, connectors)
     RoomSensor-MainPlate/  — Main plate PCB (Olimex socket, screw terminals)
     bom-lcsc.csv           — Combined BOM for LCSC ordering
-  case/         — Fusion 360 case files (.f3d stored as plain binary)
+  case/         — Fusion 360 case files (.f3d stored as plain binary),
+                  one directory per device (room-sensor/, utility-sensor/)
   room-sensor.kicad_sym   — Custom KiCad symbol library
   room-sensor.pretty/     — Custom KiCad footprint library
 scripts/
@@ -49,6 +52,57 @@ devices/secrets.yaml   — Symlink to ../secrets.yaml (committed, allows ESPHome
   - MCLK on GPIO1 requires `logger: baud_rate: 0` (disables UART0 serial logger)
 - **Power monitor:** PZEM-004T (UART: ESP TX=GPIO15 → PZEM RX, ESP RX=GPIO33 ← PZEM TX)
 - **Schematic:** https://app.cirkitdesigner.com/project/281a6c22-06b7-4593-8d16-d8be4f0f2b7c (requires login — can't be fetched programmatically)
+
+## Hardware — Utility Sensor
+
+Basement metering node (`devices/utility-sensor.yaml`, 10.10.14.11). Same Olimex
+ESP32-POE2, **no custom PCB** — field wiring lands on screw terminals — but it does
+have a custom case (`hardware/case/utility-sensor/`).
+
+- **Framework:** `esp-idf` (not arduino) — 8 simultaneous `pulse_counter` channels
+  ride the ESP32 PCNT peripheral. Uses `packages/base/utility-sensor.yaml`, which
+  omits the I2C bus because GPIO03/GPIO04 are taken by other functions here.
+- **No `friendly_name`.** The device predates this repo and its HA entities are
+  unprefixed (`sensor.water_flow_eg_kalt`). Adding `friendly_name` would re-slug
+  every entity_id and orphan history — don't. Same reason the `"Waserstand Brunnen"`
+  typo stays.
+- **Water meters:** 8 × YF-B series hall-effect pulse sensors.
+- **Well level:** QDY30A submersible transmitter, Modbus RTU holding register 0x0004.
+- **Grid power:** Eastron SDM three-phase meter — package exists
+  (`sensors/energy-sdm.yaml`) but is **not enabled**; the RS485 leg is unpopulated.
+
+| GPIO | Use | Notes |
+|------|-----|-------|
+| GPIO02 | Flow — OG Heizung | ⚠️ strapping (must be LOW at boot); input, meter passive at boot |
+| GPIO03 | Well Modbus TX | nominally UART0 RX — costs the serial console's RX half only |
+| GPIO04 | Flow — EG Kalt | ✓ |
+| GPIO05 | Flow — Brunnen | ⚠️ strapping (must be HIGH at boot) |
+| GPIO13 | Flow — OG Warm | ✓ |
+| GPIO14 | Flow — Anbau Heizung | ✓ |
+| GPIO15 | Flow — EG Heizung | ⚠️ strapping |
+| GPIO33 | Flow — OG Kalt | terminal silkscreened "16"; actually wired to GPIO33 |
+| GPIO35 | Well Modbus RX | ✓ input-only |
+| GPIO36 | Flow — EG Warm | ✓ input-only |
+| GPIO01 | (reserved) SDM Modbus TX | UART0 TX — enabling energy-sdm requires `logger: baud_rate: 0` |
+| GPIO39 | (reserved) SDM Modbus RX | ✓ input-only |
+
+> Do NOT add pull-ups to the GPIO02/05/15 meter inputs — they are strapping pins and
+> the current wiring only works because the meters are passive at boot.
+
+**Calibration model:**
+- Water meters — pulses-per-litre is a **runtime** `number` per line
+  (`Water Pulses per Liter - <line>`, `entity_category: config`, `restore_value: true`).
+  Datasheets give `F = K * Q` (Hz vs L/min) → pulses/L = `K * 60`; YF-B K=6.6 → 396.
+  Because the value is restored from flash, changing the build-time default in the
+  device YAML does **not** affect a device that already has one stored.
+- Well level — **build-time** substitutions `well_sensor_depth_cm` and
+  `well_pump_depth_cm` (both measured downward from the well head). Published value
+  is the column above the pump intake: `raw + (pump_depth - sensor_depth)`. Negative
+  is meaningful (water below the intake) and deliberately not clamped.
+
+**HA energy dashboard (water):** a water source must carry `device_class: water` AND
+`state_class: total_increasing`. Unit alone (`L`) is not enough — that was why the
+volume sensors never showed up in the picker.
 
 ## ESP32-POE2 GPIO Constraints
 
@@ -318,12 +372,15 @@ The device at `10.10.14.20` is on the local home network. The sandbox may not re
 esphome config devices/<room-name>.yaml   # validate before deploying
 ```
 
-## Prototype Device
+## Deployed Devices
 
-**File:** `devices/room-sensor-poe2.yaml`  
-**IP:** `10.10.14.20`  
-**ESPHome name:** `room-sensor-poe2` (must match for OTA continuity)  
-**Capabilities:** base + climate + illuminance + gpio_extender
+| File | IP | ESPHome name | Capabilities |
+|------|----|--------------|--------------|
+| `devices/room-sensor-poe2.yaml` (prototype) | 10.10.14.20 | `room-sensor-poe2` | base, power, climate, motion, status_led |
+| `devices/eink-dashboard.yaml` | 10.10.14.25 | `eink-dashboard` | base, trmnl |
+| `devices/utility-sensor.yaml` | 10.10.14.11 | `utility-sensor` | base, well_level, 8 × water_flow |
+
+ESPHome names must not change — OTA continuity and HA entity IDs both key off them.
 
 ## PCB Manufacturing & Parts Sourcing
 

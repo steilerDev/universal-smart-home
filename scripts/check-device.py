@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import asyncio
 import math
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -29,6 +30,8 @@ try:
         LightState,
         MediaPlayerInfo,
         MediaPlayerEntityState,
+        NumberInfo,
+        NumberState,
         SensorInfo,
         SensorState,
         SwitchInfo,
@@ -43,7 +46,13 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # Map package path fragment → checks
 # sensors: list of (suffix, min, max, unit)  — min/max=None to skip range check
-# binary_sensors/switches/covers/lights: list of object_id suffixes to assert present
+# binary_sensors/switches/covers/lights/numbers: object_id suffixes to assert present
+#
+# A package included several times with different `vars` (see water-flow) sets
+# "per_instance": True. Its suffixes are then `str.format`-templates expanded once
+# per include against that include's vars, e.g. "water_flow_{flow_key}".
+BASE_PACKAGES = ("base/room-sensor", "base/utility-sensor")
+
 PACKAGE_CHECKS: dict[str, dict[str, Any]] = {
     "base/room-sensor": {
         "label": "base",
@@ -53,6 +62,11 @@ PACKAGE_CHECKS: dict[str, dict[str, Any]] = {
         "switches": [],
         "covers": [],
         "lights": [],
+    },
+    "base/utility-sensor": {
+        "label": "base",
+        "description": "Ethernet · OTA · API connectivity (esp-idf, no I2C)",
+        "sensors": [],
     },
     "sensors/climate": {
         "label": "climate",
@@ -120,15 +134,99 @@ PACKAGE_CHECKS: dict[str, dict[str, Any]] = {
         "description": "ES8311 I2S media player",
         "media_players": ["media_player"],
     },
+    "sensors/well-level": {
+        "label": "well_level",
+        "description": "QDY30A submersible level transmitter (Modbus)",
+        # Published value is water above the pump intake, so negative is a valid
+        # (if alarming) reading. NaN means the Modbus master got no answer.
+        "sensors": [("waserstand_brunnen", -2000, 2000, "cm")],
+    },
+    "sensors/water-flow": {
+        "label": "water_flow_{flow_key}",
+        "description": "Pulse water meter — {flow_name}",
+        "per_instance": True,
+        # Flow reads NaN until the calibration number restores after a reboot.
+        "tolerate_nan": True,
+        "sensors": [
+            ("water_flow_{flow_key}",   0, 500,  "L/min"),
+            ("water_volume_{flow_key}", 0, None, "L"),
+        ],
+        "numbers": ["water_pulses_per_liter_{flow_key}"],
+    },
+    "sensors/energy-sdm": {
+        "label": "energy_meter",
+        "description": "Eastron SDM three-phase grid meter (Modbus)",
+        "tolerate_nan": True,
+        "sensors": [
+            ("grid_voltage_phase_1",      0, 300,   "V"),
+            ("grid_current_phase_1",      0, 200,   "A"),
+            ("grid_power_total",     -50000, 50000, "W"),
+            ("grid_import_active_energy", 0, None,  "kWh"),
+        ],
+    },
 }
+
+
+def resolve_spec(spec: dict[str, Any], pkg_vars: dict[str, str]) -> dict[str, Any]:
+    """Expand a per-instance spec's suffix templates against one include's vars."""
+    if not spec.get("per_instance"):
+        return spec
+    out = dict(spec)
+    out["label"] = spec["label"].format(**pkg_vars)
+    out["description"] = spec["description"].format(**pkg_vars)
+    out["sensors"] = [
+        (sfx.format(**pkg_vars), lo, hi, unit)
+        for sfx, lo, hi, unit in spec.get("sensors", [])
+    ]
+    for key in ("binary_sensors", "switches", "covers", "lights", "text_sensors", "numbers"):
+        if key in spec:
+            out[key] = [sfx.format(**pkg_vars) for sfx in spec[key]]
+    return out
+
+
+def active_package_specs(packages_raw: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
+    """(package key, resolved spec) for every include that has checks defined.
+
+    Handles both include forms: a bare "../packages/x.yaml" string, and the
+    `!include {file:, vars:}` mapping used to instantiate a package more than
+    once. Packages without per-instance vars are reported once even if the
+    device happens to include them twice.
+    """
+    resolved: list[tuple[str, dict[str, Any]]] = []
+    seen_singletons: set[str] = set()
+    for include in packages_raw.values():
+        if isinstance(include, dict):
+            path, pkg_vars = str(include.get("file", "")), include.get("vars", {}) or {}
+        else:
+            path, pkg_vars = str(include), {}
+        for key, spec in PACKAGE_CHECKS.items():
+            if key not in path:
+                continue
+            if not spec.get("per_instance"):
+                if key in seen_singletons:
+                    break
+                seen_singletons.add(key)
+            resolved.append((key, resolve_spec(spec, pkg_vars)))
+            break
+    return resolved
 
 
 # ── YAML helpers ─────────────────────────────────────────────────────────────
 
 def _make_loader() -> type[yaml.SafeLoader]:
-    """SafeLoader that ignores !include and !secret tags (returns raw string)."""
+    """SafeLoader that ignores !include and !secret tags (returns the raw node).
+
+    `!include` has two forms: a scalar path, and the mapping form
+    `!include {file: ..., vars: {...}}` used to instantiate a package more than
+    once — so it has to construct whichever node it is handed.
+    """
+    def include(loader: yaml.SafeLoader, node: yaml.Node) -> Any:
+        if isinstance(node, yaml.MappingNode):
+            return loader.construct_mapping(node, deep=True)
+        return loader.construct_scalar(node)
+
     loader = type("IgnoreLoader", (yaml.SafeLoader,), {})
-    loader.add_constructor("!include", lambda l, n: l.construct_scalar(n))
+    loader.add_constructor("!include", include)
     loader.add_constructor("!secret", lambda l, n: l.construct_scalar(n))
     return loader
 
@@ -151,11 +249,25 @@ def load_secrets() -> dict:
 
 # ── Entity helpers ────────────────────────────────────────────────────────────
 
+def normalize_object_id(value: str) -> str:
+    """Collapse an ESPHome object_id to the form HA slugifies it into.
+
+    ESPHome builds object_ids with `sanitize(snake_case(name))`, which lowercases
+    and spaces→underscores but keeps dashes verbatim: "Water Flow - EG Kalt"
+    becomes "water_flow_-_eg_kalt". HA slugifies the same name to
+    "water_flow_eg_kalt". Normalizing here lets the checks be written the way the
+    entity actually appears in Home Assistant.
+    """
+    return re.sub(r"[^a-z0-9]+", "_", value.lower()).strip("_")
+
+
 def object_id_suffix(object_id: str, prefix: str) -> str:
-    """Strip the device name prefix from an object_id."""
-    if object_id.startswith(prefix):
-        return object_id[len(prefix):]
-    return object_id
+    """Strip the device name prefix from an object_id (both normalized)."""
+    oid = normalize_object_id(object_id)
+    pfx = normalize_object_id(prefix)
+    if pfx and oid.startswith(pfx + "_"):
+        return oid[len(pfx) + 1:]
+    return oid
 
 
 # ── Checks ───────────────────────────────────────────────────────────────────
@@ -254,6 +366,29 @@ def check_text_sensor(
     return True, f"  [{PASS}] {suffix}: {val!r}"
 
 
+def check_number(
+    suffix: str,
+    entities_by_suffix: dict[str, Any],
+    states_by_key: dict[int, Any],
+) -> tuple[bool, str]:
+    """Assert a config `number` exists and carries a restored/initial value.
+
+    These are calibration inputs (pulses per litre, temperature offset): a NaN
+    here means the sensor reading derived from it is meaningless, so unlike a
+    plain sensor it is never tolerated.
+    """
+    info = entities_by_suffix.get(suffix)
+    if info is None:
+        return False, f"  [{FAIL}] {suffix}: entity not found"
+    state = states_by_key.get(info.key)
+    if state is None:
+        return False, f"  [{WARN}] {suffix}: entity present but no state received"
+    if math.isnan(state.state):
+        return False, f"  [{FAIL}] {suffix}: NaN — no value restored"
+    unit = getattr(info, "unit_of_measurement", "") or ""
+    return True, f"  [{PASS}] {suffix}: {state.state:g} {unit}".rstrip()
+
+
 def check_light(suffix, entities_by_suffix, states_by_key):
     info = entities_by_suffix.get(suffix)
     if info is None:
@@ -271,7 +406,7 @@ async def run(device_name: str) -> int:
 
     subs = device_cfg.get("substitutions", {})
     host = subs.get("device_ip")
-    friendly = subs.get("device_friendly_name", device_name)
+    friendly = subs.get("device_friendly_name")
 
     if not host:
         sys.exit("Could not find device_ip substitution in device YAML")
@@ -280,23 +415,18 @@ async def run(device_name: str) -> int:
     if not noise_psk:
         sys.exit("home_assistant_encryption not found in secrets.yaml")
 
-    # Derive the object_id prefix: "Room Sensor POE2" → "room_sensor_poe2_"
-    prefix = friendly.lower().replace(" ", "_").replace("-", "_") + "_"
+    # Derive the object_id prefix: "Room Sensor POE2" → "room_sensor_poe2_".
+    # A device without device_friendly_name (utility-sensor) does not set
+    # ESPHome's friendly_name, so its object_ids are not device-prefixed at all.
+    prefix = friendly.lower().replace(" ", "_").replace("-", "_") + "_" if friendly else ""
 
     # Determine which packages are active on this device
-    packages_raw = device_cfg.get("packages", {})
-    active_packages: list[str] = []
-    for pkg_path in packages_raw.values():
-        # pkg_path is like "../packages/sensors/climate.yaml"
-        for key in PACKAGE_CHECKS:
-            if key in str(pkg_path):
-                active_packages.append(key)
-                break
+    active_packages = active_package_specs(device_cfg.get("packages", {}))
 
     print(f"\n{'─' * 60}")
     print(f"  ESPHome device check: {device_name}  ({host})")
-    print(f"  Friendly name prefix: {prefix}")
-    print(f"  Active packages: {[PACKAGE_CHECKS[p]['label'] for p in active_packages]}")
+    print(f"  Friendly name prefix: {prefix or '(none — entities are unprefixed)'}")
+    print(f"  Active packages: {[spec['label'] for _, spec in active_packages]}")
     print(f"{'─' * 60}")
 
     client = APIClient(host, 6053, None, noise_psk=noise_psk)
@@ -321,10 +451,13 @@ async def run(device_name: str) -> int:
     lights:         dict[str, LightInfo]        = {}
     media_players:  dict[str, MediaPlayerInfo]  = {}
     text_sensors:   dict[str, TextSensorInfo]   = {}
+    numbers:        dict[str, NumberInfo]       = {}
 
     for e in entities:
         sfx = object_id_suffix(e.object_id, prefix)
-        if isinstance(e, SensorInfo):
+        if isinstance(e, NumberInfo):
+            numbers[sfx] = e
+        elif isinstance(e, SensorInfo):
             sensors[sfx] = e
         elif isinstance(e, TextSensorInfo):
             text_sensors[sfx] = e
@@ -365,12 +498,11 @@ async def run(device_name: str) -> int:
 
     total_pass = total_fail = 0
 
-    for pkg_key in active_packages:
-        if pkg_key == "base/room-sensor":
+    for pkg_key, spec in active_packages:
+        if pkg_key in BASE_PACKAGES:
             total_pass += 1
             continue
 
-        spec = PACKAGE_CHECKS[pkg_key]
         label = spec["label"]
         desc = spec["description"]
         pkg_pass = pkg_fail = 0
@@ -414,6 +546,12 @@ async def run(device_name: str) -> int:
             if ok: pkg_pass += 1
             else:   pkg_fail += 1
 
+        for suffix in spec.get("numbers", []):
+            ok, msg = check_number(suffix, numbers, states_by_key)
+            lines.append(msg)
+            if ok: pkg_pass += 1
+            else:   pkg_fail += 1
+
         pkg_ok = pkg_fail == 0
         total_pass += pkg_pass
         total_fail += pkg_fail
@@ -424,24 +562,15 @@ async def run(device_name: str) -> int:
 
     # ── Entities not matched to any package ─────────────────────────────────
     matched_suffixes: set[str] = set()
-    for pkg_key in active_packages:
-        spec = PACKAGE_CHECKS.get(pkg_key, {})
+    for _, spec in active_packages:
         for sfx, *_ in spec.get("sensors", []):
             matched_suffixes.add(sfx)
-        for sfx in spec.get("binary_sensors", []):
-            matched_suffixes.add(sfx)
-        for sfx in spec.get("switches", []):
-            matched_suffixes.add(sfx)
-        for sfx in spec.get("covers", []):
-            matched_suffixes.add(sfx)
-        for sfx in spec.get("lights", []):
-            matched_suffixes.add(sfx)
-        for sfx in spec.get("text_sensors", []):
-            matched_suffixes.add(sfx)
+        for key in ("binary_sensors", "switches", "covers", "lights", "text_sensors", "numbers"):
+            matched_suffixes.update(spec.get(key, []))
 
     all_suffixes = (
-        list(sensors) + list(binary_sensors) + list(switches) +
-        list(covers) + list(lights) + list(media_players) + list(text_sensors)
+        list(sensors) + list(binary_sensors) + list(switches) + list(covers) +
+        list(lights) + list(media_players) + list(text_sensors) + list(numbers)
     )
     extra = [s for s in all_suffixes if s not in matched_suffixes]
     if extra:

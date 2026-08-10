@@ -1,0 +1,62 @@
+# Package: Olimex ESP32-POE2 base — Utility Sensor variant
+# Provides: board config, Ethernet (PoE), OTA, HA API, logger
+#
+# Why this exists next to base/room-sensor.yaml instead of reusing it:
+#   1. Framework — the utility sensor runs esp-idf (pulse_counter uses the PCNT
+#      peripheral on all 8 channels); the room sensors run arduino.
+#   2. No I2C — base/room-sensor.yaml always instantiates bus_i2c on
+#      GPIO04/GPIO03. Here GPIO04 is a water-meter pulse input and GPIO03 is the
+#      pump Modbus TX, so an I2C bus on those pins would collide.
+#
+# Deliberately NO `friendly_name`. The deployed device never had one, so its
+# entities are named standalone ("Water Flow - EG Kalt" → sensor.water_flow_eg_kalt)
+# rather than device-prefixed. Adding friendly_name here would re-slug every
+# entity_id in Home Assistant and orphan all history/automations.
+#
+# Required substitutions:
+#   device_name     — ESPHome node name (lowercase-hyphenated)
+#   device_comment  — human-readable label shown in the ESPHome dashboard
+#   device_ip       — static IP address
+
+esphome:
+  name: ${device_name}
+  comment: ${device_comment}
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+    advanced:
+      # WROVER-E modules in this unit are rev 3.1; pinning the minimum lets the
+      # IDF drop the older-silicon errata workarounds.
+      minimum_chip_revision: "3.1"
+
+# UART0 (TX=GPIO1, RX=GPIO3) still carries the serial console. GPIO3 doubles as
+# the pump Modbus TX, so the console's RX half is dead — harmless, nothing ever
+# types into it, and log output on GPIO1 is unaffected. If the SDM energy meter
+# package is ever enabled it claims GPIO1 as its UART TX; set `baud_rate: 0`
+# here at that point so the logger stops driving the same pin.
+logger:
+  level: DEBUG
+
+ota:
+  - platform: esphome
+    password: !secret esphome_ota_password
+
+api:
+  encryption:
+    key: !secret home_assistant_encryption
+
+ethernet:
+  type: LAN8720
+  mdc_pin: GPIO23
+  mdio_pin: GPIO18
+  clk:
+    pin: GPIO0
+    mode: CLK_OUT
+  phy_addr: 0
+  power_pin: GPIO12
+  manual_ip:
+    static_ip: ${device_ip}
+    gateway: 10.10.14.1
+    subnet: 255.255.255.0

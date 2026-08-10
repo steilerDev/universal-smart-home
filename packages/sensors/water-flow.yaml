@@ -1,0 +1,92 @@
+# Package: Water meter — one supply line (hall-effect pulse sensor, e.g. YF-B series)
+#
+# Include this package once per metered line, with `vars`:
+#
+#   packages:
+#     flow_eg_kalt: !include
+#       file: ../packages/sensors/water-flow.yaml
+#       vars:
+#         flow_key: eg_kalt
+#         flow_name: "EG Kalt"
+#         flow_pin: GPIO04
+#         flow_pulses_per_liter: "396"
+#
+# Required vars:
+#   flow_key               — slug used for entity IDs (C identifier: [a-z0-9_])
+#   flow_name              — location label shown in HA ("EG Kalt")
+#   flow_pin               — GPIO the sensor's pulse output is wired to
+#   flow_pulses_per_liter  — build-time DEFAULT for the runtime calibration number
+#
+# ── Calibration ──────────────────────────────────────────────────────────────
+# Every meter model has its own K-factor, so the pulses-per-litre divisor is a
+# runtime `number` (entity_category: config) rather than a hard-coded filter.
+# Datasheets usually quote the characteristic as `F = K * Q` with F in Hz and Q
+# in L/min — pulses per litre is then `K * 60`. The YF-B series' K = 6.6 gives
+# 6.6 * 60 = 396 pulses/L, which is the default carried over from the original
+# hard-coded `x / 396` filter.
+#
+# pulse_counter always publishes in pulses/min regardless of update_interval, so
+# `pulses_per_min / pulses_per_liter` is directly L/min — no extra time scaling.
+#
+# `restore_value: true` means the build-time default only seeds the number on a
+# device that has never had one stored. Once a value is set from HA it survives
+# reboots AND re-flashes, and changing flow_pulses_per_liter here will NOT
+# override it. Set it from HA (or clear the flash) to recalibrate.
+#
+# ── Home Assistant energy dashboard ──────────────────────────────────────────
+# The volume sensor carries `device_class: water` + `state_class: total_increasing`.
+# HA's water dashboard only offers entities with BOTH — a bare `unit_of_measurement: L`
+# (as the original config had) is accepted as a unit but never lists the entity as
+# a water source. L / m³ / gal / ft³ / CCF are all valid water units.
+
+number:
+  - platform: template
+    id: water_ppl_${flow_key}
+    name: "Water Pulses per Liter - ${flow_name}"
+    icon: mdi:counter
+    entity_category: config
+    unit_of_measurement: "pulses/L"
+    min_value: 1
+    max_value: 10000
+    step: 0.1
+    mode: box
+    optimistic: true
+    restore_value: true
+    initial_value: ${flow_pulses_per_liter}
+
+sensor:
+  - platform: pulse_counter
+    id: water_flow_${flow_key}
+    name: "Water Flow - ${flow_name}"
+    pin:
+      number: ${flow_pin}
+      mode:
+        input: true
+    unit_of_measurement: "L/min"
+    device_class: volume_flow_rate
+    state_class: measurement
+    accuracy_decimals: 2
+    update_interval: 5s
+    filters:
+      # x = pulses/min → L/min. Publish NaN (rather than a wrong number) if the
+      # calibration value has not been restored yet or was set to something absurd.
+      - lambda: |-
+          const float ppl = id(water_ppl_${flow_key}).state;
+          if (std::isnan(ppl) || ppl <= 0.0f) return NAN;
+          return x / ppl;
+
+  - platform: integration
+    id: water_volume_${flow_key}
+    name: "Water Volume - ${flow_name}"
+    sensor: water_flow_${flow_key}
+    time_unit: min
+    unit_of_measurement: "L"
+    device_class: water
+    state_class: total_increasing
+    accuracy_decimals: 2
+    # Without restore the meter total resets to 0 on every reboot/OTA. HA's
+    # total_increasing handles the reset without corrupting statistics, but the
+    # running total is lost — persist it instead. Writes are batched by the
+    # global `preferences: flash_write_interval` (60s default), so this costs
+    # one flash write a minute at most, shared with every other restored value.
+    restore: true

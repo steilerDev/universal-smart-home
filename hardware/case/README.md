@@ -1,10 +1,18 @@
-# Room Sensor Case
+# Cases
 
-Custom enclosure designed in Fusion 360.
+One directory per enclosure. Each holds the Fusion 360 source plus its exports.
 
-## Design Files
+| Case | For | Custom PCB? |
+|------|-----|-------------|
+| [`room-sensor/`](room-sensor/) | Room sensor units (~25×) | Yes — `hardware/pcb/RoomSensor-{Main,Back}Plate` |
+| [`utility-sensor/`](utility-sensor/) | Utility sensor (basement metering) | No — Olimex board + screw terminals only |
 
-- `*.f3d` — Fusion 360 native source (stored as binary in git)
-- `*.step` — STEP export (open without Fusion 360)
-- `*.stl` — print-ready STL export
+## File conventions
+
+- `*.f3d` — Fusion 360 native source (the editable master)
+- `*.step` — STEP export, opens without Fusion 360
+- `*.stl` — print-ready mesh
 - `renders/` — PNG renders exported from Fusion 360
+
+CAD files are marked `binary` in `.gitattributes` so git never tries to diff or
+merge them. That also means **they do not merge** — coordinate before editing one.
