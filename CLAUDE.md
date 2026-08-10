@@ -89,16 +89,21 @@ have a custom case (`hardware/case/utility-sensor/`).
 > Do NOT add pull-ups to the GPIO02/05/15 meter inputs — they are strapping pins and
 > the current wiring only works because the meters are passive at boot.
 
-**Calibration model:**
-- Water meters — pulses-per-litre is a **runtime** `number` per line
-  (`Water Pulses per Liter - <line>`, `entity_category: config`, `restore_value: true`).
-  Datasheets give `F = K * Q` (Hz vs L/min) → pulses/L = `K * 60`; YF-B K=6.6 → 396.
-  Because the value is restored from flash, changing the build-time default in the
-  device YAML does **not** affect a device that already has one stored.
-- Well level — **build-time** substitutions `well_sensor_depth_cm` and
-  `well_pump_depth_cm` (both measured downward from the well head). Published value
-  is the column above the pump intake: `raw + (pump_depth - sensor_depth)`. Negative
-  is meaningful (water below the intake) and deliberately not clamped.
+**Calibration model** — everything is build-time (change the YAML, re-flash). No
+calibration lives in device flash, so a device is fully described by this repo.
+- Water meters — `flow_pulses_per_liter` per include, one per line. Datasheets give
+  `F = K * Q` (Hz vs L/min) → pulses/L = `K * 60`; YF-B K=6.6 → 396.
+- Well level — `well_sensor_depth_cm` and `well_pump_depth_cm`, both measured
+  downward from the well head. Published value is the column above the pump intake:
+  `raw + (pump_depth - sensor_depth)`. Negative is meaningful (water below the
+  intake) and deliberately not clamped.
+
+  **This install: probe 1500, intake 1600 → offset +100 cm.** The probe hangs ABOVE
+  the intake, and a submersible transmitter cannot report a surface below itself, so
+  every level in the last 100 cm above the intake reads 100 cm. The published value
+  is a floor in that band, not a measurement. `binary_sensor.well_probe_uncovered`
+  (`device_class: problem`) is ON exactly when that is the case — use it to gate any
+  dry-run automation instead of trusting the 100 cm reading.
 
 **HA energy dashboard (water):** a water source must carry `device_class: water` AND
 `state_class: total_increasing`. Unit alone (`L`) is not enough — that was why the

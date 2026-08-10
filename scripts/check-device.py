@@ -140,18 +140,18 @@ PACKAGE_CHECKS: dict[str, dict[str, Any]] = {
         # Published value is water above the pump intake, so negative is a valid
         # (if alarming) reading. NaN means the Modbus master got no answer.
         "sensors": [("waserstand_brunnen", -2000, 2000, "cm")],
+        # ON is not a failure here — it means the probe is no longer submerged
+        # and the level reading has bottomed out at its floor.
+        "binary_sensors": ["well_probe_uncovered"],
     },
     "sensors/water-flow": {
         "label": "water_flow_{flow_key}",
         "description": "Pulse water meter — {flow_name}",
         "per_instance": True,
-        # Flow reads NaN until the calibration number restores after a reboot.
-        "tolerate_nan": True,
         "sensors": [
             ("water_flow_{flow_key}",   0, 500,  "L/min"),
             ("water_volume_{flow_key}", 0, None, "L"),
         ],
-        "numbers": ["water_pulses_per_liter_{flow_key}"],
     },
     "sensors/energy-sdm": {
         "label": "energy_meter",

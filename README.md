@@ -53,15 +53,24 @@ Schematic (WIP): https://app.cirkitdesigner.com/project/46fdfdfb-f6f8-4aec-ac91-
 
 ### Calibration
 
-- **Water meters** — each line exposes a `Water Pulses per Liter - <line>` number in
-  HA (`entity_category: config`). Meter datasheets quote `F = K * Q` (F in Hz, Q in
-  L/min), so pulses/L is `K * 60`; the YF-B's K = 6.6 gives the 396 default. The value
-  is stored on the device and survives re-flashes, so set it from HA — editing the
-  build-time default only affects a device that has never had one stored.
+Both are build-time values in `devices/utility-sensor.yaml` — change and re-flash.
+
+- **Water meters** — `flow_pulses_per_liter` per line. Meter datasheets quote
+  `F = K * Q` (F in Hz, Q in L/min), so pulses/L is `K * 60`; the YF-B's K = 6.6 gives
+  396. Each line carries its own value, so lines with a different meter model just get
+  a different number.
 - **Well level** — the probe measures the water column above *itself*. The published
-  value is the column above the **pump intake**, computed at build time from the two
-  install depths (`well_sensor_depth_cm`, `well_pump_depth_cm`) in
-  `devices/utility-sensor.yaml`. Negative means the water has dropped below the intake.
+  value is the column above the **pump intake**:
+  `raw + (well_pump_depth_cm - well_sensor_depth_cm)`. The offset is +100 cm in this
+  install (probe at 15 m, intake at 16 m); it would be negative if the probe hung
+  below the intake. Negative readings mean the water is below the intake and are not
+  clamped away.
+
+  ⚠️ Because the probe sits **above** the intake it cannot see a surface below itself,
+  so the last 100 cm above the intake all read 100 cm — a floor, not a level. The
+  `Well Probe Uncovered` binary sensor (`device_class: problem`) is ON exactly then, so
+  automations can treat that reading as "≤100 cm, unknown" rather than trusting it.
+  Hanging the probe below the intake would remove the blind spot.
 
 ### Home Assistant water dashboard
 

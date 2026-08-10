@@ -15,11 +15,14 @@
 #   flow_key               — slug used for entity IDs (C identifier: [a-z0-9_])
 #   flow_name              — location label shown in HA ("EG Kalt")
 #   flow_pin               — GPIO the sensor's pulse output is wired to
-#   flow_pulses_per_liter  — build-time DEFAULT for the runtime calibration number
+#   flow_pulses_per_liter  — this meter's pulses per litre (see Calibration)
 #
 # ── Calibration ──────────────────────────────────────────────────────────────
 # Every meter model has its own K-factor, so the pulses-per-litre divisor is a
-# runtime `number` (entity_category: config) rather than a hard-coded filter.
+# per-include var rather than a constant shared by all eight lines. It is a
+# BUILD-TIME value: change it here and re-flash, so the calibration of each line
+# lives in git next to the pin it belongs to rather than in device flash.
+#
 # Datasheets usually quote the characteristic as `F = K * Q` with F in Hz and Q
 # in L/min — pulses per litre is then `K * 60`. The YF-B series' K = 6.6 gives
 # 6.6 * 60 = 396 pulses/L, which is the default carried over from the original
@@ -28,31 +31,11 @@
 # pulse_counter always publishes in pulses/min regardless of update_interval, so
 # `pulses_per_min / pulses_per_liter` is directly L/min — no extra time scaling.
 #
-# `restore_value: true` means the build-time default only seeds the number on a
-# device that has never had one stored. Once a value is set from HA it survives
-# reboots AND re-flashes, and changing flow_pulses_per_liter here will NOT
-# override it. Set it from HA (or clear the flash) to recalibrate.
-#
 # ── Home Assistant energy dashboard ──────────────────────────────────────────
 # The volume sensor carries `device_class: water` + `state_class: total_increasing`.
 # HA's water dashboard only offers entities with BOTH — a bare `unit_of_measurement: L`
 # (as the original config had) is accepted as a unit but never lists the entity as
 # a water source. L / m³ / gal / ft³ / CCF are all valid water units.
-
-number:
-  - platform: template
-    id: water_ppl_${flow_key}
-    name: "Water Pulses per Liter - ${flow_name}"
-    icon: mdi:counter
-    entity_category: config
-    unit_of_measurement: "pulses/L"
-    min_value: 1
-    max_value: 10000
-    step: 0.1
-    mode: box
-    optimistic: true
-    restore_value: true
-    initial_value: ${flow_pulses_per_liter}
 
 sensor:
   - platform: pulse_counter
@@ -68,12 +51,8 @@ sensor:
     accuracy_decimals: 2
     update_interval: 5s
     filters:
-      # x = pulses/min → L/min. Publish NaN (rather than a wrong number) if the
-      # calibration value has not been restored yet or was set to something absurd.
-      - lambda: |-
-          const float ppl = id(water_ppl_${flow_key}).state;
-          if (std::isnan(ppl) || ppl <= 0.0f) return NAN;
-          return x / ppl;
+      # x = pulses/min ÷ pulses/L → L/min
+      - lambda: "return x / ${flow_pulses_per_liter};"
 
   - platform: integration
     id: water_volume_${flow_key}

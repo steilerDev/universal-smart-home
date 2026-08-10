@@ -32,20 +32,23 @@ substitutions:
   well_uart_rx_pin: "GPIO35"
   well_modbus_address: "0x01"
   # Install geometry, measured downward from the well head. The published level
-  # is the water column above the PUMP INTAKE: raw + (pump depth - sensor depth).
-  # ⚠ Placeholders — measure the real install and correct these two numbers.
-  #    Equal values reproduce the pre-repo behaviour (raw column above probe).
-  well_sensor_depth_cm: "0"
-  well_pump_depth_cm: "0"
+  # is the water column above the PUMP INTAKE: raw + (pump depth - sensor depth),
+  # here raw + 100 cm because the probe hangs 1 m ABOVE the intake.
+  # Note the blind spot this geometry creates: the probe cannot see a surface
+  # below itself, so the last 100 cm above the intake all read 100 cm. The
+  # "Well Probe Uncovered" binary sensor flags when that is happening.
+  well_sensor_depth_cm: "1500"
+  well_pump_depth_cm: "1600"
 
 packages:
   base: !include ../packages/base/utility-sensor.yaml
   well: !include ../packages/sensors/well-level.yaml
 
   # --- Water meters, one include per supply line ---
-  # flow_pulses_per_liter is only the FIRST-BOOT default for the per-line
-  # "Water Pulses per Liter" number in HA; once set there it persists across
-  # re-flashes and this value is ignored. 396 = the YF-B K-factor (6.6 * 60).
+  # flow_pulses_per_liter is this line's meter calibration, applied at build
+  # time — change it here and re-flash. Datasheets quote F = K * Q (Hz vs
+  # L/min), so pulses/L is K * 60; 396 = the YF-B K-factor 6.6 * 60. Lines with
+  # a different meter model just get a different number here.
   flow_eg_kalt: !include
     file: ../packages/sensors/water-flow.yaml
     vars:

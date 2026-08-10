@@ -14,26 +14,38 @@
 # pump runs dry. Both depths are fixed by how the hardware was installed, so
 # they are build-time substitutions, not runtime entities.
 #
-#         ─── reference (well head) ─── 0
-#                  │      ▲
-#                  │      │ well_pump_depth_cm
-#          ~~~~~~~~│~~~~~~▼~~~~ water surface
-#                  ▓ pump intake        ▲
-#                  │                    │ published value = water above pump
-#                  ● probe        ──────▼──── (raw = column above probe)
-#                  ▲
-#                  └ well_sensor_depth_cm (from reference)
+#   ─── well head (reference, depth 0) ───────────────
+#            │
+#            ~~~~~~~~~~~~~ water surface ────┐
+#            │                               │ raw (column above probe)
+#            ● probe   @ well_sensor_depth_cm┘  ─┐
+#            │                                  │ offset = pump - sensor
+#            ▓ pump intake @ well_pump_depth_cm ─┘
 #
 #   water_surface_depth = well_sensor_depth_cm - raw
 #   above_pump          = well_pump_depth_cm - water_surface_depth
 #                       = raw + (well_pump_depth_cm - well_sensor_depth_cm)
 #
-# So the correction is a plain offset of (pump depth - sensor depth). It is
-# NEGATIVE in the normal install where the probe hangs below the pump: a probe
-# 100 cm below the intake reading a 150 cm column means 50 cm above the pump.
+# So the correction is a plain offset of (pump depth - sensor depth), and it is
+# sign-agnostic — the same expression is right for either install:
+#
+#   probe ABOVE the intake (our install: probe 1500, pump 1600) → offset +100 cm
+#     …the probe is 1 m of water column short of the intake, so we ADD it back.
+#   probe BELOW the intake (probe 1600, pump 1500)              → offset -100 cm
+#     …the probe sees 1 m of water the pump can never reach, so we SUBTRACT it.
 #
 # The value is deliberately NOT clamped at zero — a negative reading is the
 # meaningful "water surface has dropped below the pump intake" signal.
+#
+# ⚠ MEASUREMENT FLOOR when the probe sits above the intake
+# A submersible transmitter reads 0 once it is no longer submerged; it cannot
+# report a surface below itself. With the probe at 1500 and the intake at 1600,
+# everything in the last 100 cm above the intake — exactly the range that decides
+# whether the pump is about to run dry — reads the same: raw 0 → published 100 cm.
+# So the published value is a FLOOR, not an exact level, whenever it sits at the
+# offset. The `Well Probe Uncovered` binary sensor below marks precisely that
+# condition, so automations can treat "100 cm" as "≤100 cm, unknown" instead of
+# trusting it. Hanging the probe below the intake would remove the blind spot.
 
 uart:
   - id: uart_well
@@ -76,3 +88,17 @@ sensor:
       # Install geometry → water level above the pump intake. See the diagram above.
       - lambda: "return x + (${well_pump_depth_cm} - ${well_sensor_depth_cm});"
       - throttle_average: 20s
+
+binary_sensor:
+  - platform: template
+    id: well_probe_uncovered
+    name: "Well Probe Uncovered"
+    device_class: problem
+    entity_category: diagnostic
+    icon: mdi:waves-arrow-down
+    # Published level is post-offset, so "raw <= 0" is "published <= offset".
+    # The 0.5 cm margin absorbs averaging noise around a bone-dry probe.
+    lambda: |-
+      if (!id(well_level).has_state()) return {};
+      const float offset = ${well_pump_depth_cm} - ${well_sensor_depth_cm};
+      return id(well_level).state <= offset + 0.5f;
