@@ -169,6 +169,23 @@ PACKAGE_CHECKS: dict[str, dict[str, Any]] = {
 }
 
 
+# Entities defined directly in a device YAML rather than provided by a package —
+# one-off aggregates that would be pure indirection as a package. Keyed by device
+# name so they are still asserted rather than landing in "extra entities".
+DEVICE_CHECKS: dict[str, dict[str, Any]] = {
+    "utility-sensor": {
+        "label": "device-level",
+        "description": "Aggregate totals defined in the device YAML",
+        # Reads NaN until every source line has published once after a boot.
+        "tolerate_nan": True,
+        "sensors": [
+            ("water_flow_total",   0, 2000, "L/min"),
+            ("water_volume_total", 0, None, "L"),
+        ],
+    },
+}
+
+
 def resolve_spec(spec: dict[str, Any], pkg_vars: dict[str, str]) -> dict[str, Any]:
     """Expand a per-instance spec's suffix templates against one include's vars."""
     if not spec.get("per_instance"):
@@ -434,8 +451,11 @@ async def run(device_name: str) -> int:
     # ESPHome's friendly_name, so its object_ids are not device-prefixed at all.
     prefix = friendly.lower().replace(" ", "_").replace("-", "_") + "_" if friendly else ""
 
-    # Determine which packages are active on this device
+    # Determine which packages are active on this device, plus any entities the
+    # device YAML defines directly.
     active_packages = active_package_specs(device_cfg.get("packages", {}))
+    if device_name in DEVICE_CHECKS:
+        active_packages.append((f"device:{device_name}", DEVICE_CHECKS[device_name]))
 
     print(f"\n{'─' * 60}")
     print(f"  ESPHome device check: {device_name}  ({host})")
