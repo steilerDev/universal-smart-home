@@ -24,13 +24,20 @@ sensor:
       id: id_temperature_sensor
       name: "${device_friendly_name} Temperature"
       filters:
+        - sliding_window_moving_average:
+            window_size: 5
+            send_every: 1
         - lambda: |-
             float offset = id(id_temperature_calibration).state;
             return isnan(offset) ? x : x + offset;
     humidity:
       id: id_humidity_sensor
       name: "${device_friendly_name} Humidity"
-    update_interval: 10s
+      filters:
+        - sliding_window_moving_average:
+            window_size: 5
+            send_every: 1
+    update_interval: 60s
 
   - platform: ens160_i2c
     address: 0x53
