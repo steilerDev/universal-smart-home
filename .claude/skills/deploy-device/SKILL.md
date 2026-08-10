@@ -5,20 +5,18 @@ description: Deploy an ESPHome device in this repo via the self-hosted Device Bu
 
 # Deploy a device via the ESPHome Device Builder
 
-The agent runs in the `claude` container **beside** the builder. The repo is
-bind-mounted into both at `/repo`, so your edits to `devices/*.yaml` are visible
-to the builder **instantly** — no git push is needed to flash. The builder does
-the heavy compile + OTA; this container only edits, validates, and drives its API
-over the internal network (`ws://esphome-builder:6052/ws`, no auth).
+The agent and the ESPHome Device Builder share a bind mount of this repo, so your
+edits to `devices/*.yaml` are visible to the builder **instantly** — no git push
+is needed to flash. The builder does the heavy compile + OTA; this environment
+only edits, validates, and drives its API over the internal Docker network
+(`ws://esphome:6052/ws`, no auth).
 
 ## Preconditions (fail fast if missing)
 
-- `ESPHOME_BUILDER_URL` is set (preset in the compose env to
-  `ws://esphome-builder:6052/ws`). If unset, tell the user and stop — do **not**
-  fall back to a local `esphome run` unless they ask (that needs the PlatformIO
-  workaround stack in CLAUDE.md).
-- `websockets` is installed (baked into the claude image; otherwise
-  `pip3 install -r requirements-tooling.txt`).
+- `ESPHOME_BUILDER_URL` is set to `ws://esphome:6052/ws`. If unset, pass
+  `--server ws://esphome:6052/ws` — do **not** fall back to a local `esphome run`
+  unless the user asks (that needs the PlatformIO workaround stack in CLAUDE.md).
+- `websockets` is installed (otherwise `pip3 install -r requirements-tooling.txt`).
 
 ## Steps
 
@@ -58,7 +56,5 @@ over the internal network (`ws://esphome-builder:6052/ws`, no auth).
 
 - One device name maps to `devices/<name>.yaml` (the builder's config filename).
 - Source of truth is the YAML in git; don't edit devices in the builder UI.
-- **Fallback (out-of-network):** running the client from outside the Docker
-  network reaches the builder through Authentik (`wss://esphome.<domain>/ws`) —
-  set the `AUTHENTIK_*` env vars (see `deploy/README.md`) so it mints a Bearer
-  JWT; add `--basic` if the outpost rejects Bearer on the WS upgrade.
+- The builder's browser UI (`https://esphome.<domain>`) is Authentik-gated, but the
+  WebSocket API on the internal network is not — the client connects unauthenticated.

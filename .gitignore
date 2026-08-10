@@ -23,9 +23,6 @@ devices/.device-builder*.json
 devices/.device-builder-peer-link-key.bin
 devices/dashboard-jobs/
 
-# Local deploy env (builder/Authentik credentials)
-deploy/.env
-
 # KiCad files
 .history
 .kicad-push

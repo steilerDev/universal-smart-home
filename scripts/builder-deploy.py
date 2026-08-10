@@ -8,10 +8,10 @@ builder host, not in this container. This client only:
   2. calls ``firmware/install`` for each device and streams the job to completion,
   3. exits non-zero if any job failed.
 
-Default path: the agent runs in the ``claude`` container beside the builder, on
-the internal Docker network. The repo is bind-mounted into both, so edits to
+The agent and the builder share a bind mount of this repo, so edits to
 ``devices/*.yaml`` are already visible to the builder — just run this, no push
-needed to flash. ``ESPHOME_BUILDER_URL=ws://esphome-builder:6052/ws``, no auth.
+needed to flash. The builder is reached on the internal Docker network with no
+auth (``requires_auth: false``); Authentik only gates its browser UI.
 See deploy/README.md and .claude/skills/deploy-device.
 
 Usage:
@@ -21,35 +21,16 @@ Usage:
     ./scripts/builder-deploy.py room-sensor-poe2 --compile-only
 
 Environment:
-    ESPHOME_BUILDER_URL    ws://esphome-builder:6052/ws        (required)
-
-Fallback — running the client from OUTSIDE the Docker network, through Authentik
-(wss://esphome.<domain>/ws). Set these and the client mints an OAuth2
-client-credentials JWT and presents it as a Bearer token (``--basic`` for the
-goauthentik.io/token variant); pair with ``--sync-timeout`` if a git-synced
-builder needs time to pick up a pushed commit first:
-    AUTHENTIK_TOKEN_URL    https://auth.<domain>/application/o/token/
-    AUTHENTIK_CLIENT_ID    <proxy provider client_id>
-    AUTHENTIK_SVC_USER     <service-account username>
-    AUTHENTIK_SVC_TOKEN    <service-account app-password>
-    AUTHENTIK_CLIENT_SECRET  (optional; for confidential providers)
-    AUTHENTIK_SCOPE        (optional; default "openid profile")
-
-If none of the AUTHENTIK_* vars are set, the client connects without auth.
+    ESPHOME_BUILDER_URL    ws://esphome:6052/ws        (required)
 """
 from __future__ import annotations
 
 import argparse
 import asyncio
-import base64
 import json
 import os
-import ssl
 import sys
 import time
-import urllib.error
-import urllib.parse
-import urllib.request
 from pathlib import Path
 
 try:
@@ -93,71 +74,6 @@ def resolve_configs(names: list[str], want_all: bool) -> list[str]:
             sys.exit(f"Device config not found: {path}")
         configs.append(f"{stem}.yaml")
     return configs
-
-
-# ── Authentik machine-to-machine token ───────────────────────────────────────
-
-def _ssl_context(insecure: bool) -> ssl.SSLContext | None:
-    if not insecure:
-        return None  # let the library use the default verifying context
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    return ctx
-
-
-def fetch_jwt(insecure: bool) -> str | None:
-    """Obtain a JWT issued *for the proxy provider* via OAuth2 client-credentials.
-
-    Returns None when no Authentik env is configured (unauthenticated builder).
-    """
-    token_url = os.environ.get("AUTHENTIK_TOKEN_URL")
-    client_id = os.environ.get("AUTHENTIK_CLIENT_ID")
-    if not token_url or not client_id:
-        return None
-
-    form = {"grant_type": "client_credentials", "client_id": client_id,
-            "scope": os.environ.get("AUTHENTIK_SCOPE", "openid profile")}
-    user = os.environ.get("AUTHENTIK_SVC_USER")
-    token = os.environ.get("AUTHENTIK_SVC_TOKEN")
-    secret = os.environ.get("AUTHENTIK_CLIENT_SECRET")
-    if user and token:
-        # Service account: identify by username, authenticate by app-password.
-        form["username"] = user
-        form["password"] = token
-    if secret:
-        form["client_secret"] = secret
-    if not (secret or (user and token)):
-        sys.exit("AUTHENTIK_TOKEN_URL/CLIENT_ID set but no credentials — "
-                 "provide AUTHENTIK_SVC_USER+AUTHENTIK_SVC_TOKEN or AUTHENTIK_CLIENT_SECRET")
-
-    data = urllib.parse.urlencode(form).encode()
-    req = urllib.request.Request(
-        token_url, data=data,
-        headers={"Content-Type": "application/x-www-form-urlencoded"})
-    try:
-        with urllib.request.urlopen(req, context=_ssl_context(insecure), timeout=30) as r:
-            payload = json.loads(r.read())
-    except urllib.error.HTTPError as e:
-        sys.exit(f"Authentik token request failed: HTTP {e.code} — {e.read().decode(errors='replace')}")
-    except Exception as e:  # noqa: BLE001
-        sys.exit(f"Authentik token request failed: {e}")
-
-    jwt = payload.get("access_token")
-    if not jwt:
-        sys.exit(f"Authentik token response had no access_token: {payload}")
-    log(f"Authenticated to Authentik (token expires in {payload.get('expires_in', '?')}s)")
-    return jwt
-
-
-def auth_headers(jwt: str | None, use_basic: bool) -> dict[str, str]:
-    if jwt is None:
-        return {}
-    if use_basic:
-        # Reserved-username Basic flow: goauthentik.io/token:<jwt> behaves as Bearer.
-        blob = base64.b64encode(f"goauthentik.io/token:{jwt}".encode()).decode()
-        return {"Authorization": f"Basic {blob}"}
-    return {"Authorization": f"Bearer {jwt}"}
 
 
 # ── WebSocket protocol helpers ────────────────────────────────────────────────
@@ -259,31 +175,16 @@ async def run(args) -> int:
     server = args.server or os.environ.get("ESPHOME_BUILDER_URL")
     if not server:
         sys.exit("Builder URL not set — pass --server or set ESPHOME_BUILDER_URL "
-                 "(e.g. wss://esphome.<domain>/ws)")
-
-    jwt = fetch_jwt(args.insecure)
-    headers = auth_headers(jwt, args.basic)
+                 "(e.g. ws://esphome:6052/ws)")
 
     log(f"Connecting to {server} …")
-    connect_kwargs = {"ssl": _ssl_context(args.insecure)} if server.startswith("wss") else {}
-    try:
-        ws = await websockets.connect(server, additional_headers=headers, **connect_kwargs)
-    except TypeError:
-        # websockets < 14 used extra_headers
-        ws = await websockets.connect(server, extra_headers=headers, **connect_kwargs)
-
-    async with ws:
+    async with await websockets.connect(server) as ws:
         # First frame is the ServerInfoMessage push.
         info = json.loads(await asyncio.wait_for(ws.recv(), timeout=15))
         log(f"Server: version={info.get('server_version', '?')} "
             f"requires_auth={info.get('requires_auth')}")
 
         builder = Builder(ws)
-        if args.sync_timeout > 0:
-            log(f"Allowing {args.sync_timeout:.0f}s for the builder's git-sync poll "
-                f"to pick up the pushed commit …")
-            await asyncio.sleep(args.sync_timeout)
-
         results = []
         for cfg in configs:
             try:
@@ -308,12 +209,6 @@ def main() -> None:
     p.add_argument("--server", help="builder /ws URL (default $ESPHOME_BUILDER_URL)")
     p.add_argument("--compile-only", action="store_true", help="compile without OTA upload")
     p.add_argument("--timeout", type=float, default=900, help="per-job timeout seconds (default 900)")
-    p.add_argument("--sync-timeout", type=float, default=0,
-                   help="seconds to wait before deploying, for a git-synced (out-of-network) "
-                        "builder to pick up a pushed commit; 0 with the shared mount (default 0)")
-    p.add_argument("--basic", action="store_true",
-                   help="use Authentik Basic (goauthentik.io/token) instead of Bearer")
-    p.add_argument("--insecure", action="store_true", help="skip TLS certificate verification")
     args = p.parse_args()
 
     if not args.devices and not args.all:
