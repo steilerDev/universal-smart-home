@@ -55,7 +55,7 @@ packages:
       flow_key: eg_kalt
       flow_name: "EG Kalt"
       flow_pin: "GPIO04"
-      flow_pulses_per_liter: "396"
+      flow_pulses_per_liter: "897"
 
   flow_eg_warm: !include
     file: ../packages/sensors/water-flow.yaml
@@ -63,7 +63,7 @@ packages:
       flow_key: eg_warm
       flow_name: "EG Warm"
       flow_pin: "GPIO36"
-      flow_pulses_per_liter: "396"
+      flow_pulses_per_liter: "1077"
 
   flow_og_kalt: !include
     file: ../packages/sensors/water-flow.yaml
@@ -72,7 +72,7 @@ packages:
       flow_name: "OG Kalt"
       # Terminal is silkscreened "16"; it is wired to GPIO33 (GPIO16 is PSRAM).
       flow_pin: "GPIO33"
-      flow_pulses_per_liter: "396"
+      flow_pulses_per_liter: "897"
 
   flow_og_warm: !include
     file: ../packages/sensors/water-flow.yaml
@@ -80,7 +80,7 @@ packages:
       flow_key: og_warm
       flow_name: "OG Warm"
       flow_pin: "GPIO13"
-      flow_pulses_per_liter: "396"
+      flow_pulses_per_liter: "897"
 
   flow_eg_heizung: !include
     file: ../packages/sensors/water-flow.yaml
@@ -88,7 +88,7 @@ packages:
       flow_key: eg_heizung
       flow_name: "EG Heizung"
       flow_pin: "GPIO15"
-      flow_pulses_per_liter: "396"
+      flow_pulses_per_liter: "595"
 
   flow_og_heizung: !include
     file: ../packages/sensors/water-flow.yaml
@@ -96,7 +96,7 @@ packages:
       flow_key: og_heizung
       flow_name: "OG Heizung"
       flow_pin: "GPIO02"
-      flow_pulses_per_liter: "396"
+      flow_pulses_per_liter: "595"
 
   flow_anbau_heizung: !include
     file: ../packages/sensors/water-flow.yaml
@@ -104,7 +104,7 @@ packages:
       flow_key: anbau_heizung
       flow_name: "Anbau Heizung"
       flow_pin: "GPIO14"
-      flow_pulses_per_liter: "396"
+      flow_pulses_per_liter: "595"
 
   flow_brunnen: !include
     file: ../packages/sensors/water-flow.yaml
@@ -112,7 +112,7 @@ packages:
       flow_key: brunnen
       flow_name: "Brunnen"
       flow_pin: "GPIO05"
-      flow_pulses_per_liter: "396"
+      flow_pulses_per_liter: "595"
 
   # --- Grid power (Eastron SDM, RS485) — not populated yet ---
   # Enabling this also requires `logger: baud_rate: 0` in the base package:

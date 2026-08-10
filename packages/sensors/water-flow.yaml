@@ -31,6 +31,17 @@
 # pulse_counter always publishes in pulses/min regardless of update_interval, so
 # `pulses_per_min / pulses_per_liter` is directly L/min — no extra time scaling.
 #
+# ── Resetting a meter total ──────────────────────────────────────────────────
+# `restore: true` keys the stored total off the sensor's object_id, so it
+# survives reboots AND re-flashes — re-flashing after a calibration change does
+# NOT zero a total that was accumulated with the old pulses/L. Press the
+# per-line "Water Volume Reset - <line>" button in HA to zero it.
+#
+# HA's long-term statistics keep the pre-reset history: `total_increasing` reads
+# the drop to 0 as a meter reset (no negative spike), then carries on. Volume
+# already recorded with a wrong pulses/L stays wrong in history — correct it in
+# HA under Developer Tools → Statistics if it matters.
+#
 # ── Home Assistant energy dashboard ──────────────────────────────────────────
 # The volume sensor carries `device_class: water` + `state_class: total_increasing`.
 # HA's water dashboard only offers entities with BOTH — a bare `unit_of_measurement: L`
@@ -69,3 +80,12 @@ sensor:
     # global `preferences: flash_write_interval` (60s default), so this costs
     # one flash write a minute at most, shared with every other restored value.
     restore: true
+
+button:
+  - platform: template
+    id: water_volume_reset_${flow_key}
+    name: "Water Volume Reset - ${flow_name}"
+    entity_category: config
+    icon: mdi:restart
+    on_press:
+      - sensor.integration.reset: water_volume_${flow_key}

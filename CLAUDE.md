@@ -93,6 +93,12 @@ have a custom case (`hardware/case/utility-sensor/`).
 calibration lives in device flash, so a device is fully described by this repo.
 - Water meters — `flow_pulses_per_liter` per include, one per line. Datasheets give
   `F = K * Q` (Hz vs L/min) → pulses/L = `K * 60`; YF-B K=6.6 → 396.
+
+  The `Water Volume - <line>` totals use `restore: true`, whose stored value is keyed
+  off the sensor's object_id — so it **survives OTA**. After recalibrating a line,
+  deploy and then press its `Water Volume Reset - <line>` button
+  (`sensor.integration.reset`), or the total keeps the volume accumulated under the
+  old pulses/L. There is no other way to clear it short of erasing flash.
 - Well level — `well_sensor_depth_cm` and `well_pump_depth_cm`, both measured
   downward from the well head. Published value is the column above the pump intake:
   `raw + (pump_depth - sensor_depth)`. Negative is meaningful (water below the

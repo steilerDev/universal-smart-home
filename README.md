@@ -59,6 +59,11 @@ Both are build-time values in `devices/utility-sensor.yaml` — change and re-fl
   `F = K * Q` (F in Hz, Q in L/min), so pulses/L is `K * 60`; the YF-B's K = 6.6 gives
   396. Each line carries its own value, so lines with a different meter model just get
   a different number.
+
+  After changing a line's calibration, **re-flash and then press its
+  `Water Volume Reset - <line>` button in HA**. The running total is stored in flash
+  keyed by entity, so it survives the OTA and would otherwise keep the volume that
+  was accumulated with the old pulses/L.
 - **Well level** — the probe measures the water column above *itself*. The published
   value is the column above the **pump intake**:
   `raw + (well_pump_depth_cm - well_sensor_depth_cm)`. The offset is +100 cm in this

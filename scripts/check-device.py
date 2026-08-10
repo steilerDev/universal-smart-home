@@ -24,6 +24,7 @@ try:
         APIClient,
         BinarySensorInfo,
         BinarySensorState,
+        ButtonInfo,
         CoverInfo,
         CoverState,
         LightInfo,
@@ -152,6 +153,7 @@ PACKAGE_CHECKS: dict[str, dict[str, Any]] = {
             ("water_flow_{flow_key}",   0, 500,  "L/min"),
             ("water_volume_{flow_key}", 0, None, "L"),
         ],
+        "buttons": ["water_volume_reset_{flow_key}"],
     },
     "sensors/energy-sdm": {
         "label": "energy_meter",
@@ -178,7 +180,8 @@ def resolve_spec(spec: dict[str, Any], pkg_vars: dict[str, str]) -> dict[str, An
         (sfx.format(**pkg_vars), lo, hi, unit)
         for sfx, lo, hi, unit in spec.get("sensors", [])
     ]
-    for key in ("binary_sensors", "switches", "covers", "lights", "text_sensors", "numbers"):
+    for key in ("binary_sensors", "switches", "covers", "lights", "text_sensors",
+                "numbers", "buttons"):
         if key in spec:
             out[key] = [sfx.format(**pkg_vars) for sfx in spec[key]]
     return out
@@ -389,6 +392,17 @@ def check_number(
     return True, f"  [{PASS}] {suffix}: {state.state:g} {unit}".rstrip()
 
 
+def check_button(
+    suffix: str,
+    entities_by_suffix: dict[str, Any],
+    states_by_key: dict[int, Any],
+) -> tuple[bool, str]:
+    """Assert a button exists. Buttons are stateless — presence is all there is."""
+    if suffix not in entities_by_suffix:
+        return False, f"  [{FAIL}] {suffix}: entity not found"
+    return True, f"  [{PASS}] {suffix}: present"
+
+
 def check_light(suffix, entities_by_suffix, states_by_key):
     info = entities_by_suffix.get(suffix)
     if info is None:
@@ -452,11 +466,14 @@ async def run(device_name: str) -> int:
     media_players:  dict[str, MediaPlayerInfo]  = {}
     text_sensors:   dict[str, TextSensorInfo]   = {}
     numbers:        dict[str, NumberInfo]       = {}
+    buttons:        dict[str, ButtonInfo]       = {}
 
     for e in entities:
         sfx = object_id_suffix(e.object_id, prefix)
         if isinstance(e, NumberInfo):
             numbers[sfx] = e
+        elif isinstance(e, ButtonInfo):
+            buttons[sfx] = e
         elif isinstance(e, SensorInfo):
             sensors[sfx] = e
         elif isinstance(e, TextSensorInfo):
@@ -546,6 +563,12 @@ async def run(device_name: str) -> int:
             if ok: pkg_pass += 1
             else:   pkg_fail += 1
 
+        for suffix in spec.get("buttons", []):
+            ok, msg = check_button(suffix, buttons, states_by_key)
+            lines.append(msg)
+            if ok: pkg_pass += 1
+            else:   pkg_fail += 1
+
         for suffix in spec.get("numbers", []):
             ok, msg = check_number(suffix, numbers, states_by_key)
             lines.append(msg)
@@ -565,12 +588,14 @@ async def run(device_name: str) -> int:
     for _, spec in active_packages:
         for sfx, *_ in spec.get("sensors", []):
             matched_suffixes.add(sfx)
-        for key in ("binary_sensors", "switches", "covers", "lights", "text_sensors", "numbers"):
+        for key in ("binary_sensors", "switches", "covers", "lights", "text_sensors",
+                    "numbers", "buttons"):
             matched_suffixes.update(spec.get(key, []))
 
     all_suffixes = (
         list(sensors) + list(binary_sensors) + list(switches) + list(covers) +
-        list(lights) + list(media_players) + list(text_sensors) + list(numbers)
+        list(lights) + list(media_players) + list(text_sensors) + list(numbers) +
+        list(buttons)
     )
     extra = [s for s in all_suffixes if s not in matched_suffixes]
     if extra:
