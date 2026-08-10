@@ -1,5 +1,5 @@
 # Utility Sensor — whole-house metering unit (basement)
-# Olimex ESP32-POE2 @ 10.10.14.11 · ESPHome name: utility-sensor
+# Olimex ESP32-POE2 @ 10.10.14.10 · ESPHome name: utility-sensor
 #
 # Capabilities: 8 × water meter (pulse) + well level (Modbus). Grid power over
 # RS485 (Eastron SDM) is wired for but not yet populated — see the commented
@@ -25,7 +25,7 @@
 substitutions:
   device_name: utility-sensor
   device_comment: "Utility Sensor"
-  device_ip: "10.10.14.11"
+  device_ip: "10.10.14.10"
 
   # --- Well (QDY30A submersible level transmitter) ---
   well_uart_tx_pin: "GPIO03"
