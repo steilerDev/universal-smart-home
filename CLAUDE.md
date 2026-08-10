@@ -196,9 +196,15 @@ git add -A && git commit -m "…" && git push origin main   # 4. persist (durabi
 
 - Endpoint + deploy details: `deploy/README.md`.
 - Set `ESPHOME_BUILDER_URL=ws://esphome:6052/ws`, or pass `--server` to the script.
-- `scripts/builder-deploy.py` speaks the builder's single `/ws` endpoint
-  (`firmware/install` → `firmware/follow_job`). `--all` deploys every device;
+- `scripts/builder-deploy.py` speaks the builder's single `/ws` endpoint. A deploy is
+  **two jobs**: `firmware/install` only *compiles* on this builder version, and the
+  OTA is a separate `firmware/upload` job — calling install alone reports success
+  while the device keeps its old firmware. `--all` deploys every device;
   `--compile-only` skips the OTA.
+- The agent environment has **no route to the 10.10.14.0/24 device LAN** (only the
+  Docker network). `check-device.py` therefore cannot run from here — and if the
+  builder container also lacks that route, `firmware/upload` fails with
+  `[Errno 113] No route to host` on port 3232. Flash from the Docker host instead.
 
 The local-compile path below is the deeper **fallback** for when the builder is
 unavailable; it requires the PlatformIO/SSL workarounds in "Known Build Issues & Fixes".

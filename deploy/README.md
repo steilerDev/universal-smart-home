@@ -41,10 +41,23 @@ git add -A && git commit -m "…" && git push origin main   # 4. persist (durabi
 
 The `deploy-device` skill codifies this loop.
 
-`scripts/builder-deploy.py` speaks the builder's single `/ws` endpoint
-(`firmware/install` → `firmware/follow_job`), streams build output, and exits
-non-zero if any job fails. `--all` deploys every device; `--compile-only` skips the
-OTA upload.
+`scripts/builder-deploy.py` speaks the builder's single `/ws` endpoint, streams job
+output, and exits non-zero if any job fails. `--all` deploys every device;
+`--compile-only` skips the OTA upload.
+
+**A deploy is two jobs, not one.** On this builder (1.0.12 / ESPHome 2026.6.2)
+`firmware/install` only *compiles* — its job ends at "Successfully compiled program"
+and never contacts the device. The OTA is a separate `firmware/upload` job
+(`job_type: upload`). The script runs `firmware/install` → `firmware/upload`, each
+followed via `firmware/follow_job`. Calling install alone reports a green deploy
+while the device keeps running its old firmware.
+
+## Troubleshooting
+
+| Symptom | Cause |
+|---------|-------|
+| `firmware/upload`: `Connecting to <ip> port 3232 failed: [Errno 113] No route to host` | The **builder container** has no route to the device subnet (or the device is offline). Port 3232 is the ESPHome OTA port. Fix the builder's networking, or flash from the Docker host with `./scripts/deploy.sh <name>`. |
+| Agent cannot reach `<device-ip>:6053` for `check-device.py` | Expected — this environment only has the Docker network, not the home LAN. Run the health check from the host. |
 
 ## Why the builder's config dir points at `devices/`
 

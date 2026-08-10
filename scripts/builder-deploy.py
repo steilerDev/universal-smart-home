@@ -5,8 +5,15 @@ The heavy build (PlatformIO toolchain, ~1 GB) and the OTA upload happen on the
 builder host, not in this container. This client only:
 
   1. opens the builder's single ``/ws`` endpoint,
-  2. calls ``firmware/install`` for each device and streams the job to completion,
+  2. calls ``firmware/install`` (compile) and then ``firmware/upload`` (OTA) for
+     each device, streaming both jobs to completion,
   3. exits non-zero if any job failed.
+
+``firmware/install`` on this builder (1.0.12 / ESPHome 2026.6.2) only COMPILES —
+its job ends at "Successfully compiled program" and never contacts the device.
+The OTA is a separate ``firmware/upload`` job (``job_type: upload``). Calling
+install alone therefore reports a green deploy while the device keeps running
+its old firmware, so both jobs are required.
 
 The agent and the builder share a bind mount of this repo, so edits to
 ``devices/*.yaml`` are already visible to the builder — just run this, no push
@@ -148,11 +155,9 @@ def _succeeded(terminal: dict | None) -> bool:
     return str(terminal.get("status", "")).upper() in {"COMPLETED", "SUCCESS"}
 
 
-async def deploy_one(builder: Builder, config: str, compile_only: bool, timeout: float) -> bool:
-    command = "firmware/compile" if compile_only else "firmware/install"
-    args = {"configuration": config}
-    if not compile_only:
-        args["port"] = OTA_PORT
+async def run_job(builder: Builder, command: str, args: dict, config: str,
+                  timeout: float) -> bool:
+    """Start one builder job and stream it to its terminal result."""
     log(f"{config}: {command} …")
     result = await builder.call(command, args)
     job_id = _job_id(result)
@@ -164,8 +169,25 @@ async def deploy_one(builder: Builder, config: str, compile_only: bool, timeout:
     terminal = await builder.follow("firmware/follow_job", {"job_id": job_id}, emit, timeout)
     ok = _succeeded(terminal)
     tag = f"{GREEN}✓ SUCCESS{RESET}" if ok else f"{RED}✗ FAILED{RESET}"
-    print(f"{tag}  {config}  ({terminal})", flush=True)
+    print(f"{tag}  {config}  {command}  ({terminal})", flush=True)
     return ok
+
+
+async def deploy_one(builder: Builder, config: str, compile_only: bool, timeout: float) -> bool:
+    # Compile first. `firmware/install` builds but does NOT upload on this
+    # builder, so a green result here says nothing about the device yet.
+    build_cmd = "firmware/compile" if compile_only else "firmware/install"
+    if not await run_job(builder, build_cmd, {"configuration": config}, config, timeout):
+        return False
+    if compile_only:
+        return True
+
+    # Then the actual OTA. Skipping this is what made deploys look successful
+    # while the device kept running its old firmware.
+    return await run_job(
+        builder, "firmware/upload",
+        {"configuration": config, "port": OTA_PORT}, config, timeout,
+    )
 
 
 async def run(args) -> int:
