@@ -115,7 +115,7 @@ secrets.template.yaml
 |--------|----|---------|
 | `room-sensor-poe2` (prototype) | 10.10.14.20 | base, power, climate, motion, status\_led |
 | `eink-dashboard` | 10.10.14.25 | base, trmnl |
-| `utility-sensor` | 10.10.14.11 | base, well\_level, 8 × water\_flow |
+| `utility-sensor` | 10.10.14.10 | base, well\_level, 8 × water\_flow |
 
 ---
 

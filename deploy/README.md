@@ -56,8 +56,8 @@ while the device keeps running its old firmware.
 
 | Symptom | Cause |
 |---------|-------|
-| `firmware/upload`: `Connecting to <ip> port 3232 failed: [Errno 113] No route to host` | The **builder container** has no route to the device subnet (or the device is offline). Port 3232 is the ESPHome OTA port. Fix the builder's networking, or flash from the Docker host with `./scripts/deploy.sh <name>`. |
-| Agent cannot reach `<device-ip>:6053` for `check-device.py` | Expected — this environment only has the Docker network, not the home LAN. Run the health check from the host. |
+| `firmware/upload`: `Connecting to <ip> port 3232 failed: [Errno 113] No route to host` | **Nothing answers at that IP.** Port 3232 is the ESPHome OTA port; ARP finding no host produces this error, which reads like a routing fault but usually means `device_ip` is wrong (or the device is powered down). Verify the address before touching any network config. |
+| `firmware/install` says SUCCESS but the device behaves as before | Expected — install only compiles. The OTA is the separate `firmware/upload` job; see above. |
 
 ## Why the builder's config dir points at `devices/`
 

@@ -55,7 +55,7 @@ devices/secrets.yaml   — Symlink to ../secrets.yaml (committed, allows ESPHome
 
 ## Hardware — Utility Sensor
 
-Basement metering node (`devices/utility-sensor.yaml`, 10.10.14.11). Same Olimex
+Basement metering node (`devices/utility-sensor.yaml`, 10.10.14.10). Same Olimex
 ESP32-POE2, **no custom PCB** — field wiring lands on screw terminals — but it does
 have a custom case (`hardware/case/utility-sensor/`).
 
@@ -201,10 +201,11 @@ git add -A && git commit -m "…" && git push origin main   # 4. persist (durabi
   OTA is a separate `firmware/upload` job — calling install alone reports success
   while the device keeps its old firmware. `--all` deploys every device;
   `--compile-only` skips the OTA.
-- The agent environment has **no route to the 10.10.14.0/24 device LAN** (only the
-  Docker network). `check-device.py` therefore cannot run from here — and if the
-  builder container also lacks that route, `firmware/upload` fails with
-  `[Errno 113] No route to host` on port 3232. Flash from the Docker host instead.
+- `firmware/upload` failing with `[Errno 113] No route to host` on port 3232 means
+  **nothing answers at that IP** — check `device_ip` before blaming the network. This
+  bit us once: the utility sensor was documented at 10.10.14.11 but actually lives at
+  10.10.14.10, and the misleading error looked like a container routing problem.
+  Both this environment and the builder can reach 10.10.14.0/24 fine.
 
 The local-compile path below is the deeper **fallback** for when the builder is
 unavailable; it requires the PlatformIO/SSL workarounds in "Known Build Issues & Fixes".
@@ -395,7 +396,7 @@ esphome config devices/<room-name>.yaml   # validate before deploying
 |------|----|--------------|--------------|
 | `devices/room-sensor-poe2.yaml` (prototype) | 10.10.14.20 | `room-sensor-poe2` | base, power, climate, motion, status_led |
 | `devices/eink-dashboard.yaml` | 10.10.14.25 | `eink-dashboard` | base, trmnl |
-| `devices/utility-sensor.yaml` | 10.10.14.11 | `utility-sensor` | base, well_level, 8 × water_flow |
+| `devices/utility-sensor.yaml` | 10.10.14.10 | `utility-sensor` | base, well_level, 8 × water_flow |
 
 ESPHome names must not change — OTA continuity and HA entity IDs both key off them.
 
