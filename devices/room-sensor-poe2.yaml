@@ -9,9 +9,9 @@ substitutions:
   room_width_m: "4.0"
   room_depth_m: "5.0"
   ceiling_height_m: "2.4"
-  i2c_sda_pin: "GPIO04"
-  i2c_scl_pin: "GPIO03"
-  pzem_uart_tx_pin: "GPIO33"
+  i2c_sda_pin: "GPIO13"
+  i2c_scl_pin: "GPIO33"
+  pzem_uart_tx_pin: "GPIO1"
   pzem_uart_rx_pin: "GPIO39"
   pzem_address: "0x01"
   # NeoPixel on GPIO32 — GPIO15/GPIO33 are used for PZEM UART on this device
@@ -35,12 +35,12 @@ logger:
 
 packages:
   base:        !include ../packages/base/room-sensor.yaml
-  power:       !include ../packages/sensors/power-pzem004t.yaml
+  #power:       !include ../packages/sensors/power-pzem004t.yaml
   #climate:     !include ../packages/sensors/climate.yaml
   #motion:      !include ../packages/sensors/motion.yaml
   #status_led:  !include ../packages/actuators/status-led.yaml
   # illuminance: !include ../packages/sensors/illuminance.yaml
-  # gpio_ext:    !include ../packages/io/gpio-extender.yaml
+  gpio_ext:    !include ../packages/io/gpio-extender.yaml
   # dimmer:      !include ../packages/actuators/dimmer.yaml
   # audio: !include ../packages/actuators/audio.yaml
 
