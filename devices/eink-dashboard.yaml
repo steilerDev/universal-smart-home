@@ -13,8 +13,10 @@ substitutions:
   device_name: eink-dashboard
   device_friendly_name: "E-Ink Dashboard"
   device_ip: "10.10.14.25"
-  # base package always instantiates the I2C bus; keep the house-standard pins
-  # even though this device has no I2C peripherals.
+  # The base package always instantiates the I2C bus, and its Rev 2/3 defaults
+  # (SDA=GPIO13, SCL=GPIO33) would collide head-on with this device's SPI MOSI
+  # and RST. Park the bus on the old GPIO04/GPIO03 pair instead — nothing is
+  # attached to it here, it just has to not claim a pin the panel needs.
   i2c_sda_pin: "GPIO04"
   i2c_scl_pin: "GPIO03"
 
