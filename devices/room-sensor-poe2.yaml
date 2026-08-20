@@ -33,11 +33,8 @@ substitutions:
   # audio_din_pin: "GPIO15"
   # audio_mclk_pin: "GPIO1"
 
-# Serial logging stays off even without audio: UART0 RX is GPIO3, which this
-# device uses as I2C SCL. Enabling UART0 would claim that pin and break the
-# whole I2C bus (climate, illuminance, PCF8574, dimmer). Logs go over the API.
-logger:
-  baud_rate: 0
+# logger: baud_rate: 0 comes from the base package — this device needs it because
+# UART0 RX is GPIO3, which it uses as I2C SCL.
 
 packages:
   base:        !include ../packages/base/room-sensor.yaml
