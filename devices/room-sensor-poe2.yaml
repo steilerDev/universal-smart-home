@@ -1,6 +1,10 @@
-# Prototype — Room Sensor POE2
-# Matches previously deployed config: room-sensor-poe2 @ 10.10.14.20
-# Capabilities: climate, illuminance, GPIO expander (buttons + switches)
+# Prototype — Room Sensor POE2 @ 10.10.14.20
+# RoomSensor MainPlate Rev 2/3. Every GPIO comes from the package defaults —
+# this board IS the reference wiring, so there are no pin overrides here.
+#
+# BackPlate is not connected yet. Everything it carries stays commented out:
+#   gpio_ext (PCF8574 buttons/relays/blinds), dimmer (L1), power (PZEM on E1).
+# Enabled packages are all main-plate: I2C climate + illuminance, radar, LED.
 
 substitutions:
   device_name: room-sensor-poe2
@@ -9,40 +13,19 @@ substitutions:
   room_width_m: "4.0"
   room_depth_m: "5.0"
   ceiling_height_m: "2.4"
-  # --- Rev 1 / hand-wired prototype pinning ---
-  # The packages now default to MainPlate Rev 2/3. This unit predates that board,
-  # so every pin it does not share with Rev 2/3 is pinned explicitly here. Do not
-  # delete these to "pick up the defaults" — this device is not wired that way.
-  i2c_sda_pin: "GPIO4"     # Rev 2/3 default: GPIO13
-  i2c_scl_pin: "GPIO3"     # Rev 2/3 default: GPIO33
-  motion_uart_tx_pin: "GPIO2"    # Rev 2/3 default: GPIO4
-  motion_uart_rx_pin: "GPIO36"   # Rev 2/3 default: GPIO35
-  pzem_uart_tx_pin: "GPIO1"      # Rev 2/3 default: GPIO3
-  pzem_uart_rx_pin: "GPIO39"     # Rev 2/3 default: GPIO1
-  pzem_address: "0x01"
-  # Status LED is GPIO32 on every revision — GPIO15/GPIO33 carry PZEM UART here.
-  led_pin: "GPIO32"
-  led_num_leds: "1"
-  # Audio (ES8311 + NS4150B) is NOT part of the initial build. The PCB routes the
-  # pinout (BCK=GPIO5, LRCLK=GPIO13, DOUT=GPIO14, DIN=GPIO15, MCLK=GPIO1) but the
-  # components are not populated. To enable: restore these substitutions and the
-  # audio package include below — see packages/actuators/audio.yaml.
-  # audio_bclk_pin: "GPIO5"
-  # audio_lrclk_pin: "GPIO13"
-  # audio_dout_pin: "GPIO14"
-  # audio_din_pin: "GPIO15"
-  # audio_mclk_pin: "GPIO1"
 
-# logger: baud_rate: 0 comes from the base package — this device needs it because
-# UART0 RX is GPIO3, which it uses as I2C SCL.
+# Serial logging is disabled in the base package (logger: baud_rate: 0) because
+# the PZEM UART owns GPIO1/GPIO3 — UART0's console pins. Logs go over the API.
 
 packages:
   base:        !include ../packages/base/room-sensor.yaml
-  #power:       !include ../packages/sensors/power-pzem004t.yaml
   climate:     !include ../packages/sensors/climate.yaml
+  illuminance: !include ../packages/sensors/illuminance.yaml
   motion:      !include ../packages/sensors/motion.yaml
   status_led:  !include ../packages/actuators/status-led.yaml
-  illuminance: !include ../packages/sensors/illuminance.yaml
-  #gpio_ext:    !include ../packages/io/gpio-extender.yaml
+  # --- BackPlate required, not yet connected ---
+  # power:       !include ../packages/sensors/power-pzem004t.yaml
+  # gpio_ext:    !include ../packages/io/gpio-extender.yaml
   # dimmer:      !include ../packages/actuators/dimmer.yaml
-
+  # --- Rev 1 only, never populated ---
+  # audio:       !include ../packages/actuators/audio.yaml
