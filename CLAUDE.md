@@ -37,20 +37,55 @@ devices/secrets.yaml   — Symlink to ../secrets.yaml (committed, allows ESPHome
 
 - **Board:** Olimex ESP32-POE2 (`board: esp32dev`, framework: arduino)
 - **Ethernet:** LAN8720, MDC=GPIO23, MDIO=GPIO18, CLK_OUT=GPIO0, power=GPIO12
-- **I2C bus:** SDA=GPIO04, SCL=GPIO03
-- **Motion UART:** TX=GPIO02, RX=GPIO36 (DFRobot C4002 mmWave)
-- **Status LED:** GPIO32 (WS2811/WS2812, 1 LED per unit) via `esp32_rmt_led_strip` — GPIO15 carries PZEM TX on the prototype, so the LED lives on GPIO32 (the deprecated `neopixelbus` platform was replaced)
-- **GPIO expander:** PCF8574 @ 0x20 (8 channels: 2 inputs = buttons, 6 outputs via cover/switch)
-  - Channels 0,1 → Button 1, Button 2 (binary_sensor, INPUT)
-  - Channels 2,3 → Power Circuit 1, 2 (switch, OUTPUT)
-  - Channels 4,5 → Blind 1 open/close relays (internal switch → time_based cover)
-  - Channels 6,7 → Blind 2 open/close relays (internal switch → time_based cover)
-- **I2C sensors:** ENS160 @ 0x53, BH1750 @ 0x23, KRIDA dimmer @ 0x10
-- **Audio:** ES8311 @ 0x18 + NS4150B amplifier (I2S: BCK=GPIO5, LRCK=GPIO13, DOUT=GPIO14, DIN=GPIO15, MCLK=GPIO1)
-  - `use_mclk: true` with MCLK on GPIO1 (one of 3 valid CLK_OUT pins: GPIO0/1/3; GPIO0 taken by Ethernet)
-  - RTTTL for button sounds; media_player for HA TTS/announcements
-  - MCLK on GPIO1 requires `logger: baud_rate: 0` (disables UART0 serial logger)
-- **Power monitor:** PZEM-004T (UART: ESP TX=GPIO15 → PZEM RX, ESP RX=GPIO33 ← PZEM TX)
+
+> **Rev 2/3 is the only live wiring.** MainPlate/BackPlate **Rev 2/3** is what
+> every package defaults to and what the prototype at 10.10.14.20 actually runs —
+> no device YAML overrides pins any more. The earlier Rev 1 / hand-wired pinout is
+> retained below purely as history; that hardware is gone. The BackPlate expander
+> wiring is identical across both revisions.
+
+| Function | Rev 2/3 (package default) | Rev 1 (superseded, no live hardware) |
+|----------|---------------------------|--------------------------------------|
+| I2C SDA | GPIO13 | GPIO04 |
+| I2C SCL | GPIO33 | GPIO03 |
+| Motion UART — ESP TX → radar RX | GPIO4 | GPIO02 |
+| Motion UART — ESP RX ← radar TX | GPIO35 | GPIO36 |
+| PZEM UART — ESP TX → PZEM RX | GPIO3 | GPIO33 |
+| PZEM UART — ESP RX ← PZEM TX | GPIO1 | GPIO39 |
+| Status LED data (DOut) | GPIO32 | GPIO32 |
+| PCF8574 INT | GPIO36 | — (not routed) |
+| Audio (ES8311) | **not populated** | GPIO1/5/13/14/15 |
+
+- **Status LED:** WS2811/WS2812 via `esp32_rmt_led_strip` (the deprecated
+  `neopixelbus` platform was replaced). MainPlate terminal C1 is
+  `+5V / DIn / DOut / GND`: the ESP drives **DOut**, while **DIn** is the chain
+  return that continues to the BackPlate LED-Bus header (EX1). More than one LED
+  can therefore hang off a unit — set `led_num_leds` to match the wiring.
+- **GPIO expander:** PCF8574 @ 0x20 (8 channels), INT → GPIO36 on Rev 2/3.
+  Three 2-channel relay modules plus a button terminal:
+  - Channels 0,1 → relay module R3 → Power Circuit 1, 2 (switch, OUTPUT)
+  - Channels 2,3 → relay module R2 → Blind 1 open/close (internal → time_based cover)
+  - Channels 4,5 → relay module R1 → Blind 2 open/close (internal → time_based cover)
+  - Channels 6,7 → Button 1, Button 2 (binary_sensor, INPUT) on terminal EX3
+  - ⚠️ **Channel 5 is double-landed** — it feeds both relay R1's second channel and
+    EX3's *third* button terminal. Use one or the other. The firmware spends it on
+    Blind 2, so only two buttons are exposed.
+  - ESPHome's `pcf8574` platform has no interrupt support, so buttons are polled
+    and GPIO36 sits idle — but the trace is populated, so don't reassign it.
+- **I2C sensors:** ENS160 @ 0x53, BH1750 @ 0x23, KRIDA dimmer @ 0x10 (BackPlate L1)
+- **Audio:** ES8311 @ 0x18 + NS4150B amplifier — **Rev 1 only**, and never populated.
+  Rev 2/3 dropped the section entirely and reused two of its pins (GPIO13 → I2C SDA,
+  GPIO1 → PZEM RX), so `packages/actuators/audio.yaml` deliberately has no defaults.
+  Rev 1 pinout, for reference: BCK=GPIO5, LRCK=GPIO13, DOUT=GPIO14, DIN=GPIO15, MCLK=GPIO1
+  (`use_mclk: true`; GPIO1 is one of the 3 valid CLK_OUT pins — GPIO0/1/3 — and
+  requires `logger: baud_rate: 0`).
+- **Power monitor:** PZEM-004T on the BackPlate "Energy" header (E1), reaching the
+  ESP over the board-to-board connector.
+  ⚠️ On Rev 2/3 this UART sits on **GPIO1/GPIO3 — UART0's own console pins**, with
+  their roles swapped versus native UART0. Any device including the power package
+  MUST also set `logger: baud_rate: 0`. ESPHome does **not** catch this: it happily
+  assigns the logger `hardware_uart: UART0` and the config validates, but both
+  peripherals then drive the same pads and the meter never answers.
 - **Schematic:** https://app.cirkitdesigner.com/project/281a6c22-06b7-4593-8d16-d8be4f0f2b7c (requires login — can't be fetched programmatically)
 
 ## Hardware — Utility Sensor
@@ -140,32 +175,43 @@ The six RMII pins are fixed in ESP-IDF's EMAC driver and cannot be remapped.
 - GPIO5: must be HIGH at boot
 - GPIO12: must be LOW at boot (board handles this for 3.3V flash)
 
-**Our PCB assignments and any known conflicts:**
+**MainPlate Rev 2/3 assignments — the package defaults:**
 | GPIO | Use | Notes |
 |------|-----|-------|
 | GPIO0  | Ethernet CLK_OUT | ✓ |
-| GPIO1  | Audio MCLK (ES8311) | ⚠️ UART0 TX. Requires `logger: baud_rate: 0`. Valid CLK_OUT pin — confirmed working |
-| GPIO2  | Motion UART TX | ⚠️ strapping pin. Safe: TX only, not driven at boot, board has pull-down |
-| GPIO3  | I2C SCL | ⚠️ nominally UART0 RX. Works: GPIO matrix lets I2C claim it; proven on device |
-| GPIO4  | I2C SDA | ✓ |
-| GPIO5  | Audio I2S BCK | ✓ strapping pin, HIGH at boot — safe as I2S output |
+| GPIO1  | PZEM-004T UART RX (← PZEM TX) | ⚠️ UART0 TX pin, used here as RX. Forces `logger: baud_rate: 0` when the power package is on |
+| GPIO2  | (free) expansion header J2 | ⚠️ strapping pin, 2.2k on board |
+| GPIO3  | PZEM-004T UART TX (→ PZEM RX) | ⚠️ UART0 RX pin, used here as TX. Same logger caveat |
+| GPIO4  | Motion UART TX (→ radar RX) | ✓ |
+| GPIO5  | (free) expansion header J2 | ⚠️ strapping pin, HIGH at boot; 10k on board |
 | GPIO12 | Ethernet PHY power | ✓ |
-| GPIO13 | Audio I2S LRCLK | ✓ |
-| GPIO14 | Audio I2S DOUT (→ ES8311) | ✓ |
-| GPIO15 | Audio I2S DIN (← mic) / PZEM-004T UART TX (prototype) | ⚠️ shared — prototype uses GPIO15 for PZEM TX because audio is not populated; PCB with audio uses GPIO15 for I2S DIN instead |
+| GPIO13 | I2C SDA | ✓ |
+| GPIO14 | (free) expansion header J2 | ✓ |
+| GPIO15 | (free) expansion header J2 | ⚠️ strapping pin; 10k on board |
 | GPIO18 | Ethernet MDIO | ✓ |
 | GPIO23 | Ethernet MDC | ✓ |
-| GPIO32 | Status LED (WS2811/WS2812, esp32_rmt_led_strip) | ✓ prototype LED pin |
-| GPIO33 | PZEM-004T UART RX (prototype) / NeoPixel LED (PCB) | ⚠️ shared — prototype uses GPIO33 for PZEM RX (← PZEM TX); PCB design puts NeoPixel here when no PZEM |
-| GPIO36 | Motion UART RX | ✓ input-only |
-| GPIO39 | (available) | ✓ input-only — was PZEM RX in early prototype, reassigned to GPIO33 |
+| GPIO32 | Status LED data out (WS2811/WS2812, esp32_rmt_led_strip) | ✓ terminal C1 "DOut" |
+| GPIO33 | I2C SCL | ✓ |
+| GPIO34 | (free) expansion header J2 — silkscreened "10k/BUT" | ✓ input-only |
+| GPIO35 | Motion UART RX (← radar TX) | ✓ input-only |
+| GPIO36 | PCF8574 INT | ✓ input-only; routed but unusable — ESPHome polls the expander |
+| GPIO39 | (free) expansion header J2 — silkscreened "PWR_Sense" | ✓ input-only |
 
-**ESP32 MCLK constraint:** Hardware CLK_OUT is limited to GPIO0/1/3 only. GPIO0 = Ethernet, GPIO3 = I2C SCL. Only GPIO1 is usable for audio MCLK.
+**Rev 1 assignments** (superseded, no board still wired this way — kept only so
+old photos, notes and the schematic history stay readable):
+GPIO1 audio MCLK · GPIO2 motion TX · GPIO3 I2C SCL · GPIO4 I2C SDA ·
+GPIO5 I2S BCK · GPIO13 I2S LRCLK · GPIO14 I2S DOUT · GPIO15 I2S DIN ·
+GPIO32 status LED · GPIO33 PZEM TX · GPIO36 motion RX · GPIO39 PZEM RX
 
-**Available for future sensors/actuators** (not used by board or our PCB):
-GPIO34¹, GPIO35¹ — plus GPIO13, GPIO14, GPIO15, GPIO32, GPIO33 on any device that
-omits the audio, status-led and power-monitor packages (the e-ink dashboard reuses
-exactly those for its e-paper SPI bus).
+**ESP32 MCLK constraint:** Hardware CLK_OUT is limited to GPIO0/1/3 only. On Rev 1
+that left only GPIO1 for audio MCLK (GPIO0 = Ethernet, GPIO3 = I2C SCL). Rev 2/3
+spends GPIO1 and GPIO3 on the PZEM UART, so **no CLK_OUT pin remains** — another
+reason audio cannot come back on this revision without a board change.
+
+**Available for future sensors/actuators on Rev 2/3:** GPIO2, GPIO5, GPIO14,
+GPIO15, GPIO34¹, GPIO39¹ — all six brought out on expansion header J2. Plus
+GPIO13 and GPIO33 on any device that omits I2C entirely (the e-ink dashboard
+reuses those for its e-paper SPI bus and parks the unused I2C bus on GPIO04/GPIO03).
 
 ¹ Input-only pins.
 
@@ -394,7 +440,7 @@ esphome config devices/<room-name>.yaml   # validate before deploying
 
 | File | IP | ESPHome name | Capabilities |
 |------|----|--------------|--------------|
-| `devices/room-sensor-poe2.yaml` (prototype) | 10.10.14.20 | `room-sensor-poe2` | base, power, climate, motion, status_led |
+| `devices/room-sensor-poe2.yaml` (prototype, MainPlate Rev 2/3) | 10.10.14.20 | `room-sensor-poe2` | base, climate, illuminance, motion, status_led — BackPlate not connected, so power/gpio_ext/dimmer are off |
 | `devices/eink-dashboard.yaml` | 10.10.14.25 | `eink-dashboard` | base, trmnl |
 | `devices/utility-sensor.yaml` | 10.10.14.10 | `utility-sensor` | base, well_level, 8 × water_flow |
 

@@ -5,8 +5,21 @@
 #   device_name           — ESPHome entity name (lowercase-hyphenated)
 #   device_friendly_name  — human-readable label shown in HA
 #   device_ip             — static IP address (e.g. "10.10.14.21")
-#   i2c_sda_pin           — I2C SDA (all units: GPIO04)
-#   i2c_scl_pin           — I2C SCL (all units: GPIO03)
+#
+# Optional substitutions — default to the RoomSensor MainPlate Rev 2/3 wiring,
+# which is what every room sensor is built on. Override only for a board that is
+# deliberately wired differently (e.g. the e-ink dashboard, which has no I2C
+# peripherals and parks the bus off its SPI pins).
+#   i2c_sda_pin           — I2C SDA (Rev 2/3: GPIO13 · Rev 1: GPIO04)
+#   i2c_scl_pin           — I2C SCL (Rev 2/3: GPIO33 · Rev 1: GPIO03)
+#
+# Rev 2/3 moves I2C off GPIO04/GPIO03 so that UART0 (GPIO1 TX / GPIO3 RX) is no
+# longer straddled by the bus. On a Rev 2/3 board with no PZEM populated the
+# serial console is usable again; see packages/sensors/power-pzem004t.yaml.
+
+substitutions:
+  i2c_sda_pin: "GPIO13"
+  i2c_scl_pin: "GPIO33"
 
 esphome:
   name: ${device_name}
@@ -17,8 +30,15 @@ esp32:
   framework:
     type: arduino
 
+# Serial logging is off house-wide. On Rev 2/3 the PZEM UART sits on GPIO1/GPIO3
+# — UART0's own console pins — so a live logger would fight the meter for them;
+# ESPHome does NOT catch this, it just assigns the logger UART0 and validates
+# clean. On Rev 1 the same pins are straddled by I2C SCL (GPIO3). Either way the
+# units are headless PoE nodes and logs travel over the native API instead.
+# Override per device only on a board with nothing on GPIO1/GPIO3.
 logger:
   level: DEBUG
+  baud_rate: 0
 
 ota:
   - platform: esphome

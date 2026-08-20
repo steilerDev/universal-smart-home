@@ -1,4 +1,10 @@
 # Package: ES8311 + NS4150B — I2S Audio (notification sounds / TTS)
+#
+# ⚠️ Rev 1 boards only. The MainPlate Rev 2/3 dropped the ES8311/NS4150B section
+# entirely, and two of the Rev 1 audio pins are now spoken for: GPIO13 is I2C SDA
+# and GPIO1 is the PZEM UART RX. There are therefore no Rev 2/3 defaults here —
+# every pin below stays a required substitution so that including this package on
+# a Rev 2/3 device fails loudly instead of quietly fighting the I2C bus.
 # Bus: I2C for DAC control (bus_i2c defined in base/room-sensor.yaml), I2S for audio data
 # ES8311 address: 0x18
 # Required substitutions:

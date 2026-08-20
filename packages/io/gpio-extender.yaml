@@ -2,11 +2,23 @@
 # Bus: I2C (bus_i2c defined in base/room-sensor.yaml)
 # Address: 0x20  (PCF8575: false — 8-channel PCF8574)
 #
-# Fixed pin layout (PCB):
-#   0,1   → power circuit relays (switch, exposed to HA)
-#   2,3   → blind 1 open/close relays (internal, driven by cover entity)
-#   4,5   → blind 2 open/close relays (internal, driven by cover entity)
-#   6,7   → physical push buttons (input)
+# Fixed pin layout — BackPlate, unchanged between Rev 1 and Rev 2/3. The eight
+# expander channels are hard-wired on the board, so these are NOT substitutions.
+#
+#   P0,P1 → relay module R3  → power circuit relays (switch, exposed to HA)
+#   P2,P3 → relay module R2  → blind 1 open/close (internal, driven by cover)
+#   P4,P5 → relay module R1  → blind 2 open/close (internal, driven by cover)
+#   P5,P6,P7 → button terminal EX3 pins 4,3,2 (input)
+#
+# ⚠️ P5 is shared: it is both relay R1's second channel and EX3's third button
+# terminal. A board can use one or the other, never both. This package spends P5
+# on blind 2, so only two buttons (P6, P7) are exposed. A room that wants a third
+# button has to give up blind 2's close relay — override this package there.
+#
+# The expander's INT output is wired to ESP GPIO36 on Rev 2/3 (it carried the
+# motion UART RX on Rev 1, which is why that moved to GPIO35). ESPHome's pcf8574
+# platform has no interrupt support, so the buttons are polled and GPIO36 stays
+# unused — do not reassign it, the trace is populated.
 #
 # Optional substitutions (override per device if travel times differ):
 #   blind_1_open_duration  (default: 30s)

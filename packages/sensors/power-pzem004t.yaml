@@ -1,10 +1,26 @@
 # Package: PZEM-004T AC Power Monitor
 # pzemac uses Modbus protocol — requires uart → modbus → sensor chain.
+#
+# The meter lands on the BackPlate "Energy" header (E1) and reaches the ESP over
+# the board-to-board connector. Pin names are ESP-perspective.
+#
 # Required substitutions:
-#   pzem_uart_tx_pin  — UART TX to PZEM RX (e.g. "GPIO15")
-#   pzem_uart_rx_pin  — UART RX from PZEM TX (e.g. "GPIO33")
-#   pzem_address      — Modbus slave address (default "0x01")
 #   device_friendly_name
+#
+# Optional substitutions — default to Rev 2/3 wiring:
+#   pzem_uart_tx_pin  — ESP TX → PZEM RX (Rev 2/3: GPIO3 · Rev 1: GPIO33)
+#   pzem_uart_rx_pin  — ESP RX ← PZEM TX (Rev 2/3: GPIO1 · Rev 1: GPIO39)
+#   pzem_address      — Modbus slave address (default "0x01")
+#
+# ⚠️ Rev 2/3 runs this UART on GPIO1/GPIO3 — the two UART0 console pins, with
+# their roles swapped relative to UART0's native TX/RX. Any device including
+# this package MUST also set `logger: baud_rate: 0`, or the logger claims the
+# same pins and the meter never answers.
+
+substitutions:
+  pzem_uart_tx_pin: "GPIO3"
+  pzem_uart_rx_pin: "GPIO1"
+  pzem_address: "0x01"
 
 uart:
   - id: uart_pzem

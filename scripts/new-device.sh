@@ -27,22 +27,18 @@ substitutions:
   device_name: ${DEVICE}
   device_friendly_name: "${FRIENDLY}"
   device_ip: "CHANGE_ME"
-  i2c_sda_pin: "GPIO04"
-  i2c_scl_pin: "GPIO03"
+  # GPIO pins are NOT listed here on purpose: every package defaults to the
+  # RoomSensor MainPlate Rev 2/3 wiring (I2C SDA=GPIO13 SCL=GPIO33, radar
+  # TX=GPIO4 RX=GPIO35, PZEM TX=GPIO3 RX=GPIO1, LED=GPIO32). Override a pin here
+  # only for a Rev 1 board — see devices/room-sensor-poe2.yaml for that shape.
+  #
   # Uncomment alongside the package that needs them:
-  # led_pin: "GPIO33"
-  # led_num_leds: "1"
-  # pzem_uart_tx_pin: "GPIO15"
-  # pzem_uart_rx_pin: "GPIO33"
-  # pzem_address: "0x01"
   # room_width_m: "4.0"
   # room_depth_m: "5.0"
   # ceiling_height_m: "2.4"
 
-# UART0 RX is GPIO3, which every unit uses as I2C SCL — enabling the serial
-# logger would claim that pin and take the whole I2C bus down. Logs go over the API.
-logger:
-  baud_rate: 0
+# The base package already disables the serial logger (baud_rate: 0) — the PZEM
+# UART owns GPIO1/GPIO3. Logs go over the native API.
 
 packages:
   base:        !include ../packages/base/room-sensor.yaml
@@ -52,7 +48,7 @@ packages:
   # power:       !include ../packages/sensors/power-pzem004t.yaml
   # status_led:  !include ../packages/actuators/status-led.yaml
   # dimmer:      !include ../packages/actuators/dimmer.yaml
-  # audio:       !include ../packages/actuators/audio.yaml
+  # audio:       !include ../packages/actuators/audio.yaml   # Rev 1 boards only
   # gpio_ext:    !include ../packages/io/gpio-extender.yaml
 EOF
 

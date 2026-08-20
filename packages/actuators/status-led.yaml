@@ -1,10 +1,21 @@
 # Package: WS2811/WS2812 Status LED (RMT-driven)
 # Uses esp32_rmt_led_strip (the supported replacement for the deprecated
 # neopixelbus platform, which upstream targets for removal ~2027.1).
+# The strip lands on MainPlate screw terminal C1 (+5V / DIn / DOut / GND). The
+# ESP drives DOut; DIn is the chain return that continues to the BackPlate
+# LED-Bus header (EX1), so a device can carry more than one LED — raise
+# led_num_leds to match what is actually wired.
+#
 # Required substitutions:
-#   led_pin      — GPIO pin (GPIO32 when PZEM present on GPIO33; GPIO33 otherwise)
-#   led_num_leds — number of LEDs (all units: "1")
 #   device_friendly_name
+#
+# Optional substitutions — default to Rev 2/3 wiring (unchanged from Rev 1):
+#   led_pin      — data out (GPIO32 on every revision)
+#   led_num_leds — number of LEDs in the chain (default "1")
+
+substitutions:
+  led_pin: "GPIO32"
+  led_num_leds: "1"
 
 light:
   - platform: esp32_rmt_led_strip

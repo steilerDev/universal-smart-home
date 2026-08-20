@@ -1,6 +1,19 @@
 # Package: DFRobot C4002 mmWave Radar — Ceiling Presence Detection
-# Pins (fixed PCB layout): TX→GPIO02, RX→GPIO36
+#
+# Radar plugs into MainPlate socket S1. Pin names below are ESP-perspective:
+# motion_uart_tx_pin drives the radar's RX pin, motion_uart_rx_pin reads its TX.
+#
 # Required substitutions: room_width_m, room_depth_m, ceiling_height_m, device_friendly_name
+#
+# Optional substitutions — default to MainPlate Rev 2/3 wiring:
+#   motion_uart_tx_pin  — ESP TX → radar RX (Rev 2/3: GPIO4  · Rev 1: GPIO2)
+#   motion_uart_rx_pin  — ESP RX ← radar TX (Rev 2/3: GPIO35 · Rev 1: GPIO36)
+#
+# GPIO35 is input-only, which is fine for a UART RX line.
+
+substitutions:
+  motion_uart_tx_pin: "GPIO4"
+  motion_uart_rx_pin: "GPIO35"
 
 external_components:
   - source:
@@ -11,8 +24,8 @@ external_components:
 
 uart:
   - id: uart_motion
-    tx_pin: GPIO02
-    rx_pin: GPIO36
+    tx_pin: ${motion_uart_tx_pin}
+    rx_pin: ${motion_uart_rx_pin}
     baud_rate: 115200
 
 dfrobot_c4002:
