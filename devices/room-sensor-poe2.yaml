@@ -42,7 +42,7 @@ packages:
   climate:     !include ../packages/sensors/climate.yaml
   motion:      !include ../packages/sensors/motion.yaml
   status_led:  !include ../packages/actuators/status-led.yaml
-  # illuminance: !include ../packages/sensors/illuminance.yaml
+  illuminance: !include ../packages/sensors/illuminance.yaml
   gpio_ext:    !include ../packages/io/gpio-extender.yaml
   # dimmer:      !include ../packages/actuators/dimmer.yaml
   # audio: !include ../packages/actuators/audio.yaml
