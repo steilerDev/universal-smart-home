@@ -524,7 +524,7 @@
     "last_paths": {
       "idf": "",
       "netlist": "",
-      "plot": "",
+      "plot": "../../../../../../Desktop/BackPlate-Rev3/",
       "specctra_dsn": "",
       "vrml": ""
     },
@@ -756,7 +756,7 @@
         "uuid": "36d52cf5-35e6-4f92-8aa1-87a170394a81"
       }
     ],
-    "used_designators": "JP1-6,U1,J1-3,J5-6,R2-3,SW1-2",
+    "used_designators": "SW1-2,R2-6,J1-3,J5-6,U1,JP1-9",
     "variants": [
       {
         "name": "MPN BOM"

@@ -1,6 +1,4 @@
 (fp_lib_table
 	(version 7)
-	(lib (name "Components") (type "KiCad") (uri "/Users/franksteiler/Documents/Sandboxes/universal-smart-home/hardware/room-sensor/Components.pretty") (options "") (descr ""))
-	(lib (name "room-sensor") (type "KiCad") (uri "/Users/franksteiler/Documents/Sandboxes/universal-smart-home/hardware/room-sensor/room-sensor.pretty") (options "") (descr ""))
-	(lib (name "room-sensor") (type "KiCad") (uri "/Users/franksteiler/Documents/Sandboxes/universal-smart-home/hardware/room-sensor/room-sensor.pretty") (options "") (descr ""))
+	(lib (name "room-sensor") (type "KiCad") (uri "/Users/franksteiler/Documents/Sandboxes/universal-smart-home/hardware/pcb/room-sensor.pretty") (options "") (descr ""))
 )

@@ -524,7 +524,7 @@
     "last_paths": {
       "idf": "",
       "netlist": "",
-      "plot": "./",
+      "plot": "../../../../../../Desktop/MainBoard-Rev2/",
       "specctra_dsn": "",
       "vrml": ""
     },

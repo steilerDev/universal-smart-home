@@ -5,7 +5,7 @@
 	(uuid "36d52cf5-35e6-4f92-8aa1-87a170394a81")
 	(paper "A4")
 	(lib_symbols
-		(symbol "Conn_01x04_1"
+		(symbol "5V_2_Relay_Module_1"
 			(pin_names
 				(offset 2.54)
 			)
@@ -15,9 +15,9 @@
 			(in_pos_files yes)
 			(duplicate_pin_numbers_are_jumpers no)
 			(property "Reference" "R1"
-				(at 9.652 0 0)
+				(at 8.89 -3.048 0)
 				(show_name no)
-				(do_not_autoplace no)
+				(do_not_autoplace yes)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -25,10 +25,10 @@
 					(justify left)
 				)
 			)
-			(property "Value" "Relay"
-				(at 9.652 -2.54 0)
+			(property "Value" "2-Way Relay Module"
+				(at 8.89 -5.588 0)
 				(show_name no)
-				(do_not_autoplace no)
+				(do_not_autoplace yes)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -36,8 +36,8 @@
 					(justify left)
 				)
 			)
-			(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x04_P2.54mm_Vertical"
-				(at 0 0 0)
+			(property "Footprint" "room-sensor:2-way Relay Connector"
+				(at -0.508 8.89 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(hide yes)
@@ -59,7 +59,18 @@
 				)
 			)
 			(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
-				(at 0 0 0)
+				(at 5.588 10.414 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "MPN" "HX PM2.54-1x4P ZC H11"
+				(at 0.508 12.446 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(hide yes)
@@ -91,7 +102,7 @@
 					)
 				)
 			)
-			(symbol "Conn_01x04_1_1_1"
+			(symbol "5V_2_Relay_Module_1_1_1"
 				(rectangle
 					(start -1.27 3.81)
 					(end 1.27 -6.35)
@@ -139,6 +150,50 @@
 				(rectangle
 					(start -1.27 -4.953)
 					(end 0 -5.207)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -7.62)
+					(end 1.27 -15.24)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -1.27 -8.89)
+					(end 0 -9.144)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -11.43)
+					(end 0 -11.684)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -13.97)
+					(end 0 -14.224)
 					(stroke
 						(width 0.1524)
 						(type default)
@@ -212,6 +267,386 @@
 						)
 					)
 					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -8.89 0)
+					(length 3.81)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -11.43 0)
+					(length 3.81)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -13.97 0)
+					(length 3.81)
+					(name "RY-VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "5V_2_Relay_Module_2"
+			(pin_names
+				(offset 2.54)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "R1"
+				(at 8.89 -3.048 0)
+				(show_name no)
+				(do_not_autoplace yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "2-Way Relay Module"
+				(at 8.89 -5.588 0)
+				(show_name no)
+				(do_not_autoplace yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" "room-sensor:2-way Relay Connector"
+				(at -0.508 8.89 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 5.588 10.414 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "MPN" "HX PM2.54-1x4P ZC H11"
+				(at 0.508 12.446 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "5V_2_Relay_Module_2_1_1"
+				(rectangle
+					(start -1.27 3.81)
+					(end 1.27 -6.35)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -1.27 2.667)
+					(end 0 2.413)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -2.413)
+					(end 0 -2.667)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -4.953)
+					(end 0 -5.207)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -7.62)
+					(end 1.27 -15.24)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -1.27 -8.89)
+					(end 0 -9.144)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -11.43)
+					(end 0 -11.684)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -13.97)
+					(end 0 -14.224)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 2.54 0)
+					(length 3.81)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "IO2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name "IO1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -5.08 0)
+					(length 3.81)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -8.89 0)
+					(length 3.81)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -11.43 0)
+					(length 3.81)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -13.97 0)
+					(length 3.81)
+					(name "RY-VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -422,223 +857,6 @@
 					(at -5.08 -5.08 0)
 					(length 3.81)
 					(name "VCC"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "Conn_01x04_3"
-			(pin_names
-				(offset 2.54)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "R1"
-				(at 6.604 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Value" "Relay"
-				(at 6.604 -2.54 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Footprint" "room-sensor:2-way Relay Connector"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "connector"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "Connector*:*_1x??_*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "Conn_01x04_3_1_1"
-				(rectangle
-					(start -1.27 3.81)
-					(end 1.27 -6.35)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-				(rectangle
-					(start -1.27 2.667)
-					(end 0 2.413)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(rectangle
-					(start -1.27 0.127)
-					(end 0 -0.127)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(rectangle
-					(start -1.27 -2.413)
-					(end 0 -2.667)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(rectangle
-					(start -1.27 -4.953)
-					(end 0 -5.207)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(pin passive line
-					(at -5.08 2.54 0)
-					(length 3.81)
-					(name "VCC"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 0 0)
-					(length 3.81)
-					(name "IO2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 -2.54 0)
-					(length 3.81)
-					(name "IO1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at -5.08 -5.08 0)
-					(length 3.81)
-					(name "GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -942,6 +1160,7 @@
 				(at 12.192 -2.54 0)
 				(show_name no)
 				(do_not_autoplace no)
+				(hide yes)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -1188,7 +1407,7 @@
 				(pin passive line
 					(at -5.08 0 0)
 					(length 3.81)
-					(name "E-GPIO7"
+					(name "E_GPIO7"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1639,7 +1858,7 @@
 			(on_board yes)
 			(in_pos_files yes)
 			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "J1"
+			(property "Reference" "EX2"
 				(at 8.382 0.508 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -1684,6 +1903,17 @@
 				)
 			)
 			(property "Description" "Generic screw terminal, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "MPN" "KF128-2.54-4P"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -1871,7 +2101,7 @@
 				(pin passive line
 					(at -5.08 2.54 0)
 					(length 3.81)
-					(name "V+"
+					(name "+3.3V"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2195,7 +2425,7 @@
 				(pin passive line
 					(at -5.08 2.54 0)
 					(length 3.81)
-					(name "V+"
+					(name "+24/12V"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2213,7 +2443,7 @@
 				(pin passive line
 					(at -5.08 0 0)
 					(length 3.81)
-					(name "LED_Bus"
+					(name "+5V"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2231,7 +2461,7 @@
 				(pin passive line
 					(at -5.08 -2.54 0)
 					(length 3.81)
-					(name "GPIO15"
+					(name "LED-Bus"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2267,41 +2497,39 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "SolderJumper_2_Open_1"
-			(pin_numbers
-				(hide yes)
-			)
+		(symbol "room-sensor:5V_2_Relay_Module"
 			(pin_names
-				(offset 0)
+				(offset 2.54)
 			)
 			(exclude_from_sim no)
-			(in_bom no)
+			(in_bom yes)
 			(on_board yes)
 			(in_pos_files yes)
 			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "JP1"
-				(at 0.254 -2.286 0)
+			(property "Reference" "R4"
+				(at 8.89 -3.048 0)
 				(show_name no)
-				(do_not_autoplace no)
+				(do_not_autoplace yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left)
 				)
 			)
-			(property "Value" "SolderJumper_2_Open"
-				(at 0 3.81 0)
+			(property "Value" "2-Way Relay Module"
+				(at 8.89 -5.588 0)
 				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
+				(do_not_autoplace yes)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(justify left)
 				)
 			)
-			(property "Footprint" "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm"
-				(at 0 0 0)
+			(property "Footprint" "room-sensor:2-way Relay Connector"
+				(at -0.508 8.89 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(hide yes)
@@ -2312,28 +2540,6 @@
 				)
 			)
 			(property "Datasheet" ""
-				(at 0 -7.62 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Solder Jumper, 2-pole, open"
-				(at 0 -5.08 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "solder jumper SPST"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -2344,7 +2550,29 @@
 					)
 				)
 			)
-			(property "ki_fp_filters" "SolderJumper*Open*"
+			(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 5.588 10.414 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "MPN" "HX PM2.54-1x4P ZC H11"
+				(at 0.508 12.446 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "connector"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -2355,61 +2583,121 @@
 					)
 				)
 			)
-			(symbol "SolderJumper_2_Open_1_0_1"
-				(polyline
-					(pts
-						(xy -0.254 1.016) (xy -0.254 -1.016)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start -0.254 -1.016)
-					(mid -1.2656 0)
-					(end -0.254 1.016)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(arc
-					(start 0.254 1.016)
-					(mid 1.2656 0)
-					(end 0.254 -1.016)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.254 1.016) (xy 0.254 -1.016)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
 					)
 				)
 			)
-			(symbol "SolderJumper_2_Open_1_1_1"
+			(symbol "5V_2_Relay_Module_1_1"
+				(rectangle
+					(start -1.27 3.81)
+					(end 1.27 -6.35)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -1.27 2.667)
+					(end 0 2.413)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -2.413)
+					(end 0 -2.667)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -4.953)
+					(end 0 -5.207)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -7.62)
+					(end 1.27 -15.24)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -1.27 -8.89)
+					(end 0 -9.144)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -11.43)
+					(end 0 -11.684)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -13.97)
+					(end 0 -14.224)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
 				(pin passive line
-					(at -5.08 0 0)
+					(at -5.08 2.54 0)
 					(length 3.81)
-					(name "+3.3V"
+					(name "VCC"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2425,187 +2713,9 @@
 					)
 				)
 				(pin passive line
-					(at 5.08 0 180)
-					(length 3.81)
-					(name ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "SolderJumper_2_Open_2"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0)
-			)
-			(exclude_from_sim no)
-			(in_bom no)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "JP2"
-				(at 0.254 -2.286 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "SolderJumper_2_Open"
-				(at 0 3.81 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 -7.62 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Solder Jumper, 2-pole, open"
-				(at 0 -5.08 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "solder jumper SPST"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "SolderJumper*Open*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "SolderJumper_2_Open_2_0_1"
-				(polyline
-					(pts
-						(xy -0.254 1.016) (xy -0.254 -1.016)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start -0.254 -1.016)
-					(mid -1.2656 0)
-					(end -0.254 1.016)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(arc
-					(start 0.254 1.016)
-					(mid 1.2656 0)
-					(end 0.254 -1.016)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.254 1.016) (xy 0.254 -1.016)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "SolderJumper_2_Open_2_1_1"
-				(pin passive line
 					(at -5.08 0 0)
 					(length 3.81)
-					(name "+5V"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 5.08 0 180)
-					(length 3.81)
-					(name ""
+					(name "IO2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2620,159 +2730,17 @@
 						)
 					)
 				)
-			)
-			(embedded_fonts no)
-		)
-		(symbol "SolderJumper_2_Open_3"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0)
-			)
-			(exclude_from_sim no)
-			(in_bom no)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "JP3"
-				(at 0.254 -2.286 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "SolderJumper_2_Open"
-				(at 0 3.81 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 -7.62 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Solder Jumper, 2-pole, open"
-				(at 0 -5.08 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "solder jumper SPST"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "SolderJumper*Open*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "SolderJumper_2_Open_3_0_1"
-				(polyline
-					(pts
-						(xy -0.254 1.016) (xy -0.254 -1.016)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(arc
-					(start -0.254 -1.016)
-					(mid -1.2656 0)
-					(end -0.254 1.016)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(arc
-					(start 0.254 1.016)
-					(mid 1.2656 0)
-					(end 0.254 -1.016)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.254 1.016) (xy 0.254 -1.016)
-					)
-					(stroke
-						(width 0.1524)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "SolderJumper_2_Open_3_1_1"
 				(pin passive line
-					(at -5.08 0 0)
+					(at -5.08 -2.54 0)
 					(length 3.81)
-					(name "+24/12V"
+					(name "IO1"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number "1"
+					(number "3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2781,16 +2749,70 @@
 					)
 				)
 				(pin passive line
-					(at 5.08 0 180)
+					(at -5.08 -5.08 0)
 					(length 3.81)
-					(name ""
+					(name "GND"
 						(effects
 							(font
 								(size 1.27 1.27)
 							)
 						)
 					)
-					(number "2"
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -8.89 0)
+					(length 3.81)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -11.43 0)
+					(length 3.81)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -13.97 0)
+					(length 3.81)
+					(name "RY-VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2813,8 +2835,8 @@
 			(on_board yes)
 			(in_pos_files yes)
 			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "J"
-				(at 1.27 7.62 0)
+			(property "Reference" "C1"
+				(at 1.27 11.43 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
@@ -2824,7 +2846,7 @@
 				)
 			)
 			(property "Value" "B2B_Connector"
-				(at 1.27 -7.62 0)
+				(at 1.27 8.89 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
@@ -2856,6 +2878,17 @@
 				)
 			)
 			(property "Description" "Generic connector, double row, 02x05, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "MPN" "MTB10-10S"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -3157,7 +3190,7 @@
 				(pin passive line
 					(at -5.08 -5.08 0)
 					(length 3.81)
-					(name "GPIO15"
+					(name "IO_INT"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -3225,46 +3258,16 @@
 		(uuid "433b0aed-2ab5-4657-aa4d-06047fae12a0")
 	)
 	(junction
-		(at 100.33 72.39)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "4377c26d-93bd-4ec2-ab11-9814cd3e7023")
-	)
-	(junction
-		(at 72.39 69.85)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "52fb2215-05f0-474f-9407-b2339ec95c2f")
-	)
-	(junction
 		(at 104.14 52.07)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "6330167e-b1b0-430b-b654-176ee2481a82")
 	)
 	(junction
-		(at 67.31 74.93)
+		(at 151.13 50.8)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "801dc272-288e-4cfc-821c-e71e5b8a8203")
-	)
-	(junction
-		(at 154.94 50.8)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "83f10209-bddb-41b4-b95e-02b1fc392177")
-	)
-	(junction
-		(at 100.33 123.19)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "de3e43dc-c986-4b83-b885-1e1080f93c42")
-	)
-	(junction
-		(at 69.85 72.39)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "ea44078c-8167-44d7-bc7c-65aa2ab505df")
+		(uuid "9034e5e9-5c79-4eef-a61d-98816c7e28a0")
 	)
 	(junction
 		(at 127 60.96)
@@ -3294,17 +3297,7 @@
 	)
 	(wire
 		(pts
-			(xy 163.83 35.56) (xy 167.64 35.56)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "045febda-8c41-4e66-afa6-16acb2a84740")
-	)
-	(wire
-		(pts
-			(xy 110.49 87.63) (xy 115.57 87.63)
+			(xy 109.22 87.63) (xy 115.57 87.63)
 		)
 		(stroke
 			(width 0)
@@ -3324,7 +3317,7 @@
 	)
 	(wire
 		(pts
-			(xy 44.45 49.53) (xy 30.48 49.53)
+			(xy 44.45 49.53) (xy 27.94 49.53)
 		)
 		(stroke
 			(width 0)
@@ -3334,7 +3327,17 @@
 	)
 	(wire
 		(pts
-			(xy 111.76 127) (xy 115.57 127)
+			(xy 111.76 45.72) (xy 116.84 45.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0b3b438a-d9d5-4058-a147-542154ae5780")
+	)
+	(wire
+		(pts
+			(xy 109.22 127) (xy 115.57 127)
 		)
 		(stroke
 			(width 0)
@@ -3344,17 +3347,27 @@
 	)
 	(wire
 		(pts
-			(xy 107.95 121.92) (xy 115.57 121.92)
+			(xy 180.34 27.94) (xy 186.69 27.94)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "0f64b6fb-3e00-4221-a78c-e62b329f4417")
+		(uuid "0bda714d-102f-4d89-b62a-985817099e6f")
 	)
 	(wire
 		(pts
-			(xy 152.4 53.34) (xy 152.4 81.28)
+			(xy 36.83 44.45) (xy 44.45 44.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "10f0fdae-3189-4620-b3fe-f02c66b8fe2c")
+	)
+	(wire
+		(pts
+			(xy 149.86 53.34) (xy 149.86 97.79)
 		)
 		(stroke
 			(width 0)
@@ -3364,37 +3377,7 @@
 	)
 	(wire
 		(pts
-			(xy 106.68 123.19) (xy 106.68 119.38)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "13f7d89e-8dc4-45fd-bca3-46f71c4c53fc")
-	)
-	(wire
-		(pts
-			(xy 25.4 44.45) (xy 25.4 69.85)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1767eadd-2a9d-456b-adab-c8ee64fd598e")
-	)
-	(wire
-		(pts
-			(xy 44.45 44.45) (xy 25.4 44.45)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "192d4110-4111-4c29-969e-0147b9d063dd")
-	)
-	(wire
-		(pts
-			(xy 154.94 83.82) (xy 167.64 83.82)
+			(xy 151.13 100.33) (xy 186.69 100.33)
 		)
 		(stroke
 			(width 0)
@@ -3404,7 +3387,7 @@
 	)
 	(wire
 		(pts
-			(xy 57.15 54.61) (xy 62.23 54.61)
+			(xy 57.15 54.61) (xy 76.2 54.61)
 		)
 		(stroke
 			(width 0)
@@ -3414,17 +3397,7 @@
 	)
 	(wire
 		(pts
-			(xy 67.31 125.73) (xy 67.31 74.93)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "281827e8-8388-42df-9404-6250be26dffb")
-	)
-	(wire
-		(pts
-			(xy 137.16 53.34) (xy 152.4 53.34)
+			(xy 137.16 53.34) (xy 149.86 53.34)
 		)
 		(stroke
 			(width 0)
@@ -3434,7 +3407,7 @@
 	)
 	(wire
 		(pts
-			(xy 162.56 43.18) (xy 162.56 50.8)
+			(xy 158.75 43.18) (xy 158.75 52.07)
 		)
 		(stroke
 			(width 0)
@@ -3444,7 +3417,7 @@
 	)
 	(wire
 		(pts
-			(xy 149.86 55.88) (xy 149.86 78.74)
+			(xy 148.59 55.88) (xy 148.59 95.25)
 		)
 		(stroke
 			(width 0)
@@ -3454,7 +3427,17 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 36.83) (xy 161.29 36.83)
+			(xy 180.34 44.45) (xy 186.69 44.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2e968d43-0578-4d8b-be33-cc37d9cd72cd")
+	)
+	(wire
+		(pts
+			(xy 161.29 30.48) (xy 186.69 30.48)
 		)
 		(stroke
 			(width 0)
@@ -3464,13 +3447,13 @@
 	)
 	(wire
 		(pts
-			(xy 90.17 67.31) (xy 90.17 69.85)
+			(xy 127 25.4) (xy 127 33.02)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "2f97623b-0b66-4cca-b9a0-6d1381cc58d1")
+		(uuid "353799b1-3ae3-4718-8e7d-a768853aa803")
 	)
 	(wire
 		(pts
@@ -3484,7 +3467,7 @@
 	)
 	(wire
 		(pts
-			(xy 30.48 49.53) (xy 30.48 74.93)
+			(xy 27.94 49.53) (xy 27.94 119.38)
 		)
 		(stroke
 			(width 0)
@@ -3494,13 +3477,13 @@
 	)
 	(wire
 		(pts
-			(xy 161.29 50.8) (xy 154.94 50.8)
+			(xy 76.2 124.46) (xy 115.57 124.46)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "397de4e0-fdcf-4231-ad2a-22d0ecfa2ce1")
+		(uuid "3b01c33f-3d9c-4d39-96c0-ea9ea944faf8")
 	)
 	(wire
 		(pts
@@ -3514,7 +3497,7 @@
 	)
 	(wire
 		(pts
-			(xy 152.4 81.28) (xy 167.64 81.28)
+			(xy 149.86 97.79) (xy 186.69 97.79)
 		)
 		(stroke
 			(width 0)
@@ -3524,7 +3507,7 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 48.26) (xy 154.94 36.83)
+			(xy 161.29 48.26) (xy 161.29 30.48)
 		)
 		(stroke
 			(width 0)
@@ -3534,7 +3517,7 @@
 	)
 	(wire
 		(pts
-			(xy 161.29 40.64) (xy 167.64 40.64)
+			(xy 162.56 33.02) (xy 186.69 33.02)
 		)
 		(stroke
 			(width 0)
@@ -3544,7 +3527,7 @@
 	)
 	(wire
 		(pts
-			(xy 167.64 64.77) (xy 158.75 64.77)
+			(xy 186.69 73.66) (xy 154.94 73.66)
 		)
 		(stroke
 			(width 0)
@@ -3554,7 +3537,7 @@
 	)
 	(wire
 		(pts
-			(xy 162.56 50.8) (xy 167.64 50.8)
+			(xy 158.75 52.07) (xy 186.69 52.07)
 		)
 		(stroke
 			(width 0)
@@ -3564,7 +3547,17 @@
 	)
 	(wire
 		(pts
-			(xy 30.48 74.93) (xy 67.31 74.93)
+			(xy 151.13 50.8) (xy 162.56 50.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4ea4e8e8-ee97-4624-ba80-1113cf0c7184")
+	)
+	(wire
+		(pts
+			(xy 27.94 119.38) (xy 115.57 119.38)
 		)
 		(stroke
 			(width 0)
@@ -3584,16 +3577,6 @@
 	)
 	(wire
 		(pts
-			(xy 90.17 125.73) (xy 90.17 128.27)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5509ad5a-c828-4224-ba52-deccb58719fc")
-	)
-	(wire
-		(pts
 			(xy 82.55 44.45) (xy 82.55 106.68)
 		)
 		(stroke
@@ -3601,6 +3584,16 @@
 			(type default)
 		)
 		(uuid "5a1e220c-b04c-4d39-82d5-cf22fa3ea71e")
+	)
+	(wire
+		(pts
+			(xy 180.34 35.56) (xy 186.69 35.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5b1fb2b5-6be1-4bbe-9139-a2f42e04738c")
 	)
 	(wire
 		(pts
@@ -3614,57 +3607,7 @@
 	)
 	(wire
 		(pts
-			(xy 163.83 62.23) (xy 167.64 62.23)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "62510f99-b47a-4bd4-9ac0-3d56ea68ee52")
-	)
-	(wire
-		(pts
-			(xy 100.33 123.19) (xy 100.33 128.27)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "633ef51e-6a4a-4a6c-adb1-8172362f36d7")
-	)
-	(wire
-		(pts
-			(xy 163.83 48.26) (xy 167.64 48.26)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "649ff296-86cb-4c89-870f-af167e770c0c")
-	)
-	(wire
-		(pts
-			(xy 69.85 123.19) (xy 69.85 72.39)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "66911771-17c6-415f-ace4-002b5c90e20f")
-	)
-	(wire
-		(pts
-			(xy 163.83 55.88) (xy 167.64 55.88)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "67897d4c-3250-4f24-9b69-e363e1135923")
-	)
-	(wire
-		(pts
-			(xy 156.21 67.31) (xy 156.21 40.64)
+			(xy 153.67 76.2) (xy 153.67 40.64)
 		)
 		(stroke
 			(width 0)
@@ -3694,27 +3637,7 @@
 	)
 	(wire
 		(pts
-			(xy 90.17 118.11) (xy 90.17 120.65)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6b75b551-c2a4-485f-9dc2-ab00799fb58d")
-	)
-	(wire
-		(pts
-			(xy 106.68 119.38) (xy 115.57 119.38)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6da5d563-390a-4d60-9207-4fed7230a5fd")
-	)
-	(wire
-		(pts
-			(xy 160.02 53.34) (xy 167.64 53.34)
+			(xy 157.48 54.61) (xy 186.69 54.61)
 		)
 		(stroke
 			(width 0)
@@ -3724,7 +3647,17 @@
 	)
 	(wire
 		(pts
-			(xy 137.16 55.88) (xy 149.86 55.88)
+			(xy 76.2 124.46) (xy 76.2 54.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7131f838-b0d2-49d6-8598-01151a737c61")
+	)
+	(wire
+		(pts
+			(xy 137.16 55.88) (xy 148.59 55.88)
 		)
 		(stroke
 			(width 0)
@@ -3754,13 +3687,13 @@
 	)
 	(wire
 		(pts
-			(xy 163.83 43.18) (xy 167.64 43.18)
+			(xy 180.34 66.04) (xy 186.69 66.04)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "83340a93-7d08-4969-ac19-046f245b71e6")
+		(uuid "7c1ec4fd-e047-4918-98f1-fc29240225b4")
 	)
 	(wire
 		(pts
@@ -3774,23 +3707,23 @@
 	)
 	(wire
 		(pts
-			(xy 90.17 69.85) (xy 72.39 69.85)
+			(xy 43.18 59.69) (xy 43.18 54.61)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "897fca7a-93bc-4bc1-8df1-8d2a34a0600a")
+		(uuid "85866eb3-18f2-4f6d-9738-4d459903168e")
 	)
 	(wire
 		(pts
-			(xy 107.95 124.46) (xy 115.57 124.46)
+			(xy 180.34 87.63) (xy 186.69 87.63)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "8d383868-597d-4c00-8e53-a8ab332cd066")
+		(uuid "8ac70149-e523-41ea-be6f-de972d5a0990")
 	)
 	(wire
 		(pts
@@ -3804,13 +3737,13 @@
 	)
 	(wire
 		(pts
-			(xy 25.4 69.85) (xy 72.39 69.85)
+			(xy 104.14 38.1) (xy 116.84 38.1)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "930f57f9-623d-4d65-88c3-4b2934f6d1de")
+		(uuid "95deb760-7551-46de-afbc-b1a8a5fc0374")
 	)
 	(wire
 		(pts
@@ -3834,53 +3767,33 @@
 	)
 	(wire
 		(pts
-			(xy 90.17 72.39) (xy 69.85 72.39)
+			(xy 180.34 78.74) (xy 186.69 78.74)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "99f34c39-64d5-40bb-a652-b95a381c2dd2")
+		(uuid "a0f793cc-bd11-402e-a5b7-b87471244728")
 	)
 	(wire
 		(pts
-			(xy 72.39 120.65) (xy 72.39 69.85)
+			(xy 180.34 71.12) (xy 186.69 71.12)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "a0dc1d3d-662e-499b-8689-8419b51a6d8d")
+		(uuid "a244fc88-c6ce-4c5d-9bc9-c6c519777fe8")
 	)
 	(wire
 		(pts
-			(xy 33.02 54.61) (xy 44.45 54.61)
+			(xy 180.34 49.53) (xy 186.69 49.53)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "a194ff74-74d5-4f61-9061-a39ffe538e55")
-	)
-	(wire
-		(pts
-			(xy 27.94 46.99) (xy 44.45 46.99)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a25ac587-20a6-4a91-abf0-b5207af14405")
-	)
-	(wire
-		(pts
-			(xy 90.17 120.65) (xy 72.39 120.65)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a6540d82-c7f8-480e-9232-19a9b51d31a8")
+		(uuid "a2cc1f15-bfd9-4d0f-9af1-d905ad24b5f5")
 	)
 	(wire
 		(pts
@@ -3894,6 +3807,36 @@
 	)
 	(wire
 		(pts
+			(xy 109.22 121.92) (xy 115.57 121.92)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ad88a082-08ab-4720-907f-b2bb7c40a557")
+	)
+	(wire
+		(pts
+			(xy 106.68 40.64) (xy 116.84 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "aeed3cbb-f70c-47b6-99ce-f6f623ba1ce7")
+	)
+	(wire
+		(pts
+			(xy 43.18 59.69) (xy 111.76 59.69)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b015c2aa-e304-4d6d-8782-9bc3946349d7")
+	)
+	(wire
+		(pts
 			(xy 104.14 74.93) (xy 104.14 92.71)
 		)
 		(stroke
@@ -3904,17 +3847,17 @@
 	)
 	(wire
 		(pts
-			(xy 163.83 69.85) (xy 167.64 69.85)
+			(xy 111.76 45.72) (xy 111.76 59.69)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "b111eabf-a244-444f-a53c-4206cd92078b")
+		(uuid "b2b6fef0-bdb3-42dc-a9f0-a1136a8c8882")
 	)
 	(wire
 		(pts
-			(xy 137.16 50.8) (xy 154.94 50.8)
+			(xy 137.16 50.8) (xy 151.13 50.8)
 		)
 		(stroke
 			(width 0)
@@ -3924,7 +3867,7 @@
 	)
 	(wire
 		(pts
-			(xy 149.86 78.74) (xy 167.64 78.74)
+			(xy 148.59 95.25) (xy 186.69 95.25)
 		)
 		(stroke
 			(width 0)
@@ -3944,33 +3887,13 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 50.8) (xy 154.94 83.82)
+			(xy 151.13 50.8) (xy 151.13 100.33)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "b9635eb8-c956-4bcb-ad77-140d0cf7dfea")
-	)
-	(wire
-		(pts
-			(xy 90.17 74.93) (xy 90.17 77.47)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "bd7ca43d-731b-46bf-a8b6-ea62cccdcbef")
-	)
-	(wire
-		(pts
-			(xy 100.33 72.39) (xy 100.33 77.47)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "bde80732-0126-416f-824f-525d995b73ab")
 	)
 	(wire
 		(pts
@@ -3984,27 +3907,7 @@
 	)
 	(wire
 		(pts
-			(xy 100.33 72.39) (xy 115.57 72.39)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c0bdeff5-2c63-440a-bac5-4cda603341e3")
-	)
-	(wire
-		(pts
-			(xy 90.17 125.73) (xy 67.31 125.73)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c1feb343-b8e4-4301-9e3c-b90f3884d170")
-	)
-	(wire
-		(pts
-			(xy 158.75 64.77) (xy 158.75 38.1)
+			(xy 154.94 73.66) (xy 154.94 38.1)
 		)
 		(stroke
 			(width 0)
@@ -4014,67 +3917,17 @@
 	)
 	(wire
 		(pts
-			(xy 161.29 36.83) (xy 161.29 38.1)
+			(xy 43.18 54.61) (xy 44.45 54.61)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "c47edb4e-cbb2-4aeb-aa12-34fd7f3799fc")
+		(uuid "ca3df58e-eeb5-4169-952a-e187ae177a25")
 	)
 	(wire
 		(pts
-			(xy 90.17 123.19) (xy 69.85 123.19)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c52c790e-0fe5-4893-98c9-01b691cf2717")
-	)
-	(wire
-		(pts
-			(xy 116.84 40.64) (xy 106.68 40.64)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c5a0cce2-c055-48f1-be0d-4feaf094d711")
-	)
-	(wire
-		(pts
-			(xy 116.84 38.1) (xy 104.14 38.1)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c660e621-bfc6-4d43-a128-98cbb8da52a1")
-	)
-	(wire
-		(pts
-			(xy 67.31 74.93) (xy 90.17 74.93)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c770fc2b-5db8-42a4-96b6-ca14fff90a04")
-	)
-	(wire
-		(pts
-			(xy 100.33 118.11) (xy 100.33 123.19)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "cce1f592-c0c1-419f-9fcc-b5fe32c64572")
-	)
-	(wire
-		(pts
-			(xy 160.02 45.72) (xy 160.02 53.34)
+			(xy 157.48 45.72) (xy 157.48 54.61)
 		)
 		(stroke
 			(width 0)
@@ -4084,7 +3937,7 @@
 	)
 	(wire
 		(pts
-			(xy 158.75 38.1) (xy 137.16 38.1)
+			(xy 154.94 38.1) (xy 137.16 38.1)
 		)
 		(stroke
 			(width 0)
@@ -4094,7 +3947,27 @@
 	)
 	(wire
 		(pts
-			(xy 137.16 45.72) (xy 160.02 45.72)
+			(xy 36.83 46.99) (xy 44.45 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d1c6ad12-4219-46d9-bb5d-9226be3258d6")
+	)
+	(wire
+		(pts
+			(xy 180.34 57.15) (xy 186.69 57.15)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d20dc9e7-5d36-47ec-872f-5e82e4b11c15")
+	)
+	(wire
+		(pts
+			(xy 137.16 45.72) (xy 157.48 45.72)
 		)
 		(stroke
 			(width 0)
@@ -4114,7 +3987,7 @@
 	)
 	(wire
 		(pts
-			(xy 163.83 76.2) (xy 167.64 76.2)
+			(xy 182.88 92.71) (xy 186.69 92.71)
 		)
 		(stroke
 			(width 0)
@@ -4124,7 +3997,17 @@
 	)
 	(wire
 		(pts
-			(xy 33.02 52.07) (xy 44.45 52.07)
+			(xy 158.75 43.18) (xy 137.16 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "dcff1225-ac95-457c-b746-33616d4d03f8")
+	)
+	(wire
+		(pts
+			(xy 36.83 52.07) (xy 44.45 52.07)
 		)
 		(stroke
 			(width 0)
@@ -4144,27 +4027,7 @@
 	)
 	(wire
 		(pts
-			(xy 27.94 46.99) (xy 27.94 72.39)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e6f1a393-68d1-4282-a972-d00ed6061ab0")
-	)
-	(wire
-		(pts
-			(xy 27.94 72.39) (xy 69.85 72.39)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "eb33a920-df5e-40d1-b3f4-c97be96897d6")
-	)
-	(wire
-		(pts
-			(xy 167.64 67.31) (xy 156.21 67.31)
+			(xy 186.69 76.2) (xy 153.67 76.2)
 		)
 		(stroke
 			(width 0)
@@ -4174,7 +4037,7 @@
 	)
 	(wire
 		(pts
-			(xy 161.29 40.64) (xy 161.29 50.8)
+			(xy 162.56 33.02) (xy 162.56 50.8)
 		)
 		(stroke
 			(width 0)
@@ -4194,17 +4057,7 @@
 	)
 	(wire
 		(pts
-			(xy 127 25.4) (xy 127 33.02)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f274b1fd-1f9d-46b7-a1cc-7eaaeff9c702")
-	)
-	(wire
-		(pts
-			(xy 156.21 40.64) (xy 137.16 40.64)
+			(xy 153.67 40.64) (xy 137.16 40.64)
 		)
 		(stroke
 			(width 0)
@@ -4214,7 +4067,7 @@
 	)
 	(wire
 		(pts
-			(xy 137.16 48.26) (xy 154.94 48.26)
+			(xy 137.16 48.26) (xy 161.29 48.26)
 		)
 		(stroke
 			(width 0)
@@ -4234,33 +4087,13 @@
 	)
 	(wire
 		(pts
-			(xy 110.49 80.01) (xy 115.57 80.01)
+			(xy 109.22 80.01) (xy 115.57 80.01)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "f6f370d4-5ea2-4e49-9bc4-09052d80baa6")
-	)
-	(wire
-		(pts
-			(xy 137.16 43.18) (xy 162.56 43.18)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f6fdb46a-ebb9-4ee4-9001-33719b00a33f")
-	)
-	(wire
-		(pts
-			(xy 100.33 123.19) (xy 106.68 123.19)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f847bcae-031a-494e-9dee-a37c2f3d314d")
 	)
 	(wire
 		(pts
@@ -4274,23 +4107,13 @@
 	)
 	(wire
 		(pts
-			(xy 100.33 67.31) (xy 100.33 72.39)
+			(xy 109.22 72.39) (xy 115.57 72.39)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "f914220d-ef13-4d36-9b3c-6cd0fcb50c41")
-	)
-	(wire
-		(pts
-			(xy 161.29 38.1) (xy 167.64 38.1)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "fa14d85f-be4a-4350-9a03-8f6b31147fdc")
+		(uuid "faaf8c9c-ff20-4f47-b413-c6a696b81e39")
 	)
 	(wire
 		(pts
@@ -4303,7 +4126,7 @@
 		(uuid "ffb8e47c-be13-4b67-8d9b-d8c2c15dcad0")
 	)
 	(label "GND"
-		(at 111.76 127 0)
+		(at 109.22 127 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4333,7 +4156,7 @@
 		(uuid "0a1c6848-8f53-4e5f-9628-14909c7199e9")
 	)
 	(label "GND"
-		(at 33.02 52.07 0)
+		(at 36.83 52.07 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4362,7 +4185,7 @@
 		)
 		(uuid "0e4ba1e4-beef-4d62-89b7-bda9cdd62912")
 	)
-	(label "+5V"
+	(label "+3.3V"
 		(at 127 25.4 0)
 		(effects
 			(font
@@ -4372,8 +4195,18 @@
 		)
 		(uuid "0e628fdc-1698-450d-9340-4ea3338f2a0d")
 	)
+	(label "+3.3V"
+		(at 36.83 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "14e02ce6-e19e-4893-a496-3dc27eabc668")
+	)
 	(label "+5V"
-		(at 34.29 46.99 0)
+		(at 36.83 46.99 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4383,7 +4216,7 @@
 		(uuid "1ecc8d00-c544-4122-8f22-75a493274822")
 	)
 	(label "GND"
-		(at 163.83 43.18 0)
+		(at 180.34 35.56 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4391,6 +4224,26 @@
 			(justify left bottom)
 		)
 		(uuid "4096166a-da66-42b7-a9ef-1c2d416faf74")
+	)
+	(label "+3.3V"
+		(at 109.22 72.39 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "47b4ed91-6a95-424e-8077-a4ae15a3fc41")
+	)
+	(label "+3.3V"
+		(at 180.34 71.12 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4962cab0-e3cb-4a47-b63a-fcbcc44293a3")
 	)
 	(label "E-GPIO5"
 		(at 138.4327 50.8 0)
@@ -4403,7 +4256,7 @@
 		(uuid "5ac2e5a9-12f5-4197-a4f5-13eedccd7508")
 	)
 	(label "GND"
-		(at 110.49 80.01 0)
+		(at 109.22 80.01 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4412,18 +4265,8 @@
 		)
 		(uuid "5c7b93cd-7be1-43cf-854d-ce288618f316")
 	)
-	(label "GPIO15"
-		(at 33.02 54.61 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "623103e0-ef0a-4e2b-b3f0-c68a7bf8c02e")
-	)
 	(label "+5V"
-		(at 163.83 48.26 0)
+		(at 180.34 66.04 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4433,7 +4276,7 @@
 		(uuid "65b38c34-1f35-4f22-b286-3ec5e83c28bc")
 	)
 	(label "+5V"
-		(at 163.83 35.56 0)
+		(at 180.34 44.45 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4441,6 +4284,16 @@
 			(justify left bottom)
 		)
 		(uuid "65b852af-8290-4d25-82fd-1095420114b5")
+	)
+	(label "+3.3V"
+		(at 180.34 49.53 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "6c6d222a-289e-468a-9158-05be517e4a0b")
 	)
 	(label "+5V"
 		(at 110.49 111.76 0)
@@ -4453,7 +4306,7 @@
 		(uuid "80510ecd-ff87-477b-a7ad-be2cb7284c15")
 	)
 	(label "GND"
-		(at 163.83 76.2 0)
+		(at 182.88 92.71 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4472,15 +4325,15 @@
 		)
 		(uuid "90020243-db88-48a2-9bd5-a699d169f877")
 	)
-	(label "GPIO15"
-		(at 107.95 124.46 0)
+	(label "+3.3V"
+		(at 180.34 27.94 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "990cff5e-6447-45ce-b51b-7244e7f09022")
+		(uuid "b1890251-dae1-49ca-a5d1-e16b4d527df5")
 	)
 	(label "E-GPIO3"
 		(at 138.43 45.72 0)
@@ -4492,16 +4345,6 @@
 		)
 		(uuid "b3f534b9-91ec-41d0-bd6f-1f62c12779f7")
 	)
-	(label "LED Bus"
-		(at 107.95 121.92 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "b6cb7cf1-c85d-4ffc-867f-478d80f17758")
-	)
 	(label "GND"
 		(at 127 64.77 0)
 		(effects
@@ -4512,18 +4355,8 @@
 		)
 		(uuid "b72d6034-3feb-42c9-81a1-d0df7af754a5")
 	)
-	(label "LED Bus"
-		(at 62.23 54.61 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "c0600315-dbb3-4a2d-9d10-2d13755a8c20")
-	)
 	(label "+5V"
-		(at 163.83 62.23 0)
+		(at 180.34 87.63 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4533,7 +4366,7 @@
 		(uuid "c4fe3f88-64be-4f7d-a38d-3484a192e2b3")
 	)
 	(label "GND"
-		(at 163.83 69.85 0)
+		(at 180.34 78.74 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4573,7 +4406,7 @@
 		(uuid "da68e921-6fea-492a-a5a4-16a2db0f2ea5")
 	)
 	(label "GND"
-		(at 163.83 55.88 0)
+		(at 180.34 57.15 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4582,8 +4415,18 @@
 		)
 		(uuid "dd50999b-fd16-482e-ae7e-668549dc4031")
 	)
+	(label "+5V"
+		(at 109.22 121.92 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e2b8dd56-b654-459d-90c6-8fd7de501c95")
+	)
 	(label "GND"
-		(at 110.49 87.63 0)
+		(at 109.22 87.63 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4711,94 +4554,8 @@
 		)
 	)
 	(symbol
-		(lib_name "SolderJumper_2_Open_1")
-		(lib_id "Jumper:SolderJumper_2_Open")
-		(at 95.25 67.31 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "0f3789ab-74b6-48c0-88d8-1338299ec6ad")
-		(property "Reference" "JP1"
-			(at 95.504 69.596 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "SolderJumper_2_Open"
-			(at 95.25 63.5 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm"
-			(at 95.25 67.31 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 95.25 74.93 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Solder Jumper, 2-pole, open"
-			(at 95.25 72.39 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "2"
-			(uuid "0d212215-a121-4597-a04b-bd8e60cb0949")
-		)
-		(pin "1"
-			(uuid "46fb42c9-5de1-4a8d-bee3-e99f77d309d5")
-		)
-		(instances
-			(project "RoomSensor-BackPlate"
-				(path "/36d52cf5-35e6-4f92-8aa1-87a170394a81"
-					(reference "JP1")
-					(unit 1)
-					(variant
-						(name "MPN BOM")
-					)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_name "Conn_01x04_1")
-		(lib_id "Connector_Generic:Conn_01x04")
-		(at 172.72 64.77 0)
+		(lib_id "room-sensor:5V_2_Relay_Module")
+		(at 191.77 30.48 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4806,11 +4563,12 @@
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
-		(uuid "16e26f2d-ec28-4707-8022-776a8eef3291")
-		(property "Reference" "R3"
-			(at 179.578 64.77 0)
+		(fields_autoplaced yes)
+		(uuid "2e920a9b-8cb4-45b4-a1e5-72cf4578246b")
+		(property "Reference" "R1"
+			(at 200.66 33.528 0)
 			(show_name no)
-			(do_not_autoplace no)
+			(do_not_autoplace yes)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4818,10 +4576,10 @@
 				(justify left)
 			)
 		)
-		(property "Value" "Relay"
-			(at 179.578 67.31 0)
+		(property "Value" "2-Way Relay Module"
+			(at 200.66 36.068 0)
 			(show_name no)
-			(do_not_autoplace no)
+			(do_not_autoplace yes)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4830,7 +4588,7 @@
 			)
 		)
 		(property "Footprint" "room-sensor:2-way Relay Connector"
-			(at 172.72 64.77 0)
+			(at 191.262 21.59 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4841,7 +4599,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 172.72 64.77 0)
+			(at 191.77 30.48 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4852,7 +4610,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 172.72 64.77 0)
+			(at 197.358 20.066 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4863,7 +4621,7 @@
 			)
 		)
 		(property "MPN" "HX PM2.54-1x4P ZC H11"
-			(at 172.72 64.77 0)
+			(at 192.278 18.034 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4873,111 +4631,32 @@
 				)
 			)
 		)
-		(pin "3"
-			(uuid "0d7a8afd-3d17-47e1-8903-57dd39f49035")
+		(pin "1"
+			(uuid "c72a220e-0de1-4444-8d34-6e48172a3828")
+		)
+		(pin "6"
+			(uuid "c488dec1-050b-4325-81e3-ce426c9a5cac")
+		)
+		(pin "5"
+			(uuid "e9fb50c4-1f2e-40c5-891b-59df297a0b9b")
+		)
+		(pin "7"
+			(uuid "e6702ca4-9ffe-4df5-a7f0-1c767e08146e")
 		)
 		(pin "4"
-			(uuid "27b73130-522a-4495-8c0b-db76b6f70c72")
+			(uuid "1773f9f5-cc9f-47a9-9b11-0d913795d38b")
 		)
-		(pin "1"
-			(uuid "615d35a6-336b-488d-82ab-89c232a3dee1")
+		(pin "3"
+			(uuid "dbc592ab-7432-41d4-920f-58cb44f197bc")
 		)
 		(pin "2"
-			(uuid "2542321c-175f-4e38-bfea-3aee6382634d")
+			(uuid "90f188b9-9087-41e6-b7a3-67580e7d65e4")
 		)
 		(instances
 			(project "RoomSensor-BackPlate"
 				(path "/36d52cf5-35e6-4f92-8aa1-87a170394a81"
-					(reference "R3")
+					(reference "R1")
 					(unit 1)
-					(variant
-						(name "MPN BOM")
-					)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_name "SolderJumper_2_Open_1")
-		(lib_id "Jumper:SolderJumper_2_Open")
-		(at 95.25 118.11 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "2d552936-6b7f-4276-bb76-8fd0861ec4dd")
-		(property "Reference" "JP4"
-			(at 95.504 120.396 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "SolderJumper_2_Open"
-			(at 95.25 114.3 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm"
-			(at 95.25 118.11 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 95.25 125.73 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Solder Jumper, 2-pole, open"
-			(at 95.25 123.19 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "2"
-			(uuid "8425cca1-4496-40f5-a441-7a0bc3bf847e")
-		)
-		(pin "1"
-			(uuid "f1f121e2-5346-443c-b14a-48ce525a54da")
-		)
-		(instances
-			(project "RoomSensor-BackPlate"
-				(path "/36d52cf5-35e6-4f92-8aa1-87a170394a81"
-					(reference "JP4")
-					(unit 1)
-					(variant
-						(name "MPN BOM")
-					)
 				)
 			)
 		)
@@ -5289,94 +4968,9 @@
 		)
 	)
 	(symbol
-		(lib_name "SolderJumper_2_Open_3")
-		(lib_id "Jumper:SolderJumper_2_Open")
-		(at 95.25 77.47 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "5b6a7c43-5f55-4846-8e4e-69d7a9c0aa8e")
-		(property "Reference" "JP3"
-			(at 95.504 79.756 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "SolderJumper_2_Open"
-			(at 95.25 73.66 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm"
-			(at 95.25 77.47 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 95.25 85.09 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Solder Jumper, 2-pole, open"
-			(at 95.25 82.55 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "2"
-			(uuid "781107a6-f47d-4124-91a5-81a40ecfecd9")
-		)
-		(pin "1"
-			(uuid "1f9c9bdc-0ede-4d86-9a56-9982a542aed4")
-		)
-		(instances
-			(project "RoomSensor-BackPlate"
-				(path "/36d52cf5-35e6-4f92-8aa1-87a170394a81"
-					(reference "JP3")
-					(unit 1)
-					(variant
-						(name "MPN BOM")
-					)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_name "Conn_01x04_1")
-		(lib_id "Connector_Generic:Conn_01x04")
-		(at 172.72 50.8 0)
+		(lib_name "5V_2_Relay_Module_1")
+		(lib_id "room-sensor:5V_2_Relay_Module")
+		(at 191.77 52.07 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5384,11 +4978,12 @@
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
-		(uuid "80d20716-9b5a-45b8-b4ef-b2079d3e97a3")
+		(fields_autoplaced yes)
+		(uuid "8529c0d3-c22f-457f-8f89-b49804da917d")
 		(property "Reference" "R2"
-			(at 179.324 50.8 0)
+			(at 200.66 55.118 0)
 			(show_name no)
-			(do_not_autoplace no)
+			(do_not_autoplace yes)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5396,10 +4991,10 @@
 				(justify left)
 			)
 		)
-		(property "Value" "Relay"
-			(at 179.324 53.086 0)
+		(property "Value" "2-Way Relay Module"
+			(at 200.66 57.658 0)
 			(show_name no)
-			(do_not_autoplace no)
+			(do_not_autoplace yes)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5408,7 +5003,7 @@
 			)
 		)
 		(property "Footprint" "room-sensor:2-way Relay Connector"
-			(at 172.72 50.8 0)
+			(at 191.262 43.18 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5419,7 +5014,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 172.72 50.8 0)
+			(at 191.77 52.07 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5430,7 +5025,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 172.72 50.8 0)
+			(at 197.358 41.656 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5441,7 +5036,7 @@
 			)
 		)
 		(property "MPN" "HX PM2.54-1x4P ZC H11"
-			(at 172.72 50.8 0)
+			(at 192.278 39.624 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5451,26 +5046,141 @@
 				)
 			)
 		)
-		(pin "3"
-			(uuid "72811bf1-39c4-4e9c-a583-7ebb78a98bc8")
+		(pin "1"
+			(uuid "311e865d-df36-4543-be49-461ca98dee39")
+		)
+		(pin "7"
+			(uuid "f440cbbc-a449-4ca0-9d48-3c406c920c13")
+		)
+		(pin "6"
+			(uuid "6a5f30fb-ae05-4331-983c-65571fe156c5")
+		)
+		(pin "5"
+			(uuid "c5563204-e187-492d-a6fb-bbb785b4e661")
 		)
 		(pin "4"
-			(uuid "63f6f88a-6d22-4496-8536-97eae3e7aac3")
+			(uuid "0e7a2c76-f7f4-4659-84cd-d21f23583a0a")
 		)
-		(pin "1"
-			(uuid "069b08da-a0b8-4abc-b0f6-f1266825849e")
+		(pin "3"
+			(uuid "925297df-3b9a-4340-8ead-4776d6fe9753")
 		)
 		(pin "2"
-			(uuid "2a1843a8-9160-4b56-9407-d72b507168b4")
+			(uuid "03ea80cd-5b08-4006-a957-19e2fff1f48a")
 		)
 		(instances
 			(project "RoomSensor-BackPlate"
 				(path "/36d52cf5-35e6-4f92-8aa1-87a170394a81"
 					(reference "R2")
 					(unit 1)
-					(variant
-						(name "MPN BOM")
-					)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_name "5V_2_Relay_Module_2")
+		(lib_id "room-sensor:5V_2_Relay_Module")
+		(at 191.77 73.66 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "96b7df7b-7559-401d-b5ff-1c7b763c9d89")
+		(property "Reference" "R3"
+			(at 200.66 76.708 0)
+			(show_name no)
+			(do_not_autoplace yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "2-Way Relay Module"
+			(at 200.66 79.248 0)
+			(show_name no)
+			(do_not_autoplace yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "room-sensor:2-way Relay Connector"
+			(at 191.262 64.77 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 191.77 73.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 197.358 63.246 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "HX PM2.54-1x4P ZC H11"
+			(at 192.278 61.214 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "7"
+			(uuid "643de7ec-615a-4b05-9d01-0b887202da95")
+		)
+		(pin "4"
+			(uuid "1debba36-d993-4465-b58d-e4467c47b1ce")
+		)
+		(pin "5"
+			(uuid "744f87e7-ad79-428e-8daf-fdfe4ad93b32")
+		)
+		(pin "6"
+			(uuid "463fb6ab-a1ef-491c-aa52-81ebb3a09843")
+		)
+		(pin "3"
+			(uuid "9c2a544a-916d-485f-b40d-b913e27f2f7d")
+		)
+		(pin "1"
+			(uuid "4a5adde8-1219-4cc2-abe6-b4cf895c2d29")
+		)
+		(pin "2"
+			(uuid "29987d11-9ef3-4191-9969-5f46cae962b7")
+		)
+		(instances
+			(project "RoomSensor-BackPlate"
+				(path "/36d52cf5-35e6-4f92-8aa1-87a170394a81"
+					(reference "R3")
+					(unit 1)
 				)
 			)
 		)
@@ -5570,194 +5280,6 @@
 			(project "RoomSensor-BackPlate"
 				(path "/36d52cf5-35e6-4f92-8aa1-87a170394a81"
 					(reference "E1")
-					(unit 1)
-					(variant
-						(name "MPN BOM")
-					)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_name "SolderJumper_2_Open_2")
-		(lib_id "Jumper:SolderJumper_2_Open")
-		(at 95.25 72.39 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "9cacdef7-5ab8-4716-b564-5dae57f373d0")
-		(property "Reference" "JP2"
-			(at 95.504 74.676 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "SolderJumper_2_Open"
-			(at 95.25 68.58 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm"
-			(at 95.25 72.39 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 95.25 80.01 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Solder Jumper, 2-pole, open"
-			(at 95.25 77.47 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "2"
-			(uuid "fe0e3166-279b-4b38-9f63-92602d32cb9b")
-		)
-		(pin "1"
-			(uuid "dfda31a9-ea89-4bb8-a2b0-0f93f87fb798")
-		)
-		(instances
-			(project "RoomSensor-BackPlate"
-				(path "/36d52cf5-35e6-4f92-8aa1-87a170394a81"
-					(reference "JP2")
-					(unit 1)
-					(variant
-						(name "MPN BOM")
-					)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_name "Conn_01x04_3")
-		(lib_id "Connector_Generic:Conn_01x04")
-		(at 172.72 38.1 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "b8afb488-521e-4515-901e-c0c6f609ccf0")
-		(property "Reference" "R1"
-			(at 179.324 38.1 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "Relay"
-			(at 179.324 40.64 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "room-sensor:2-way Relay Connector"
-			(at 172.72 38.1 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 172.72 38.1 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 172.72 38.1 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "MPN" "HX PM2.54-1x4P ZC H11"
-			(at 172.72 38.1 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "3"
-			(uuid "8851d6c5-7ff9-4429-861d-702961c699e1")
-		)
-		(pin "4"
-			(uuid "24298313-5ce7-4f96-b3be-2ca2a347b0da")
-		)
-		(pin "1"
-			(uuid "70996c5c-b72a-485a-a477-634ce298e28a")
-		)
-		(pin "2"
-			(uuid "ebea3faf-9502-4b9c-8965-e2f1f361916b")
-		)
-		(instances
-			(project "RoomSensor-BackPlate"
-				(path "/36d52cf5-35e6-4f92-8aa1-87a170394a81"
-					(reference "R1")
 					(unit 1)
 					(variant
 						(name "MPN BOM")
@@ -5905,178 +5427,8 @@
 		)
 	)
 	(symbol
-		(lib_name "SolderJumper_2_Open_3")
-		(lib_id "Jumper:SolderJumper_2_Open")
-		(at 95.25 128.27 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "c5629add-eac6-4081-add0-029cfbdf9dee")
-		(property "Reference" "JP6"
-			(at 95.504 130.556 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "SolderJumper_2_Open"
-			(at 95.25 124.46 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm"
-			(at 95.25 128.27 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 95.25 135.89 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Solder Jumper, 2-pole, open"
-			(at 95.25 133.35 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "2"
-			(uuid "2bc472c2-81af-4b4d-afd3-fe9e7a70eedc")
-		)
-		(pin "1"
-			(uuid "8ae5c40a-ec08-43a3-aaac-b101599dbfbd")
-		)
-		(instances
-			(project "RoomSensor-BackPlate"
-				(path "/36d52cf5-35e6-4f92-8aa1-87a170394a81"
-					(reference "JP6")
-					(unit 1)
-					(variant
-						(name "MPN BOM")
-					)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_name "SolderJumper_2_Open_2")
-		(lib_id "Jumper:SolderJumper_2_Open")
-		(at 95.25 123.19 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "e5a975fa-0cb9-4a3f-bfbd-a98a35df87af")
-		(property "Reference" "JP5"
-			(at 95.504 125.476 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "SolderJumper_2_Open"
-			(at 95.25 119.38 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm"
-			(at 95.25 123.19 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 95.25 130.81 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Solder Jumper, 2-pole, open"
-			(at 95.25 128.27 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "2"
-			(uuid "b48f6427-fe79-49db-98b7-67efa8ed50aa")
-		)
-		(pin "1"
-			(uuid "ac9debaa-4638-4b0e-84ad-f300467d05c1")
-		)
-		(instances
-			(project "RoomSensor-BackPlate"
-				(path "/36d52cf5-35e6-4f92-8aa1-87a170394a81"
-					(reference "JP5")
-					(unit 1)
-					(variant
-						(name "MPN BOM")
-					)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Connector:Screw_Terminal_01x04")
-		(at 172.72 78.74 0)
+		(at 191.77 95.25 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -6087,7 +5439,7 @@
 		(fields_autoplaced yes)
 		(uuid "f1c3d9a8-a170-4ab3-844e-fb12cb52f541")
 		(property "Reference" "EX3"
-			(at 184.912 78.74 0)
+			(at 203.962 95.25 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6098,7 +5450,8 @@
 			)
 		)
 		(property "Value" "Buttons"
-			(at 184.912 81.28 0)
+			(at 203.962 97.79 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6109,7 +5462,7 @@
 			)
 		)
 		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MPT-0,5-4-2.54_1x04_P2.54mm_Horizontal"
-			(at 172.72 78.74 0)
+			(at 191.77 95.25 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6120,7 +5473,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 172.72 78.74 0)
+			(at 191.77 95.25 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6131,7 +5484,7 @@
 			)
 		)
 		(property "Description" "Generic screw terminal, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 172.72 78.74 0)
+			(at 191.77 95.25 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6142,7 +5495,7 @@
 			)
 		)
 		(property "MPN" "KF128-2.54-4P"
-			(at 172.72 78.74 0)
+			(at 191.77 95.25 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
